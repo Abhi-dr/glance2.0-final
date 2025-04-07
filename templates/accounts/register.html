@@ -22,6 +22,11 @@
   <link id="pagestyle" href="{% static 'css/accounts/argon-dashboard.css' %}" rel="stylesheet" />
 
   <style>
+
+    body{
+      background-color: rgb(23, 23, 23);
+    }
+
     .input-container {
       position: relative;
     }
@@ -37,16 +42,32 @@
       display: none;
     }
 
-    #password-input:valid+.validation-icon {
+    #password-input:valid+.validation-icon,
+    #confirm-password-input:valid+.validation-icon {
       background-image: url('https://img.icons8.com/glyph-neue/64/40C057/double-tick.png');
       /* Replace with your green check icon image path */
       display: block;
     }
 
-    #password-input:invalid+.validation-icon {
+    #password-input:invalid+.validation-icon,
+    #confirm-password-input:invalid+.validation-icon {
       background-image: url('https://img.icons8.com/emoji/48/cross-mark-emoji.png');
       /* Replace with your red cross icon image path */
       display: block;
+    }
+    
+    .password-requirements {
+      margin-top: 5px;
+      font-size: 0.85rem;
+    }
+    
+    .requirement {
+      margin-bottom: 3px;
+      color: #dc3545;
+    }
+    
+    .requirement.valid {
+      color: #40C057;
     }
   </style>
 </head>
@@ -82,7 +103,7 @@
       </div>
     </div>
 
-    <div class="container">
+    <div class="container bg-black">
       <div class="row mt-lg-n10 mt-md-n11 mt-n10 justify-content-center">
 
         <div class="col-xl-7 col-lg-5 col-md-7">
@@ -95,9 +116,9 @@
               <form role="form" method="post">
                 {% csrf_token %}
                 <div class="mb-3">
+                  <label for="exampleInputEmail1" class="form-label">Email address</label>
                   <input type="email" class="form-control" id="username" name="email" aria-label="Email Address"
-                    placeholder="Enter your Mail ID" pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
-                    required>
+                    placeholder="Enter your Mail ID" pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}" required>
                   <span id="username-feedback"></span>
 
                 </div>
@@ -123,7 +144,7 @@
                     name="mobile_number" required>
                 </div>
 
-                <div class="row">
+                <!-- <div class="row">
                   <div class="col-md-4">
                     <label for="subject" class="form-label">Class 10th Percentage
                     </label>
@@ -146,7 +167,7 @@
                     <label for="subject" class="form-label">Current CGPA</label>
                     <div class="form-group">
                       <input type="number" step=".01" class="form-control" placeholder="Current CGPA (Out of 10)"
-                         name="cgpa" required max="10" id="cgpaInput">
+                        name="cgpa" required max="10" id="cgpaInput">
                     </div>
                   </div>
 
@@ -157,10 +178,10 @@
                         aria-label="last_name" name="backlog" required>
                     </div>
                   </div>
-                </div>
+                </div> -->
 
 
-                <div class="row mb-4">
+                <!-- <div class="row mb-4">
                   <div class="col-md-6">
 
                     <label for="subject" class="form-label">Gender</label>
@@ -188,7 +209,6 @@
                     </select>
                   </div>
 
-                  <!-- course -->
 
                   <div class="mb-3">
 
@@ -211,7 +231,7 @@
                       <option value="LLB">LLB</option>
                       <option value="Other">Other</option>
                     </select>
-                  </div>
+                  </div> -->
 
                   <!-- <div class="mb-3">
                   <label for="subject" class="form-label">Subject</label>
@@ -227,7 +247,7 @@
                   </select>
                 </div> -->
 
-                  <div class="mb-3  input-container">
+                  <div class="mb-3 input-container">
                     <label for="password" class="form-label">Password</label>
                     <input type="password" class="form-control form-control-lg" placeholder="Password"
                       aria-label="Password" name="password" id="password-input"
@@ -235,22 +255,22 @@
                       title="Must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters"
                       required>
                     <div class="validation-icon"></div>
+                    <div class="password-requirements">
+                      <div id="length" class="requirement">✓ At least 8 characters</div>
+                      <div id="lowercase" class="requirement">✓ At least 1 lowercase letter</div>
+                      <div id="uppercase" class="requirement">✓ At least 1 uppercase letter</div>
+                      <div id="number" class="requirement">✓ At least 1 number</div>
+                      <div id="no-space" class="requirement">✓ No spaces</div>
+                    </div>
                   </div>
 
-                  <!-- <div class="col-md-1">
-                    <img src="{% static 'img/accounts/eyes.png' %}" width="100%" alt="">
-                  </div> -->
-
-
-                  <div class="col-md-12">
-                    <div class="mb-3 text-wrap">
-                      <ul>
-                        <li>Password must contain at least one number.</li>
-                        <li>Password must contain one Uppercase and Lowercase letter.</li>
-                        <li>Password must Have at least 8 or more characters.</li>
-                        <li>Password must <b>Not</b> Have any spaces.</li>
-                      </ul>
-                    </div>
+                  <div class="mb-3 input-container">
+                    <label for="confirm-password" class="form-label">Confirm Password</label>
+                    <input type="password" class="form-control form-control-lg" placeholder="Confirm Password"
+                      aria-label="Confirm Password" name="confirm_password" id="confirm-password-input"
+                      required>
+                    <div class="validation-icon"></div>
+                    <div id="password-match-message"></div>
                   </div>
 
                   <div class="form-check form-check-info text-start">
@@ -338,34 +358,127 @@
     });
   </script>
 
-<script>
-  // Get the input element
-const cgpaInput = document.getElementById('cgpaInput');
-
-// Add event listener to listen for changes in the input field
-cgpaInput.addEventListener('input', function() {
-    // Check if the entered value exceeds the maximum allowed (10)
-    if (parseFloat(this.value) > 10 || parseFloat(this.value) < 0){
-        this.value = ""; // Reset the value to 0
-        // Show an alert message to the user
-        alert('CGPA should not be more than 10');
-    }
-});
-
-</script>
-
   <script>
-    // stop the form from submitting and disable the submit button until the process is complete
+    // Get the input element
+    const cgpaInput = document.getElementById('cgpaInput');
 
-    document.querySelector('form').addEventListener('submit', function (e) {
-      // Disable the button to prevent multiple clicks
-      document.getElementById('signup-button').disabled = true;
-      // change the text
-      document.getElementById('signup-button').innerHTML = 'Processing...';
-      // return false to prevent the form from submitting
-      return true;
+    // Add event listener to listen for changes in the input field
+    if (cgpaInput) {
+      cgpaInput.addEventListener('input', function () {
+        // Check if the entered value exceeds the maximum allowed (10)
+        if (parseFloat(this.value) > 10 || parseFloat(this.value) < 0) {
+          this.value = ""; // Reset the value to 0
+          // Show an alert message to the user
+          alert('CGPA should not be more than 10');
+        }
+      });
+    }
+
+    // Password validation
+    document.addEventListener('DOMContentLoaded', function() {
+      const passwordInput = document.getElementById('password-input');
+      const confirmPasswordInput = document.getElementById('confirm-password-input');
+      const passwordMatchMessage = document.getElementById('password-match-message');
+      const signupButton = document.getElementById('signup-button');
+      
+      // Password requirement elements
+      const lengthReq = document.getElementById('length');
+      const lowercaseReq = document.getElementById('lowercase');
+      const uppercaseReq = document.getElementById('uppercase');
+      const numberReq = document.getElementById('number');
+      const noSpaceReq = document.getElementById('no-space');
+      
+      // Function to check password requirements
+      function checkPasswordRequirements() {
+        const password = passwordInput.value;
+        
+        // Check length
+        if (password.length >= 8) {
+          lengthReq.classList.add('valid');
+        } else {
+          lengthReq.classList.remove('valid');
+        }
+        
+        // Check lowercase
+        if (/[a-z]/.test(password)) {
+          lowercaseReq.classList.add('valid');
+        } else {
+          lowercaseReq.classList.remove('valid');
+        }
+        
+        // Check uppercase
+        if (/[A-Z]/.test(password)) {
+          uppercaseReq.classList.add('valid');
+        } else {
+          uppercaseReq.classList.remove('valid');
+        }
+        
+        // Check number
+        if (/[0-9]/.test(password)) {
+          numberReq.classList.add('valid');
+        } else {
+          numberReq.classList.remove('valid');
+        }
+        
+        // Check no spaces
+        if (!/\s/.test(password)) {
+          noSpaceReq.classList.add('valid');
+        } else {
+          noSpaceReq.classList.remove('valid');
+        }
+      }
+      
+      // Function to check if passwords match
+      function checkPasswordsMatch() {
+        if (confirmPasswordInput.value === '') {
+          passwordMatchMessage.innerHTML = '';
+          return;
+        }
+        
+        if (passwordInput.value === confirmPasswordInput.value) {
+          passwordMatchMessage.innerHTML = '<span style="color:green;">Passwords match</span>';
+          confirmPasswordInput.setCustomValidity('');
+        } else {
+          passwordMatchMessage.innerHTML = '<span style="color:red;">Passwords do not match</span>';
+          confirmPasswordInput.setCustomValidity('Passwords do not match');
+        }
+      }
+      
+      // Add event listeners
+      if (passwordInput) {
+        passwordInput.addEventListener('input', function() {
+          checkPasswordRequirements();
+          if (confirmPasswordInput.value !== '') {
+            checkPasswordsMatch();
+          }
+        });
+      }
+      
+      if (confirmPasswordInput) {
+        confirmPasswordInput.addEventListener('input', checkPasswordsMatch);
+      }
+      
+      // Form submission validation
+      const form = document.querySelector('form');
+      if (form) {
+        form.addEventListener('submit', function(e) {
+          if (passwordInput.value !== confirmPasswordInput.value) {
+            e.preventDefault();
+            passwordMatchMessage.innerHTML = '<span style="color:red;">Passwords do not match</span>';
+            return false;
+          }
+          
+          // Disable the button to prevent multiple clicks
+          signupButton.disabled = true;
+          // change the text
+          signupButton.innerHTML = 'Processing...';
+          return true;
+        });
+      }
     });
   </script>
+
+  <!-- Form submission handling is now in the password validation script above -->
 
   <!-- Github buttons -->
   <script async defer src="https://buttons.github.io/buttons.js"></script>

@@ -1,213 +1,135 @@
+{% extends 'home/base.html' %}
 {% load static %}
-
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <link rel="apple-touch-icon" sizes="76x76" href="{% static 'img/apple-icon.png' %}">
-  <link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}">
-  <title>
-    Welcome Back!
-  </title>
-  <!--     Fonts and icons     -->
-  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
-  <!-- Nucleo Icons -->
-  <link href="{% static 'css/accounts/nucleo-icons.css' %}" rel="stylesheet" />
-  <link href="{% static 'css/accounts/nucleo-svg.css' %}" rel="stylesheet" />
-  <!-- Font Awesome Icons -->
-  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
-  <link href="{% static 'css/accounts/nucleo-svg.css' %}" rel="stylesheet" />
-  <!-- CSS Files -->
-  <link id="pagestyle" href="{% static 'css/accounts/argon-dashboard.css' %}" rel="stylesheet" />
-
-  <style>
-    .input-container {
-      position: relative;
-    }
-
-    .validation-icon {
-      position: absolute;
-      top: 50%;
-      right: 10px;
-      transform: translateY(-50%);
-      width: 20px;
-      height: 20px;
-      background-size: cover;
-      display: none;
-    }
-
-    #password-input:valid+.validation-icon {
-      background-image: url('https://img.icons8.com/glyph-neue/64/40C057/double-tick.png');
-      /* Replace with your green check icon image path */
-      display: block;
-    }
-
-    #password-input:invalid+.validation-icon {
-      background-image: url('https://img.icons8.com/emoji/48/cross-mark-emoji.png');
-      /* Replace with your red cross icon image path */
-      display: block;
-    }
-  </style>
-</head>
-
-<body class="">
-  <main class="main-content ">
-
-    <section>
-      <div class="page-header min-vh-100">
-        <div class="container">
+{% block title %}Login{% endblock %}
 
 
-          <div class="row">
-            <div class="alert alert-secondary fade show" role="alert">
-              <span class="alert-text text-white"><strong>Hey! </strong>Good Luck🔥</span>
+{% block css %}
+<style>
+  .input-container {
+    position: relative;
+  }
 
-              <a href="{% url 'home' %}" class="btn btn-sm mb-n1 btn-outline-white float-end mt-n1">
-                Home
-              </a>
-            </div>
-          </div>
+  .validation-icon {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    background-size: cover;
+    display: none;
+  }
 
-          {% for message in messages %}
+  #password-input:valid+.validation-icon {
+    background-image: url('https://img.icons8.com/glyph-neue/64/40C057/double-tick.png');
+    /* Replace with your green check icon image path */
+    display: block;
+  }
 
-          <div class="row">
-            <div class="alert {{ message.tags }} fade show" role="alert">
-              <span class="alert-text text-white"><strong>{{ message.tag }}</strong>{{ message }}</span>
-            </div>
-          </div>
+  #password-input:invalid+.validation-icon {
+    background-image: url('https://img.icons8.com/emoji/48/cross-mark-emoji.png');
+    /* Replace with your red cross icon image path */
+    display: block;
+  }
+</style>
+{% endblock %}
 
-          {% endfor %}
+{% block body %}
 
-          <br>
+<div class="container py-4">
 
-          <div class="row mb-2">
-            <div class="col-xl-4 col-lg-5 col-md-7 d-flex flex-column mx-lg-0 mx-auto">
-              <div class="card card-plain">
-                <div class="card-header pb-0 text-start">
-                  <h4 class="font-weight-bolder">Login Here</h4>
-                  <p class="mb-0">Enter your Email Address and Password</p>
-                </div>
-                <div class="card-body">
+  <div class="page-header min-vh-100">
+    <div class="container mt-5">
+      <div class="row justify-content-center">
+        <div class="col-md-6">
+          <div class="card shadow">
+            <div class="card-body">
+              <h2 class="text-center mb-4">Login</h2>
 
-
-                  <form role="form" method="post">
-                    {% csrf_token %}
-                    <div class="mb-3">
-                      <input type="email" class="form-control form-control-lg" placeholder="Email Address"
-                        aria-label="Email Address" name="email" id="email-input"
-                        pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
-                        title="Please enter a valid Email ID" required>
-                      <div class="validation-icon"></div>
-                    </div>
-                    <div class="mb-3">
-
-                      <!-- <input type="password" class="form-control form-control-lg" placeholder="Password"
-                        aria-label="Password" name="password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="Must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters"> -->
-
-                      <div class="input-container">
-                        <input type="password" class="form-control form-control-lg" placeholder="Password"
-                          aria-label="Password" name="password" id="password-input"
-                          title="Must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters"
-                          required>
-                        <div class="validation-icon"></div>
-                      </div>
-                      <!-- pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?!.*\s).{8,}$" -->
-                    </div>
-
-
-                    <div class="text-center">
-                      <button type="submit" class="btn btn-lg btn-primary btn-lg w-100 mt-4 mb-0">Login</button>
-                    </div></a>
-                  </form>
-
-
-                </div>
-
-                <div class="card-footer text-center pt-0 px-lg-2 px-1">
-                  <p class="mb-4 text-sm mx-auto">
-                    <strong>
-                      Not Registered Yet?
-                    </strong>
-                    <a href="{% url 'register' %}" class="text-primary text-gradient font-weight-bold">Hurry Up!</a>
-                  </p>
-
-                  <!-- <p class="text-sm mt-3 mb-0 text-center">Are you an Alumni of GLAU? <br><a href="{% url 'alumni_registration' %}"
-                    class="btn btn-sm btn-outline-secondary text-dark font-weight-bolder">Skip Registration and Direct Apply</a></p>
-                     -->
-
-                </div>
-
+              {% for message in messages %}
+              <div class="alert alert-{{ message.tags }}">
+                {{ message }}
               </div>
-            </div>
-            <div
-              class="col-5 d-lg-flex d-none h-100 my-auto pe-0 position-absolute top-0 end-0 text-center justify-content-center flex-column">
-              <div
-                class="position-relative bg-gradient-primary h-100 m-3 px-7 border-radius-lg d-flex flex-column justify-content-center overflow-hidden"
-                style="background-image: url('../../static/img/accounts/gla_image.jpg');
-          background-size: cover;
-          background-repeat: no-repeat;">
-                <span class="mask bg-gradient-primary opacity-2"></span>
-                <!-- <h4 class="mt-5 text-white font-weight-bolder position-relative">"The Ignite Momevent"</h4>
-                <p class="text-white position-relative">It Is For Everyone But, Specially For You To Learn!</p> -->
+              {% endfor %}
+
+              <form role="form" method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                  <input type="email" class="form-control form-control-lg" placeholder="Email Address"
+                    aria-label="Email Address" name="email" id="email-input"
+                    pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}" title="Please enter a valid Email ID"
+                    required>
+                  <div class="validation-icon"></div>
+                </div>
+                <div class="mb-3">
+
+                  <!-- <input type="password" class="form-control form-control-lg" placeholder="Password"
+                                aria-label="Password" name="password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="Must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters"> -->
+
+                  <div class="input-container">
+                    <input type="password" class="form-control form-control-lg" placeholder="Password"
+                      aria-label="Password" name="password" id="password-input"
+                      title="Must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters"
+                      required>
+                    <div class="validation-icon"></div>
+                  </div>
+                  <!-- pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?!.*\s).{8,}$" -->
+                </div>
+
+
+                <div class="text-center">
+                  <button type="submit" class="btn btn-lg btn-primary btn-lg w-100 mt-4 mb-0">Login</button>
+                </div></a>
+              </form>
+
+              <div class="text-center mt-3">
+                <p>Don't have an account? <a href="{% url 'register' %}">Sign up</a></p>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </section>
-  </main>
-  <!--   Core JS Files   -->
-  <script src="../js/core/popper.min.js"></script>
-  <script src="../js/core/bootstrap.min.js"></script>
-  <script src="../js/plugins/perfect-scrollbar.min.js"></script>
-  <script src="../js/plugins/smooth-scrollbar.min.js"></script>
-  <script>
-    var win = navigator.platform.indexOf('Win') > -1;
-    if (win && document.querySelector('#sidenav-scrollbar')) {
-      var options = {
-        damping: '0.5'
+    </div>
+
+  </div>
+
+</div>
+
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const passwordInput = document.getElementById("password-input");
+
+    passwordInput.addEventListener("input", function () {
+      const isValid = passwordInput.checkValidity();
+
+      if (isValid) {
+        passwordInput.style.border = "1px solid green";
+      } else {
+        passwordInput.style.border = "1px solid red";
       }
-      Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
-    }
-  </script>
-
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const passwordInput = document.getElementById("password-input");
-
-      passwordInput.addEventListener("input", function () {
-        const isValid = passwordInput.checkValidity();
-
-        if (isValid) {
-          passwordInput.style.border = "1px solid green";
-        } else {
-          passwordInput.style.border = "1px solid red";
-        }
-      });
     });
+  });
 
-    document.addEventListener("DOMContentLoaded", function () {
-      const emailInput = document.getElementById("email-input");
+  document.addEventListener("DOMContentLoaded", function () {
+    const emailInput = document.getElementById("email-input");
 
-      emailInput.addEventListener("input", function () {
-        const isValid = emailInput.checkValidity();
+    emailInput.addEventListener("input", function () {
+      const isValid = emailInput.checkValidity();
 
-        if (isValid) {
-          emailInput.style.border = "1px solid green";
-        } else {
-          emailInput.style.border = "1px solid red";
-        }
-      });
+      if (isValid) {
+        emailInput.style.border = "1px solid green";
+      } else {
+        emailInput.style.border = "1px solid red";
+      }
     });
-  </script>
+  });
+</script>
 
 
-  <!-- Github buttons -->
-  <script async defer src="https://buttons.github.io/buttons.js"></script>
-  <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
-  <script src="/js/argon-dashboard.min.js"></script>
-</body>
+<!-- Github buttons -->
+<script async defer src="https://buttons.github.io/buttons.js"></script>
+<!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
+<script src="/js/argon-dashboard.min.js"></script>
 
-</html>
+{% endblock %}

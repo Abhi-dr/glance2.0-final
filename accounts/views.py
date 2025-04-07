@@ -61,13 +61,13 @@ def register(request):
         first_name = request.POST.get("first_name").strip().title()
         last_name = request.POST.get("last_name").strip().title()
         phone_number = request.POST.get("mobile_number")
-        tenth = request.POST.get("tenth").replace("%", "").strip()
-        twelfth = request.POST.get("twelfth").replace("%", "").strip()
-        cgpa = request.POST.get("cgpa").replace("%", "").strip()
-        gender = request.POST.get("gender")
-        backlog = request.POST.get("backlog")
-        year = request.POST.get("year")
-        course = request.POST.get("course")
+        # tenth = request.POST.get("tenth").replace("%", "").strip()
+        # twelfth = request.POST.get("twelfth").replace("%", "").strip()
+        # cgpa = request.POST.get("cgpa").replace("%", "").strip()
+        # gender = request.POST.get("gender")
+        # backlog = request.POST.get("backlog")
+        # year = request.POST.get("year")
+        # course = request.POST.get("course")
         
         # if username.split("@")[-1] != "gla.ac.in":
         #     messages.error(request, "Please use a valid GLA Mail ID")
@@ -79,14 +79,7 @@ def register(request):
             username=username,
             first_name=first_name,
             last_name = last_name,
-            phone_number = phone_number,
-            tenth = tenth,
-            twelfth = twelfth,
-            cgpa = cgpa,
-            backlog = backlog,
-            gender = gender,
-            year = year,
-            course = course
+            phone_number = phone_number
         )
 
         new_user.set_password(password)
@@ -118,7 +111,7 @@ GLA University"""
         email_to = [username]
 
         # Send the email
-        send_mail(email_subject, email_body, email_from, email_to)  
+        # send_mail(email_subject, email_body, email_from, email_to)  
         
         messages.success(request, "Account created successfully")
 
