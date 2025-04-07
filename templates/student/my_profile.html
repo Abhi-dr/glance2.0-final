@@ -1,0 +1,165 @@
+{% extends "student/base.html" %} {% load static %} {% block title %} Student ->
+Profile {% endblock %} {% block body %}
+
+<div class="container-fluid">
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title fw-semibold">Profile</h5>
+      <p class="mb-0">Your Profile Matters🔥</p>
+    </div>
+  </div>
+
+  {% for message in messages %}
+
+  <div class="alert alert-warning alert-dismissible fade show m-n2" role="alert">
+    <strong>{{ message.tag }}</strong> {{ message }}
+    <button
+      type="button"
+      class="btn-close"
+      data-bs-dismiss="alert"
+      aria-label="Close"
+    ></button>
+  </div>
+
+  {% endfor %}
+
+  <div class="container py-5">
+    <div class="row">
+      <div class="col-lg-4">
+        <div class="card mb-4">
+          <div class="card-body text-center">
+            <img
+              src="{{ student.profile_pic.url }}"
+              alt="avatar"
+              class="rounded-circle img-fluid"
+              style="width: 150px;"
+            />
+            <h5 class="my-3">
+              {{ student.first_name }} {{ student.last_name }}
+            </h5>
+            <p class="text-muted mb-1">
+              <b>{{ student.year }} </b> |
+              <b>{{ student.get_profile_score }}% </b> Profile Completed
+            </p>
+            <p class="text-muted mb-4">{{ student.address }}</p>
+            <div class="d-flex justify-content-center mb-2">
+              <a type="button" href="{% url 'edit_profile' %}" class="btn btn-outline-primary ms-1">
+                Update Profile
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-8">
+        <div class="card mb-4">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-sm-3">
+                <p class="mb-0">Name</p>
+              </div>
+              <div class="col-sm-9">
+                <p class="text-muted mb-0">
+                  {{ student.first_name }} {{ student.last_name }}
+                </p>
+              </div>
+            </div>
+            <hr />
+            <div class="row">
+              <div class="col-sm-3">
+                <p class="mb-0">Email</p>
+              </div>
+              <div class="col-sm-9">
+                <p class="text-muted mb-0">{{ student.username }}</p>
+              </div>
+            </div>
+            <hr />
+            <div class="row">
+              <div class="col-sm-3">
+                <p class="mb-0">Phone</p>
+              </div>
+              <div class="col-sm-9">
+                <p class="text-muted mb-0">+91 {{ student.phone_number }}</p>
+              </div>
+            </div>
+            <hr />
+            <div class="row">
+              <div class="col-sm-3">
+                <p class="mb-0">LinkedIn</p>
+              </div>
+              <div class="col-sm-9">
+                <a href="{{ student.linkedin_id }}" target="_blank" class="text-muted mb-0">{{ student.linkedin_id }}</a>
+              </div>
+            </div>
+            <hr />
+            <div class="row">
+              <div class="col-sm-3">
+                <p class="mb-0">GitHub</p>
+              </div>
+              <div class="col-sm-9">
+                <a href="{{ student.github_id }}" target="_blank" class="text-muted mb-0">{{ student.github_id }}</a>
+              </div>
+            </div>
+
+            
+            <hr />
+            <div class="row">
+              <div class="col-sm-3">
+                <p class="mb-0">Gender</p>
+              </div>
+              <div class="col-sm-9">
+                <p class="text-muted mb-0">{{ student.gender }}</p>
+              </div>
+            </div>
+            <hr />
+            <div class="row">
+              <div class="col-sm-3">
+                <p class="mb-0 fs-3 fw-bolder">Educational Details</p>
+              </div><span></span>
+
+              <div class="col-sm-3">
+                <p class="mb-0 fw-bold">Highschool</p>
+              </div>
+              
+              <div class="col-sm-9">
+                <p class="text-muted mb-0">{{ student.tenth }}%</p>
+              </div>
+              <div class="col-sm-3">
+                <p class="mb-0 fw-bold">Intermediate</p>
+              </div>
+              <div class="col-sm-9">
+                <p class="text-muted mb-0">{{ student.twelfth }}%</p>
+              </div>
+              <div class="col-sm-3">
+                <p class="mb-0 fw-bold">Current CGPA</p>
+              </div>
+              <div class="col-sm-9">
+                <p class="text-muted mb-0">{{ student.cgpa }}</p>
+              </div>
+              
+            </div>
+            <hr />
+
+            <div class="row">
+
+              <div class="col-sm-3">
+                <p class="mb-0 fw-bolder fs-3">Backlogs</p>
+              </div>
+              
+              <div class="col-sm-9">
+                <p class="text-muted mb-0 fw-bold">{{ student.backlog }}</p>
+              </div>              
+            </div>
+            <hr />
+
+            <a
+              href="{% url 'edit_profile' %}"
+              class="btn btn-outline-warning w-100"
+              >Edit Profile</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

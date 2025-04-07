@@ -1,0 +1,145 @@
+{% extends "administration/base.html" %}
+{% load static %}
+
+{% block title %}
+Administration -> Send Messages
+{% endblock %}
+
+{% block extra_css %}
+
+<style>
+
+    .star {
+        color: red;
+        display: inline;
+    }
+</style>
+
+{% endblock %}
+
+{% block body %}
+
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title fw-semibold mb-0">Send Messages To Everyone</h5>
+
+        </div>
+        <div class="container px-4">
+
+            <hr class="mt-0">
+            <div class="row">
+
+                <div class="w-100">
+                    <!-- Account details card-->
+
+
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <form method="POST">
+                                {% csrf_token %}
+                                <!-- Form Group (username)-->
+                                <div class="mb-3">
+                                    <label class="mb-1" for="inputUsername">Subject <div class="star">*</div>
+                                    </label>
+                                    <input class="form-control" id="inputUsername" type="text"
+                                        placeholder="Enter The Subject" name="title">
+                                </div>
+                            
+                                <div class="mb-3">
+                                    <label class="mb-1" for="description">Description <div class="star">*
+                                        </div></label>
+                                    <textarea class="form-control" rows="10" id="inputEmailAddress" type="textarea"
+                                        placeholder="Enter Your Description here." name="description"></textarea>
+                                </div>
+
+                                <button class="btn btn-primary" type="submit">Send Message</button>
+                            </form>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class="row">
+        <div class="d-flex align-items-stretch">
+            <div class="card w-100">
+                <div class="card-body p-4">
+                    <h5 class="card-title fw-semibold mb-4">Past Notifications 📝</h5>
+                    <div class="table-responsive">
+                        <table class="table text-nowrap mb-0 align-middle">
+                            <thead class="text-dark fs-4">
+
+                                <tr>
+                                    <th class="border-bottom-0">
+                                        <h6 class="fw-semibold mb-0">
+                                            #
+                                        </h6>
+                                    </th>
+                                    <th class="border-bottom-0">
+                                        <h6 class="fw-semibold mb-0">
+                                            Title
+                                        </h6>
+                                    </th>
+
+                                    <th class="border-bottom-0">
+                                        <h6 class="fw-semibold mb-0">
+                                            Description
+                                        </h6>
+                                    </th>
+
+                                    <th class="border-bottom-0">
+                                        <h6 class="fw-semibold mb-0">
+                                            Date
+                                        </h6>
+                                    </th>
+                                    
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                {% for notification in notifications %}
+
+                                <tr>
+                                    <td class="border-bottom-0">
+                                        <h6 class="fw-semibold mb-0">{{ forloop.counter }}</h6>
+                                    </td>
+                                    <td class="border-bottom-0">
+                                        <h6 class="fw-semibold mb-1">{{ notification.title }}</h6>
+                                        <span class="fw-normal"></span>
+                                    </td>
+
+                                    <td class="border-bottom-0">
+                                        <p class="mb-0 fw-normal">
+                                            {{ notification.description|truncatewords:20 }}
+                                        </p>
+                                    </td>
+                                    
+                                    <td class="border-bottom-0">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <p class="mb-0 fw-normal">{{ notification.timeStamp }}</p>
+                                            <!--  -->
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+</div>
+
+{% endblock %}

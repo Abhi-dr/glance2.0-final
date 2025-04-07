@@ -1,0 +1,376 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="apple-touch-icon" sizes="76x76" href="{% static 'img/apple-icon.png' %}">
+  <link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}">
+  <title>
+    Register Here!
+  </title>
+  <!--     Fonts and icons     -->
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
+  <!-- Nucleo Icons -->
+  <link href="{% static 'css/accounts/nucleo-icons.css' %}" rel="stylesheet" />
+  <link href="{% static 'css/accounts/nucleo-svg.css' %}" rel="stylesheet" />
+  <!-- Font Awesome Icons -->
+  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+  <link href="{% static 'css/accounts/nucleo-svg.css' %}" rel="stylesheet" />
+  <!-- CSS Files -->
+  <link id="pagestyle" href="{% static 'css/accounts/argon-dashboard.css' %}" rel="stylesheet" />
+
+  <style>
+    .input-container {
+      position: relative;
+    }
+
+    .validation-icon {
+      position: absolute;
+      top: 70%;
+      right: 4%;
+      transform: translateY(-50%);
+      width: 20px;
+      height: 20px;
+      background-size: cover;
+      display: none;
+    }
+
+    #password-input:valid+.validation-icon {
+      background-image: url('https://img.icons8.com/glyph-neue/64/40C057/double-tick.png');
+      /* Replace with your green check icon image path */
+      display: block;
+    }
+
+    #password-input:invalid+.validation-icon {
+      background-image: url('https://img.icons8.com/emoji/48/cross-mark-emoji.png');
+      /* Replace with your red cross icon image path */
+      display: block;
+    }
+  </style>
+</head>
+
+<body class="w-100">
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg position-absolute top-0 z-index-3 w-100 shadow-none my-3 navbar-transparent mt-4">
+    <div class="container">
+      <a class="navbar-brand font-weight-bolder ms-lg-0 ms-3 text-white" href="{% url 'home' %}">
+        🔥 THE GLANCE 🔥
+      </a>
+
+
+      <a class="btn btn-outline-white" href="{% url 'home' %}">
+        Home
+      </a>
+    </div>
+  </nav>
+  <!-- End Navbar -->
+  <main class="main-content  mt-0">
+    <div class="page-header align-items-start min-vh-50 pt-6 pb-11 m-3 border-radius-lg"
+      style="background-image: url('https://images.shiksha.com/mediadata/images/articles/1663131815phpZ3WZxB.jpeg'); background-position: center;">
+      <span class="mask bg-gradient-dark opacity-6"></span>
+      <div class="container">
+        <div class="row justify-content-center">
+          <div class="col-lg-5 text-center mx-auto">
+            <h1 class="text-white mb-2 mt-5">Welcome!</h1>
+            <p class="text-lead text-white">
+              Bringing Out The Potential In You
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="row mt-lg-n10 mt-md-n11 mt-n10 justify-content-center">
+
+        <div class="col-xl-7 col-lg-5 col-md-7">
+          <div class="card z-index-0" style="border: 1px solid rgb(255, 150, 63);">
+            <div class="card-header text-center">
+              <h5>Your Talent Is Our Biggest Asset</h5>
+            </div>
+            <div class="card-body">
+
+              <form role="form" method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                  <input type="email" class="form-control" id="username" name="email" aria-label="Email Address"
+                    placeholder="Enter your Mail ID" pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
+                    required>
+                  <span id="username-feedback"></span>
+
+                </div>
+
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <input type="text" class="form-control" placeholder="First name" aria-label="first_name"
+                        name="first_name" required>
+                    </div>
+                  </div>
+
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <input type="text" class="form-control" placeholder="Last name" aria-label="last_name"
+                        name="last_name" value="">
+                    </div>
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <input type="number" class="form-control" placeholder="Mobile Number *" aria-label="Mobile Number"
+                    name="mobile_number" required>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-4">
+                    <label for="subject" class="form-label">Class 10th Percentage
+                    </label>
+
+                    <div class="form-group">
+                      <input type="number" step=".01" class="form-control" placeholder="Percentage %"
+                        aria-label="first_name" name="tenth" required>
+                    </div>
+                  </div>
+
+                  <div class="col-md-4">
+                    <label for="subject" class="form-label">Class 12th Percentage</label>
+                    <div class="form-group">
+                      <input type="number" step=".01" class="form-control" placeholder="Percentage %"
+                        aria-label="last_name" name="twelfth" required>
+                    </div>
+                  </div>
+
+                  <div class="col-md-4">
+                    <label for="subject" class="form-label">Current CGPA</label>
+                    <div class="form-group">
+                      <input type="number" step=".01" class="form-control" placeholder="Current CGPA (Out of 10)"
+                         name="cgpa" required max="10" id="cgpaInput">
+                    </div>
+                  </div>
+
+                  <div class="">
+                    <label for="subject" class="form-label">Backlogs</label>
+                    <div class="form-group">
+                      <input type="number" class="form-control" placeholder="Number of active backlogs"
+                        aria-label="last_name" name="backlog" required>
+                    </div>
+                  </div>
+                </div>
+
+
+                <div class="row mb-4">
+                  <div class="col-md-6">
+
+                    <label for="subject" class="form-label">Gender</label>
+                    <select name="gender" id="subject" class="form-control" required>
+
+                      <option value="Male" selected>Male</option>
+                      <option value="Female">Female</option>
+                      <option value="Prefer not to say">Prefer not to say</option>
+
+                    </select>
+                  </div>
+
+
+                  <div class="col-md-6">
+
+                    <label for="subject" class="form-label">Year of study or Alumni</label>
+                    <select name="year" id="subject" class="form-control" required>
+
+                      <option value="1st Year">1st Year</option>
+                      <option value="2nd Year">2nd Year</option>
+                      <option value="3rd Year" selected>3rd Year</option>
+                      <option value="4th Year">4th Year</option>
+                      <option value="Alumni">Passed Out / Alumni</option>
+
+                    </select>
+                  </div>
+
+                  <!-- course -->
+
+                  <div class="mb-3">
+
+                    <label for="subject" class="form-label">Course</label>
+                    <select name="course" id="subject" class="form-control" required>
+
+                      <option value="B.Tech" selected>B.Tech</option>
+                      <option value="M.Tech">M.Tech</option>
+                      <option value="MBA">MBA</option>
+                      <option value="BBA">BBA</option>
+                      <option value="BCA">BCA</option>
+                      <option value="MCA">MCA</option>
+                      <option value="B.Sc">B.Sc</option>
+                      <option value="M.Sc">M.Sc</option>
+                      <option value="B.Com">B.Com</option>
+                      <option value="M.Com">M.Com</option>
+                      <option value="B.Pharma">B.Pharma</option>
+                      <option value="M.Pharma">M.Pharma</option>
+                      <option value="BBA LLB">BBA LLB</option>
+                      <option value="LLB">LLB</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+
+                  <!-- <div class="mb-3">
+                  <label for="subject" class="form-label">Subject</label>
+                  <select name="subject" id="subject" class="form-control">
+
+                    {% for subject in subjects %}
+
+                    <option value="{{ subject.id }}">{{ subject.name }} by {{ subject.teacher.first_name }}
+                      {{subject.teacher.last_name }} </option>
+
+                    {% endfor %}
+
+                  </select>
+                </div> -->
+
+                  <div class="mb-3  input-container">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" class="form-control form-control-lg" placeholder="Password"
+                      aria-label="Password" name="password" id="password-input"
+                      pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?!.*\s).{8,}$"
+                      title="Must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters"
+                      required>
+                    <div class="validation-icon"></div>
+                  </div>
+
+                  <!-- <div class="col-md-1">
+                    <img src="{% static 'img/accounts/eyes.png' %}" width="100%" alt="">
+                  </div> -->
+
+
+                  <div class="col-md-12">
+                    <div class="mb-3 text-wrap">
+                      <ul>
+                        <li>Password must contain at least one number.</li>
+                        <li>Password must contain one Uppercase and Lowercase letter.</li>
+                        <li>Password must Have at least 8 or more characters.</li>
+                        <li>Password must <b>Not</b> Have any spaces.</li>
+                      </ul>
+                    </div>
+                  </div>
+
+                  <div class="form-check form-check-info text-start">
+                    <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" checked required>
+                    <label class="form-check-label" for="flexCheckDefault">
+                      I agree the <a href="{% url 'tnc' %}" target="_blank" class="text-dark font-weight-bolder">Terms
+                        and Conditions</a>
+                    </label>
+                  </div>
+
+                  <div class="text-center">
+                    <button type="submit" class="btn bg-gradient-dark w-100 my-4 mb-2 mybtn"
+                      id="signup-button">Register</button>
+                  </div>
+                  </a>
+
+                  <p class="text-sm mt-3 mb-0 text-center">Already have an account? <a href="{% url 'login' %}"
+                      class="text-dark font-weight-bolder">Login</a></p>
+                  <!-- <p class="text-sm mt-3 mb-0 text-center">Are you an Alumni of GLAU? <a href="{% url 'alumni_registration' %}"
+                      class="text-dark font-weight-bolder">Skip Registration and Direct Apply</a></p> -->
+
+
+
+              </form>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="card-footer text-center pt-0 px-lg-2 px-1 mt-2 mb-4">
+          <p class="mb-4 text-sm mx-auto">
+            For any query <a href="https://wa.me/918273619318" target="_blank" class="text-dark font-weight-bolder">
+              WhatsApp Our Technical Team</a>
+          </p>
+        </div>
+
+      </div>
+
+      <br><br>
+  </main>
+  <!--   Core JS Files   -->
+  <script src="/js/core/popper.min.js"></script>
+  <script src="/js/core/bootstrap.min.js"></script>
+  <script src="/js/plugins/perfect-scrollbar.min.js"></script>
+  <script src="/js/plugins/smooth-scrollbar.min.js"></script>
+  <script>
+    var win = navigator.platform.indexOf('Win') > -1;
+    if (win && document.querySelector('#sidenav-scrollbar')) {
+      var options = {
+        damping: '0.5'
+      }
+      Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
+    }
+  </script>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    $(document).ready(function () {
+      $("#username").on("input", function () {
+        var username = $(this).val();
+
+        if (username.length >= 3) { // Only check when username is at least 3 characters
+          $.ajax({
+            url: "{% url 'check_username_availability' %}",
+            data: {
+              'username': username
+            },
+            dataType: 'json',
+            success: function (data) {
+              if (data.is_available) {
+                $("#username-feedback").html("<span style='color:green;'>Email is available</span>");
+                document.getElementById("signup-button").disabled = false;
+                document.getElementById("signup-button").innerHTML = "Register";
+              } else {
+                $("#username-feedback").html("<span style='color:red;'>Email Already Exists!</span>");
+                document.getElementById("signup-button").disabled = true;
+                document.getElementById("signup-button").innerHTML = "Cannot REGISTER (Email Already Exists)";
+              }
+            }
+          });
+        } else {
+          $("#username-feedback").empty(); // Clear feedback if username is too short
+        }
+      });
+    });
+  </script>
+
+<script>
+  // Get the input element
+const cgpaInput = document.getElementById('cgpaInput');
+
+// Add event listener to listen for changes in the input field
+cgpaInput.addEventListener('input', function() {
+    // Check if the entered value exceeds the maximum allowed (10)
+    if (parseFloat(this.value) > 10 || parseFloat(this.value) < 0){
+        this.value = ""; // Reset the value to 0
+        // Show an alert message to the user
+        alert('CGPA should not be more than 10');
+    }
+});
+
+</script>
+
+  <script>
+    // stop the form from submitting and disable the submit button until the process is complete
+
+    document.querySelector('form').addEventListener('submit', function (e) {
+      // Disable the button to prevent multiple clicks
+      document.getElementById('signup-button').disabled = true;
+      // change the text
+      document.getElementById('signup-button').innerHTML = 'Processing...';
+      // return false to prevent the form from submitting
+      return true;
+    });
+  </script>
+
+  <!-- Github buttons -->
+  <script async defer src="https://buttons.github.io/buttons.js"></script>
+  <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
+  <script src="/js/argon-dashboard.min.js"></script>
+</body>
+
+</html>

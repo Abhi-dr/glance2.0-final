@@ -1,0 +1,840 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+  <title>GLA University</title>
+  <meta content="" name="description">
+  <meta content="" name="keywords">
+
+  <!-- Favicons -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+  <!-- jQuery -->
+
+  <link href="{% static 'home/assets/img/favicon.png" rel="icon">
+  <link href="{% static 'home/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <!-- Google Fonts -->
+  <link
+    href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+    rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="{% static 'home/assets/vendor/bootstrap/css/bootstrap.min.css' %} " rel="stylesheet">
+  <link href="{% static 'home/assets/vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+  <link href="{% static 'home/assets/vendor/boxicons/css/boxicons.min.css' %}" rel="stylesheet">
+  <link href="{% static 'home/assets/vendor/glightbox/css/glightbox.min.css' %}" rel="stylesheet">
+  <link href="{% static 'home/assets/vendor/swiper/swiper-bundle.min.css' %}" rel="stylesheet">
+
+  <!-- Template Main CSS File -->
+  <link href="{% static 'home/assets/css/style.css' %}" rel="stylesheet">
+
+
+  <style>
+    @media (max-width: 304px) {
+      #navbar {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      #navbar ul {
+        margin: 0;
+        padding: 0;
+      }
+
+      h2 {
+        margin-top: 30%;
+      }
+
+      #navbar ul li {
+        margin-bottom: 10px;
+        /* Adjust spacing between navigation links */
+      }
+
+      .header-social-links {
+        display: none;
+        /* Hide social links on smaller screens */
+      }
+
+      .mobile-nav-toggle {
+        display: block;
+        /* Show mobile navigation toggle on smaller screens */
+      }
+    }
+
+    .alert {
+      padding: 1%;
+      margin: 2%;
+      background-color: #43A89F;
+      color: rgb(0, 0, 0);
+    }
+
+    ​ .closebtn {
+      color: white;
+      font-weight: bold;
+      float: right;
+      font-size: 29px;
+      line-height: 20px;
+      cursor: pointer;
+      transition: 0.3s;
+
+    }
+
+    ​ .closebtn:hover {
+      color: black;
+    }
+
+    .member {
+      transition: transform 0.3s ease, background-color 0.3s ease;
+      cursor: pointer;
+    }
+
+    .member:hover {
+      transform: translateY(-10px);
+      background-color: #43A89F !important;
+      color: #fff !important;
+    }
+
+    .member h4,
+    .member span,
+    .member p {
+      transition: color 0.3s ease;
+    }
+
+    .member:hover h4,
+    .member:hover span,
+    .member:hover p {
+      color: #fff !important;
+    }
+
+    .carousel-item .row [class^="col-"] {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .carousel-item .row [class^="col-"] img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    .recruiter-card {
+      width: 200px;
+      height: 200px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: transform 0.3s ease;
+    }
+
+    .recruiter-card:hover {
+      transform: scale(1.1);
+    }
+
+    .recruiter-logo {
+      max-width: 100px;
+      max-height: 100px;
+      transition: transform 0.3s ease;
+    }
+
+    .recruiter-card:hover .recruiter-logo {
+      transform: scale(1.2);
+    }
+
+    @media (max-width: 767px) {
+      .recruiter-card {
+        width: 150px;
+        height: 150px;
+      }
+
+      .recruiter-logo {
+        max-width: 80px;
+        max-height: 80px;
+      }
+
+      h2 {
+        margin-top: 30%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ======= Header ======= -->
+  <header id="header" class="fixed-top d-flex align-items-center">
+    <div class="container d-flex align-items-center">
+
+      <div class="logo me-auto">
+        <h1>
+          <a href="{% url 'home' %}">
+            <img src="{% static 'home/assets/img/logo2.png' %}" alt="Lumia Logo" style="width: 100%; max-height:60px">
+          </a>
+        </h1>
+      </div>
+      <!-- Uncomment below if you prefer to use an image logo -->
+      <!-- <a href="index.html"><img src="assets/img/logo.png" alt="" class="img-fluid"></a>-->
+    </div>
+
+    <nav id="navbar" class="navbar order-last order-lg-0">
+      <ul>
+        <li><a class="nav-link scrollto active" href="#hero">Home</a></li>
+        <li><a class="nav-link scrollto" href="#about">About</a></li>
+
+        <li><a class="nav-link scrollto" href="#contact">Contact</a></li>
+
+
+      </ul>
+      <i class="bi bi-list mobile-nav-toggle"></i>
+    </nav><!-- .navbar -->
+
+    <div class="header-social-links d-flex align-items-center">
+      <a href="https://www.facebook.com/profile.php?id=61552790286215" class="facebook"><i
+          class="bi bi-facebook"></i></a>
+      <a href="https://www.instagram.com/alumniassociationgla/" class="instagram"><i class="bi bi-instagram"></i></a>
+      <a href="https://www.linkedin.com/groups/4993377/" class="linkedin"><i class="bi bi-linkedin"></i></i></a>
+    </div>
+
+    </div>
+  </header><!-- End Header -->
+
+
+  <!-- ======= Hero Section ======= -->
+  <section id="hero" class="d-flex flex-column justify-content-center align-items-center">
+    <div class="container text-center text-md-left" data-aos="fade-up">
+      <h1>Welcome to GLA University</h1>
+      <h2></h2>
+      <a href="{% url 'login' %}" class="btn-get-started scrollto">Login</a>
+      &nbsp;
+      <a href="{% url 'register' %}" class="btn-get-started scrollto">Register</a>
+    </div>
+  </section><!-- End Hero -->
+
+  <main id="main">
+
+    <!-- ======= What We Do Section ======= -->
+
+    {% for message in messages %}
+
+    <div class="alert">
+      <strong>Thank You</strong> {{ message }}
+      <!-- <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> -->
+    </div>
+
+    {% endfor %}<section id="about" class="about">
+      <div class="container">
+        <div class="row mb-4">
+          <div class="section-title">
+            <h2>About</h2>
+          </div>
+          <div id="imageSlider" class="carousel slide" data-ride="carousel">
+            <div class="carousel-inner">
+              <div class="carousel-item active">
+                <img src="{% static 'home/assets/img/high.png' %}" class="d-block w-100" alt="First slide">
+              </div>
+              <div class="carousel-item">
+                <img src="{% static 'home/assets/img/cr1.png' %}" class="d-block w-100" alt="Second slide">
+              </div>
+              <div class="carousel-item">
+                <img src="{% static 'home/assets/img/cr2.jpeg' %}" class="d-block w-100" alt="Third slide">
+              </div>
+            </div>
+            <a class="carousel-control-prev" href="#imageSlider" role="button" data-slide="prev">
+              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+              <span class="sr-only">Previous</span>
+            </a>
+            <a class="carousel-control-next" href="#imageSlider" role="button" data-slide="next">
+              <span class="carousel-control-next-icon" aria-hidden="true"></span>
+              <span class="sr-only">Next</span>
+            </a>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-lg-6 pt-4 pt-lg-0">
+            <h3>About GLANCE</h3>
+            <p>GLANCE, the inaugural job fair hosted by GLA University Mathura, promises students an exciting
+              opportunity to explore diverse career paths and connect with esteemed organizations. With engaging events
+              and networking opportunities, GLANCE is set to empower students in their journey towards professional
+              success.</p>
+            <h5><strong>Benefits for students</strong></h5>
+            <ul>
+              <li><i class="bx bx-check-double"></i> Varied job and internship offers.</li>
+              <li><i class="bx bx-check-double"></i> Interactive events for company insights.</li>
+              <li><i class="bx bx-check-double"></i> Networking with recruiters and peers.</li>
+              <li><i class="bx bx-check-double"></i> Personal and professional growth.</li>
+              <li><i class="bx bx-check-double"></i>Career advancement opportunities.</li>
+            </ul>
+          </div>
+          <div class="col-lg-6 pt-4 pt-lg-0">
+            <h3><strong>Details of The Job Fair</strong></h3>
+            <ul>
+              <br>
+              <li><i>Date: 24th-25th April, 2024</i></li>
+              <br>
+              <li><i>Time: 09:00 AM onwards</i></li>
+              <br>
+              <li><i>Venue: CSED, AB-11, GLA university, Mathura</i></li>
+            </ul>
+          </div>
+        </div>
+
+        <!--co-ordinator-->
+        <!-- Inside the main section -->
+        <!-- Inside the main section -->
+
+        <div class="container">
+          <div class="section-title">
+            <h2>Our Recruiters</h2>
+          </div>
+          <div>
+            <h2 class="title-section"></h2>
+          </div>
+          <div id="recruitersCarousel" class="carousel slide" data-bs-ride="carousel" data-interval="100">
+            <div class="carousel-inner">
+
+              <div class="carousel-item active">
+                <div class="row justify-content-center align-items-center">
+                  <div class="col-md-3 recruiter-card">
+                    <img src="{% static 'home/assets/img/companies/logo.png' %}" class="img-fluid recruiter-logo"
+                      alt="Recruiter 1">
+                  </div>
+                  <div class="col-md-3 recruiter-card">
+                    <img src="{% static 'home/assets/img/companies/logo1.png' %}" class="img-fluid recruiter-logo"
+                      alt="Recruiter 2">
+                  </div>
+                </div>
+              </div>
+
+              <div class="carousel-item">
+                <div class="row justify-content-center align-items-center">
+                  <div class="col-md-3 recruiter-card">
+                    <img src="{% static 'home/assets/img/companies/logo2.png' %}" class="img-fluid recruiter-logo"
+                      alt="Recruiter 3">
+                  </div>
+                  <div class="col-md-3 recruiter-card">
+                    <img src="{% static 'home/assets/img/companies/logo10.png' %}" class="img-fluid recruiter-logo"
+                      alt="Recruiter 7">
+                  </div>
+                  <!-- <div class="col-md-3 recruiter-card">
+              <img src="{% static 'home/assets/img/companies/logo3.png' %}" class="img-fluid recruiter-logo" alt="Recruiter 4">
+            </div> -->
+                </div>
+              </div>
+
+              <div class="carousel-item">
+                <div class="row justify-content-center align-items-center">
+                  <div class="col-md-3 recruiter-card">
+                    <img src="{% static 'home/assets/img/companies/logo4.png' %}" class="img-fluid recruiter-logo"
+                      alt="Recruiter 5">
+                  </div>
+                  <div class="col-md-3 recruiter-card">
+                    <img src="{% static 'home/assets/img/companies/logo11.png' %}" class="img-fluid recruiter-logo"
+                      alt="Recruiter 8">
+                  </div>
+                  <!-- <div class="col-md-3 recruiter-card">
+              <img src="{% static 'home/assets/img/companies/logo5.png' %}" class="img-fluid recruiter-logo" alt="Recruiter 6">
+            </div> -->
+                </div>
+              </div>
+
+              <div class="carousel-item">
+                <div class="row justify-content-center align-items-center">
+                  <div class="col-md-3 recruiter-card">
+                    <img src="{% static 'home/assets/img/companies/logo6.png' %}" class="img-fluid recruiter-logo"
+                      alt="Recruiter 7">
+                  </div>
+                  <div class="col-md-3 recruiter-card">
+                    <img src="{% static 'home/assets/img/companies/logo9.png' %}" class="img-fluid recruiter-logo"
+                      alt="Recruiter 8">
+                  </div>
+                </div>
+              </div>
+
+              <div class="carousel-item">
+                <div class="row justify-content-center align-items-center">
+                  <div class="col-md-3 recruiter-card">
+                    <img src="{% static 'home/assets/img/companies/logo8.png' %}" class="img-fluid recruiter-logo"
+                      alt="Recruiter 5">
+                  </div>
+                  <div class="col-md-3 recruiter-card">
+                    <img src="{% static 'home/assets/img/companies/logo7.png' %}" class="img-fluid recruiter-logo"
+                      alt="Recruiter 6">
+                  </div>
+                </div>
+              </div>
+              <!-- 
+        <div class="carousel-item">
+          <div class="row justify-content-center align-items-center">
+            
+            
+          </div>
+        </div> -->
+
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#recruitersCarousel"
+              data-bs-slide="prev" style="color: black;">
+              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#recruitersCarousel"
+              data-bs-slide="next" style="color: black;">
+              <span class="carousel-control-next-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Next</span>
+            </button>
+          </div>
+        </div>
+        <!-- =======Recruiters end ======= -->
+
+        <!-- Inside the main section -->
+        <section id="our-team" class="our-team section-bg">
+          <div class="container">
+            <div class="section-title">
+              <h2>Our Placement Co-ordinators</h2>
+            </div>
+
+            <div class="row g-4">
+              <div class="col-lg-4 col-md-6">
+                <div
+                  class="member h-100 d-flex flex-column align-items-center text-center bg-white rounded shadow-sm p-4">
+                  <div class="member-info mt-3">
+                    <h4>Mr. Shelesh Saraswat</h4>
+                    <span>EC</span>
+                    <p>shelesh.saraswat@gla.ac.in</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-lg-4 col-md-6">
+                <div
+                  class="member h-100 d-flex flex-column align-items-center text-center bg-white rounded shadow-sm p-4">
+                  <div class="member-info mt-3">
+                    <h4>Mr. Vikas Sharma</h4>
+                    <span>BBA & B Com</span>
+                    <p>ankita.mishra@gla.ac.in</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-lg-4 col-md-6">
+                <div
+                  class="member h-100 d-flex flex-column align-items-center text-center bg-white rounded shadow-sm p-4">
+                  <div class="member-info mt-3">
+                    <h4>Dr. Priyank Gupta</h4>
+                    <span>BBA & B Com</span>
+                    <p>priyank.gupta@gla.ac.in</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-lg-4 col-md-6">
+                <div
+                  class="member h-100 d-flex flex-column align-items-center text-center bg-white rounded shadow-sm p-4">
+                  <div class="member-info mt-3">
+                    <h4>Mr. Praveen Mittal </h4>
+                    <span>C.S</span>
+                    <p>praveen.mittal@gla.ac.in</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-lg-4 col-md-6">
+                <div
+                  class="member h-100 d-flex flex-column align-items-center text-center bg-white rounded shadow-sm p-4">
+                  <div class="member-info mt-3">
+                    <h4> Mr. Raisul Islam </h4>
+                    <span>Civil</span>
+                    <p>raisul.islam@gla.ac.in</p>
+                  </div>
+                </div>
+              </div>
+
+
+              <div class="col-lg-4 col-md-6">
+                <div
+                  class="member h-100 d-flex flex-column align-items-center text-center bg-white rounded shadow-sm p-4">
+                  <div class="member-info mt-3">
+                    <h4> Mr.Anuj Mangal </h4>
+                    <span>BCA</span>
+                    <p> anuj.mangal@gla.ac.in</p>
+                  </div>
+                </div>
+              </div>
+
+
+              <div class="col-lg-4 col-md-6">
+                <div
+                  class="member h-100 d-flex flex-column align-items-center text-center bg-white rounded shadow-sm p-4">
+                  <div class="member-info mt-3">
+                    <h4>Mr. Sanjeev Chauhan </h4>
+                    <span>MBA</span>
+                    <p>sanjeev.chauhan@gla.ac.in</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-lg-4 col-md-6">
+                <div
+                  class="member h-100 d-flex flex-column align-items-center text-center bg-white rounded shadow-sm p-4">
+                  <div class="member-info mt-3">
+                    <h4>Mr. Sanjeev Saraswat </h4>
+                    <span>MBA</span>
+                    <p>sanjeev.saraswat@gla.ac.in</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-lg-4 col-md-6">
+                <div
+                  class="member h-100 d-flex flex-column align-items-center text-center bg-white rounded shadow-sm p-4">
+                  <div class="member-info mt-3">
+                    <h4>Dr. Ajit Dwarika Sao</h4>
+                    <span>MBA</span>
+                    <p>ajitdwarika.sao@gla.ac.in </p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-lg-4 col-md-6">
+                <div
+                  class="member h-100 d-flex flex-column align-items-center text-center bg-white rounded shadow-sm p-4">
+                  <div class="member-info mt-3">
+                    <h4> Ms. Chhavi Singh </h4>
+                    <span>MBA</span>
+                    <p>chhavi.singh@gla.ac.in </p>
+                  </div>
+                </div>
+              </div>
+
+
+              <div class="col-lg-4 col-md-6">
+                <div
+                  class="member h-100 d-flex flex-column align-items-center text-center bg-white rounded shadow-sm p-4">
+                  <div class="member-info mt-3">
+                    <h4>Dr. Priyank Gupta </h4>
+                    <span>BBA & B Com</span>
+                    <p>priyank.gupta@gla.ac.in </p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-lg-4 col-md-6">
+                <div
+                  class="member h-100 d-flex flex-column align-items-center text-center bg-white rounded shadow-sm p-4">
+                  <div class="member-info mt-3">
+                    <h4>Mr. Mukesh Pushkarna </h4>
+                    <span>EN & EE </span>
+                    <p>mukesh.pushkarna@gla.ac.in</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-lg-4 col-md-6">
+                <div
+                  class="member h-100 d-flex flex-column align-items-center text-center bg-white rounded shadow-sm p-4">
+                  <div class="member-info mt-3">
+                    <h4>Mr. Atul Uttam</h4>
+                    <span>MCA</span>
+                    <p>atul.uttam@gla.ac.in</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-lg-4 col-md-6">
+                <div
+                  class="member h-100 d-flex flex-column align-items-center text-center bg-white rounded shadow-sm p-4">
+                  <div class="member-info mt-3">
+                    <h4>Mr. Bhupesh Chander Semwal</h4>
+                    <span>B Pharm & M Pharm</span>
+                    <p>bhupesh.semwal@gla.ac.in</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-lg-4 col-md-6">
+                <div
+                  class="member h-100 d-flex flex-column align-items-center text-center bg-white rounded shadow-sm p-4">
+                  <div class="member-info mt-3">
+                    <h4>Mr. Pradeep Kr. Choudhary</h4>
+                    <span>B Sc & M Sc</span>
+                    <p>pradeep.choudhary@gla.ac.in</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-lg-4 col-md-6">
+                <div
+                  class="member h-100 d-flex flex-column align-items-center text-center bg-white rounded shadow-sm p-4">
+                  <div class="member-info mt-3">
+                    <h4>Dr. Prabal Pratap Singh</h4>
+                    <span>B Sc. Chem.</span>
+                    <p>prabal.singh@gla.ac.in</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-lg-4 col-md-6">
+                <div
+                  class="member h-100 d-flex flex-column align-items-center text-center bg-white rounded shadow-sm p-4">
+                  <div class="member-info mt-3">
+                    <h4>Mr. Yogendra Kumar</h4>
+                    <span>Diplom-ME</span>
+                    <p>yogendra.kumar@gla.ac.in</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-lg-4 col-md-6">
+                <div
+                  class="member h-100 d-flex flex-column align-items-center text-center bg-white rounded shadow-sm p-4">
+                  <div class="member-info mt-3">
+                    <h4>Mr. Girijapati Sharma</h4>
+                    <span>Diploma-EE</span>
+                    <p>girijapati.sharma@gla.ac.in</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-lg-4 col-md-6">
+                <div
+                  class="member h-100 d-flex flex-column align-items-center text-center bg-white rounded shadow-sm p-4">
+                  <div class="member-info mt-3">
+                    <h4>Mr. Aditya Gautam</h4>
+                    <span>Dip-CS</span>
+                    <p>aditya.gautam@gla.ac.in</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-lg-4 col-md-6">
+                <div
+                  class="member h-100 d-flex flex-column align-items-center text-center bg-white rounded shadow-sm p-4">
+                  <div class="member-info mt-3">
+                    <h4>Mr. Bhagat Singh</h4>
+                    <span>Dip-CE</span>
+                    <p>bhagat.singh@gla.ac.in</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-lg-4 col-md-6">
+                <div
+                  class="member h-100 d-flex flex-column align-items-center text-center bg-white rounded shadow-sm p-4">
+                  <div class="member-info mt-3">
+                    <h4>Mr. Chandrapal Singh</h4>
+                    <span>Dip-Chemical</span>
+                    <p>chandrapal.singh@gla.ac.in</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-lg-4 col-md-6">
+                <div
+                  class="member h-100 d-flex flex-column align-items-center text-center bg-white rounded shadow-sm p-4">
+                  <div class="member-info mt-3">
+                    <h4>Ms. Rohini Sharma</h4>
+                    <span>Dip-EC</span>
+                    <p>rohini.sharma@gla.ac.in</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-lg-4 col-md-6">
+                <div
+                  class="member h-100 d-flex flex-column align-items-center text-center bg-white rounded shadow-sm p-4">
+                  <div class="member-info mt-3">
+                    <h4>Dr. Rohit Kumar Singh</h4>
+                    <span>BSc Agg.</span>
+                    <p>kumar.rohit@gla.ac.in</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-lg-4 col-md-6">
+                <div
+                  class="member h-100 d-flex flex-column align-items-center text-center bg-white rounded shadow-sm p-4">
+                  <div class="member-info mt-3">
+                    <h4>Dr.Ankita Mishra</h4>
+                    <span>BBA & B.Com</span>
+                    <p>ankita.mishta@gla.ac.in</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-lg-4 col-md-6">
+                <div
+                  class="member h-100 d-flex flex-column align-items-center text-center bg-white rounded shadow-sm p-4">
+                  <div class="member-info mt-3">
+                    <h4>Mr. Alok Verma</h4>
+                    <span>LLB</span>
+                    <p>alok.verma@gla.ac.in</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+
+
+
+        <!-- Video Section -->
+        <div class="container my-5">
+          <div class="row justify-content-center">
+            <div class="col-12 col-lg-8">
+              <div class="ratio ratio-16x9">
+                <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/UZQZSZMWegE"
+                  allowfullscreen></iframe>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- End Video Section -->
+
+        <!-- ======= Contact Section ======= -->
+        <section id="contact" class="contact section-bg">
+          <div class="container">
+
+            <div class="section-title">
+              <h2>Contact Us</h2>
+              <p></p>
+            </div>
+
+            <div class="row mt-5 justify-content-center">
+
+              <div class="col-lg-10">
+
+                <div class="info-wrap">
+                  <div class="row">
+                    <div class="col-lg-4 info">
+                      <i class="bi bi-geo-alt"></i>
+                      <h4>Location:</h4>
+                      <p>Address: 17km Stone, NH-2, Mathura-Delhi Road, Mathura-281 406 (U.P.) INDIA </p>
+                    </div>
+
+                    <div class="col-lg-4 info mt-4 mt-lg-0">
+                      <i class="bi bi-envelope"></i>
+                      <h4>Email:</h4>
+                      <p>alumniassociation@gla.ac.in <br></p>
+                    </div>
+
+                    <div class="col-lg-4 info mt-4 mt-lg-0">
+                      <i class="bi bi-phone"></i>
+                      <h4>Call:</h4>
+                      <p>+91 9068405049<br></p>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+
+            <div class="row mt-5 justify-content-center">
+              <div class="col-lg-10">
+
+                <form method="post">
+
+                  {% csrf_token %}
+
+
+                  <div class="row">
+                    <div class="col-md-6 form-group">
+                      <input type="text" name="name" class="form-control" id="name" placeholder="Your Name" required>
+                    </div>
+                    <div class="col-md-6 form-group mt-3 mt-md-0">
+                      <input type="email" class="form-control" name="email" id="email" placeholder="Your Email"
+                        required>
+                    </div>
+                  </div>
+                  <div class="form-group mt-3">
+                    <input type="text" class="form-control" name="subject" id="subject" placeholder="Subject" required>
+                  </div>
+                  <div class="form-group mt-3">
+                    <textarea class="form-control" name="message" rows="5" placeholder="Message" required></textarea>
+                  </div>
+
+                  <div class="text-center">
+                    <button class="btn btn-success mt-4" type="submit">Send Message</button>
+                  </div>
+                </form>
+
+              </div>
+
+            </div>
+
+          </div>
+        </section><!-- End Contact Section -->
+
+  </main><!-- End #main -->
+
+  <!-- ======= Footer ======= -->
+  <footer id="footer">
+
+    <div class="footer-top">
+      <div class="container">
+        <div class="row">
+
+          <div class="col-lg-3 col-md-6 footer-contact">
+            <h3>GLA University</h3>
+            <p>
+              Address: 17km Stone, NH-2, Mathura-Delhi Road, Mathura-281 406 (U.P.) INDIA <br><br>
+              <strong>Phone:</strong> +91 90684 05049<br>
+              <strong>Email:</strong> alumniassociation@gla.ac.in <br>
+            </p>
+          </div>
+          <div class="col-lg-3 col-md-6 footer-contact">
+            <div class="">
+              <h4 class="">About Us</h4>
+              <p>The Department of Alumni Affairs at GLA University Mathura fosters connections between graduates and
+                the alma mater, facilitating networking, mentorship, and career development opportunities. Through
+                various events and initiatives, it strengthens the bond between alumni and the university, fostering a
+                vibrant and engaged alumni community.</p>
+            </div>
+          </div>
+
+          <div class="col-lg-3 col-md-6 footer-contact">
+            <h4 style="text-align: center;">Social Media</h4>
+            <div class="social-links text-center text-md-right pt-3 pt-md-0">
+              {% comment %} <a href="http://glauniversity.in:8095/" class="website"><i class="bx bxl"></i></a> {% endcomment %}
+              <a href="https://www.facebook.com/profile.php?id=61552790286215" class="facebook"><i
+                  class="bx bxl-facebook"></i></a>
+              <a href="https://www.instagram.com/alumniassociationgla/" class="instagram"><i
+                  class="bx bxl-instagram"></i></a>
+              <a href="https://www.linkedin.com/groups/4993377/" class="linkedin"><i class="bx bxl-linkedin"></i></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </footer><!-- End Footer -->
+
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
+      class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Vendor JS Files -->
+  <script src="{% static 'home/assets/vendor/purecounter/purecounter_vanilla.js' %}"></script>
+  <script src="{% static 'home/assets/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'home/assets/vendor/glightbox/js/glightbox.min.js' %}"></script>
+  <script src="{% static 'home/assets/vendor/isotope-layout/isotope.pkgd.min.js' %}"></script>
+  <script src="{% static 'home/assets/vendor/swiper/swiper-bundle.min.js' %}"></script>
+  <script src="{% static 'home/assets/vendor/waypoints/noframework.waypoints.js' %}"></script>
+  <script src="{% static 'home/assets/vendor/php-email-form/validate.js' %}"></script>
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+
+  <!-- Bootstrap JavaScript -->
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+  <!-- Template Main JS File -->
+  <script src="{% static 'home/assets/js/main.js' %}"> </script>
+
+</body>
+
+</html>

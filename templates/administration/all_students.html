@@ -1,0 +1,214 @@
+{% extends "administration/base.html" %}
+{% load static %}
+
+{% block title %}
+Administration -> Students
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    @media (max-width: 768px) {
+
+        /* Adjustments for mobile devices */
+        #pdfContainer {
+            height: 400px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-body">
+            <h3 class="heading">
+                <span class="fw-semibold">Students &nbsp;({{ students.count }})</span>
+                <span class="fs-4"> | GLANCE &nbsp; Job &nbsp; Fair</span>
+            </h3>
+        </div>
+        <a href="{% url 'export_unapplied_students_csv' %}" class="btn btn-outline-success m-3 mb-1">Download Unapplied Students Data</a>
+        <a href="{% url 'export_uneligible_students' %}" class="btn btn-outline-primary m-3">Download Uneligible Students Data</a>
+    </div>
+
+
+    {% for message in messages %}
+
+    <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert">
+        <strong>{{ message.tag }}</strong> {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    {% endfor %}
+
+    <!-- create a search bar -->
+
+    <div class="card w-100">
+        <div class="card-body p-4">
+            <!-- <h5 class="card-title fw-semibold mb-4">Search Applicants 🔍</h5> -->
+            <form method="post">
+
+                {% csrf_token %}
+
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Search by Name, Year, Academic Score"
+                        aria-label="Search by Name, Year, Academic Score" aria-describedby="button-addon2" name="query">
+                    <button class="btn btn-outline-secondary" type="submit" id="button-addon2">Search</button>
+                    <!-- make a button to clear the search -->
+                    <a href="{% url 'all_students' %}" class="btn btn-outline-danger">Clear</a>
+                </div>
+
+                <!-- search on the basis of tags -->
+
+
+
+            </form>
+        </div>
+
+
+    </div>
+
+
+    <div class="card w-100">
+        <div class="card-body p-4">
+            <h5 class="card-title fw-semibold mb-4">Our Students 🔥
+                {% if query %}
+                <span class="fs-6"> | Search Results for "{{ query }}"</span>
+                {% endif %}
+            </h5>
+            <div class="table-responsive">
+                <table class="table text-nowrap mb-0 align-middle">
+                    <thead class="text-dark fs-4">
+
+                        <tr>
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">
+                                    #
+                                </h6>
+                            </th>
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">
+                                    Name
+                                </h6>
+                            </th>
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">
+                                    Academic Details
+                                </h6>
+                            </th>
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">
+                                    Companies Applied
+                                </h6>
+                            </th>
+
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">
+                                    Social Links
+                                </h6>
+                            </th>
+
+                            <th class="border-bottom-0 justify-content-center">
+                                <h6 class="fw-semibold mb-0">
+                                    Contacts
+                                </h6>
+                            </th>
+                            <th class="border-bottom-0 justify-content-center">
+                                <h6 class="fw-semibold mb-0">
+                                    Action#2
+                                </h6>
+                            </th>
+
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for student in students %}
+
+                        <tr>
+                            <td class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">{{ forloop.counter }}</h6>
+                            </td>
+                            <td class="border-bottom-0">
+                                <h6 class="fw-semibold mb-1">{{ student.first_name }} {{student.last_name }}</h6>
+                                <span class="fw-normal">{{ student.course }}</span>
+                                <br>
+                                <span class="fw-normal">{{ student.year }}</span>
+
+                            </td>
+
+                            <td class="border-bottom-0">
+                                <p class="fw-semibold mb-0">
+                                    Highschool: <span style="font-weight: bold; color: black;"> {{student.tenth }}%
+                                    </span>
+                                    <br>
+                                    Intermediate: <span style="font-weight: bold; color: black;"> {{student.twelfth }}%
+                                    </span>
+                                    <br>
+                                    UG: <span style="font-weight: bold; color: black;"> {{ student.cgpa }}</span>
+                                    <br>
+
+                                    {% if student.backlog != 0 %}
+                                    <br>
+                                    <span style="font-weight: bold; color: rgb(254, 59, 59);">Backlogs:
+                                        {{student.backlog }}</span>
+                                    {% endif %}
+                                </p>
+                            </td>
+
+                            <td class="border-bottom-0 ">
+                                <p class="fw-semibold mb-0">
+                                   {{ student.application_set.count }}
+                                </p>
+                            </td>
+
+                            <td class="border-bottom-0">
+
+                                <div class="d-flex align-items-center gap-2">
+
+                                    <a href="{{ student.linkedin_id }}" target="_blank"
+                                        class="btn btn-outline-warning text-red float-end">LinkedIn</a>
+
+                                    <a href="{{ student.github_id }}" target="_blank"
+                                        class="btn btn-outline-primary text-green float-end">GitHub</a>
+                                </div>
+                            </td>
+
+                            <td class="border-bottom-0">
+                                <div class="d-flex align-items-center gap-2">
+
+                                    <a href="mailto:{{ student.username }}"
+                                        class="btn btn-outline-warning text-red float-end">Mail</a>
+
+                                    <a href="tel:{{ student.phone_number }}"
+                                        class="btn btn-outline-primary text-green float-end">Call</a>
+                                </div>
+            </div>
+            </td>
+            <td class="border-bottom-0">
+                <div class="d-flex align-items-center gap-2">
+
+                    {% if student.resume %}
+                    <a href="{{ student.resume.url }}" target="_blank"
+                        class="btn btn-outline-success text-red float-end">Open Resume</a>
+                        {% else %}
+                    <a style="pointer-events: none;"
+                        class="btn btn-outline-dark text-red float-end">No Resume</a>
+                        {% endif %}
+
+                </div>
+            </td>
+
+            {% endfor %}
+            </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+</div>
+
+
+{% endblock %}

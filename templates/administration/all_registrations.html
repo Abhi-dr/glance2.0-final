@@ -1,0 +1,231 @@
+{% extends "administration/base.html" %}
+{% load static %}
+
+{% block title %}
+Administration -> Applications
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    @media (max-width: 768px) {
+
+        /* Adjustments for mobile devices */
+        #pdfContainer {
+            height: 400px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-body">
+            <h3 class="heading">
+                <span class="fw-semibold">Applications &nbsp;({{ applications.count }})</span>
+                <span class="fs-4"> | GLANCE &nbsp; Job &nbsp; Fair</span>
+            </h3>
+        </div>
+    </div>
+
+
+    {% for message in messages %}
+
+    <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert">
+        <strong>{{ message.tag }}</strong> {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    {% endfor %}
+
+    <!-- create a search bar -->
+
+    <div class="card w-100">
+        <div class="card-body p-4">
+            <!-- <h5 class="card-title fw-semibold mb-4">Search Applicants 🔍</h5> -->
+            <form method="post">
+
+                {% csrf_token %}
+
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Search by Name, Year, Academic Score"
+                        aria-label="Search by Name, Year, Academic Score" aria-describedby="button-addon2" name="query">
+                    <button class="btn btn-outline-secondary" type="submit" id="button-addon2">Search</button>
+                    <!-- make a button to clear the search -->
+                    <a href="{% url 'all_registrations' %}" class="btn btn-outline-danger">Clear</a>
+                </div>
+
+                <!-- search on the basis of tags -->
+
+                
+
+            </form>
+        </div>
+
+        
+    </div>
+
+
+    <div class="card w-100">
+        <div class="card-body p-4">
+            <h5 class="card-title fw-semibold mb-4">Our Applicants 🔥
+                {% if query %}
+                <span class="fs-6"> | Search Results for "{{ query }}"</span>
+                {% endif %}
+            </h5>
+            <div class="table-responsive">
+                <table class="table text-nowrap mb-0 align-middle">
+                    <thead class="text-dark fs-4">
+
+                        <tr>
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">
+                                    #
+                                </h6>
+                            </th>
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">
+                                    Name
+                                </h6>
+                            </th>
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">
+                                    Academic Score
+                                </h6>
+                            </th>
+
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">
+                                    Offer
+                                </h6>
+                            </th>
+
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">
+                                    Status
+                                </h6>
+                            </th>
+                            <th class="border-bottom-0 justify-content-center">
+                                <h6 class="fw-semibold mb-0">
+                                    Action#1
+                                </h6>
+                            </th>
+                            <th class="border-bottom-0 justify-content-center">
+                                <h6 class="fw-semibold mb-0">
+                                    Action#2
+                                </h6>
+                            </th>
+
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for application in applications %}
+
+                        <tr>
+                            <td class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">{{ forloop.counter }}</h6>
+                            </td>
+                            <td class="border-bottom-0">
+                                <h6 class="fw-semibold mb-1">{{ application.student.first_name }} {{application.student.last_name }}</h6>
+                                <span class="fw-normal">{{ application.student.course }}</span>
+                                <br>
+                                <span class="fw-normal">{{ application.student.year }}</span>
+
+                            </td>
+
+                            <td class="border-bottom-0">
+                                <p class="fw-semibold mb-0">
+                                    Highschool: <span style="font-weight: bold; color: black;"> {{application.student.tenth }}% </span>
+                                    <br>
+                                    Intermediate: <span style="font-weight: bold; color: black;"> {{application.student.twelfth }}% </span>
+                                    <br>
+                                    UG: <span style="font-weight: bold; color: black;"> {{ application.student.cgpa }}
+                                    </span>
+                                </p>
+                            </td>
+
+                            <td class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0 fs-4">
+                                    <p class="mb-0 fw-normal">
+                                        {{ application.job.title|title }} @{{ application.job.company.name|title }}
+                                    </p>
+                                </h6>
+                            </td>
+
+                            <td class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0 fs-4">
+                                    {% if application.status == 'pending' %}
+                                    <span class="badge bg-warning">{{ application.status|title }}</span>
+                                    {% elif application.status == 'accepted' %}
+                                    <span class="badge bg-success">{{ application.status|title }}</span>
+                                    {% else %}
+                                    <span class="badge bg-danger">{{ application.status|title }}</span>
+                                    {% endif %}
+                                </h6>
+                            </td>
+
+                            <td class="border-bottom-0">
+                                <div class="d-flex align-items-center gap-2">
+<!-- 
+                                    <a class="btn btn-outline-primary text-blue float-end"
+                                        id="viewbtn-{{ application.id }}" onclick="myf({{ application.id }})"
+                                        >View Resume</a> -->
+
+                                        <!-- open application -->
+                                    <a href="{% url 'applications' application.job.slug %}"
+                                        class="btn btn-outline-info text-blue float-end">Open Application</a>
+                                </div>
+
+                                </div>
+                            </td>
+                            <td class="border-bottom-0">
+                                <div class="d-flex align-items-center gap-2">
+
+                                    <a href="mailto:{{ application.student.username }}"
+                                        class="btn btn-outline-warning text-red float-end">Mail</a>
+
+                                    <a href="tel:{{ application.student.phone_number }}"
+                                        class="btn btn-outline-primary text-green float-end">Call</a>
+                                </div>
+                            </td>
+                        </tr>
+
+
+                        <embed id="pdfContainer-{{ application.id }}"
+                            style="display: none; border-radius: 10px; margin-top: 5%;"
+                            src="{{ application.student.resume.url }}" type="application/pdf" width="100%"
+                            height="400px" />
+
+
+                        <script>
+                            function myf(pdfId) {
+                                var x = document.getElementById("pdfContainer-" + pdfId);
+                                var btn = document.getElementById("viewbtn-" + pdfId);
+
+                                if (x.style.display === "none") {
+                                    btn.innerHTML = "Close";
+                                    x.style.display = "block";
+                                    card.style.height = "600px";
+                                } else {
+                                    btn.innerHTML = "View";
+                                    x.style.display = "none";
+                                    card.style.height = "auto";
+                                }
+                            }
+                        </script>
+
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+
+{% endblock %}

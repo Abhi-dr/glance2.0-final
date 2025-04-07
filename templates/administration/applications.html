@@ -1,0 +1,596 @@
+{% extends "administration/base.html" %}
+{% load static %}
+
+{% block title %}
+Administration -> Applications
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    @media (max-width: 768px) {
+
+        /* Adjustments for mobile devices */
+        #pdfContainer {
+            height: 400px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+
+<div class="container-fluid">
+
+    {% for message in messages %}
+
+    <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert">
+        <strong>{{ message.tag }}</strong> {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    {% endfor %}
+
+    {% if pending_applications.count != 0 %}
+
+    <div class="card">
+        <div class="card-body">
+            <h3 class="heading">
+                <span class="fw-semibold">Pending Applications &nbsp;({{ pending_applications.count }})</span>
+           </h3>
+        </div>
+    </div>
+
+    <div class="card w-100">
+        <div class="card-body p-4">
+            <h5 class="card-title fw-semibold mb-4">Our Applicants 🔥</h5>
+            <div class="table-responsive">
+                <table class="table text-nowrap mb-0 align-middle">
+                    <thead class="text-dark fs-4">
+
+                        <tr>
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">
+                                    #
+                                </h6>
+                            </th>
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">
+                                    Name
+                                </h6>
+                            </th>
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">
+                                    Course - Year
+                                </h6>
+                            </th>
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">
+                                    Academic Score
+                                </h6>
+                            </th>
+
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">
+                                    Status
+                                </h6>
+                            </th>
+                            <th class="border-bottom-0 justify-content-center">
+                                <h6 class="fw-semibold mb-0">
+                                    Action#1
+                                </h6>
+                            </th>
+                            <th class="border-bottom-0 justify-content-center">
+                                <h6 class="fw-semibold mb-0">
+                                    Action#2
+                                </h6>
+                            </th>
+
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for application in pending_applications %}
+
+                        <tr>
+                            <td class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">{{ forloop.counter }}</h6>
+                            </td>
+                            <td class="border-bottom-0">
+                                <h6 class="fw-semibold mb-1">{{ application.student.first_name }}
+                                    {{application.student.last_name }}</h6>
+                                <span class="fw-normal"></span>
+                            </td>
+
+                            <td class="border-bottom-0">
+                                <div class="d-flex align-items-center gap-2">
+                                    <p>
+                                        <span class="mb-0 fw-normal">{{ application.student.course }}</span>
+                                        <br>
+                                        <span class="mb-0 fw-normal">{{ application.student.year }}</span>
+                                    </p>
+                                </div>
+                            </td>
+                            <td class="border-bottom-0">
+                                <p class="fw-semibold mb-0">
+                                    Highschool: <span style="font-weight: bold; color: black;">
+                                        {{application.student.tenth }}% </span>
+                                    <br>
+                                    Intermediate: <span style="font-weight: bold; color: black;">
+                                        {{application.student.twelfth }}% </span>
+                                    <br>
+                                    UG: <span style="font-weight: bold; color: black;"> {{ application.student.cgpa }}
+                                    </span>
+                                </p>
+                            </td>
+
+                            <td class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0 fs-4">
+                                    {% if application.status == 'pending' %}
+                                    <span class="badge bg-warning">{{ application.status|title }}</span>
+                                    {% elif application.status == 'accepted' %}
+                                    <span class="badge bg-success">{{ application.status|title }}</span>
+                                    {% else %}
+                                    <span class="badge bg-danger">{{ application.status|title }}</span>
+                                    {% endif %}
+                                </h6>
+                            </td>
+
+                            <td class="border-bottom-0">
+                                <div class="d-flex align-items-center gap-2">
+
+                                    <a class="btn btn-outline-primary text-blue float-end"
+                                        id="viewbtn-{{ application.id }}"
+                                        onclick="return myf({{ application.id }});">View Resume</a>
+
+                                </div>
+                            </td>
+                            <td class="border-bottom-0">
+                                <div class="d-flex align-items-center gap-2">
+
+                                    {% if application.status == 'pending' %}
+                                    <a href="{% url 'reject_application' application.id %}"
+                                        class="btn btn-outline-danger text-red float-end"
+                                        onclick="return confirm('Are you sure you want to REJECT the application?')">Reject</a>
+
+                                    <a href="{% url 'accept_application' application.id %}"
+                                        class="btn btn-outline-success text-green float-end"
+                                        onclick="return confirm('Are you sure you want to ACCEPT the application?')">Accept</a>
+
+                                    {% elif application.status == 'accepted' %}
+                                    <a href="{% url 'reject_application' application.id %}"
+                                        class="btn btn-outline-danger text-red float-end"
+                                        onclick="return confirm('Are you sure you want to REJECT the application?')">Reject</a>
+
+                                    <a href="{% url 'change_to_pending' application.id %}"
+                                        class="btn btn-outline-warning"
+                                        onclick="return confirm('Are you sure you want to change the application status to PENDING?')">Change
+                                        to Pending</a>
+
+                                    {% else %}
+                                    <a href="{% url 'accept_application' application.id %}"
+                                        class="btn btn-outline-success text-green float-end"
+                                        onclick="return confirm('Are you sure you want to ACCEPT the application?')">Accept</a>
+
+                                    <a href="{% url 'change_to_pending' application.id %}"
+                                        class="btn btn-outline-warning"
+                                        onclick="return confirm('Are you sure you want to change the application status to PENDING?')">Change
+                                        to Pending</a>
+
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+
+
+                        <embed id="pdfContainer-{{ application.id }}"
+                            style="display: none; border-radius: 10px; margin-top: 5%;"
+                            src="{{ application.student.resume.url }}" type="application/pdf" width="100%"
+                            height="400px" />
+
+
+                        <script>
+                            function myf(pdfId) {
+                                var x = document.getElementById("pdfContainer-" + pdfId);
+                                var btn = document.getElementById("viewbtn-" + pdfId);
+
+                                if (x.style.display === "none") {
+                                    btn.innerHTML = "Close";
+                                    x.style.display = "block";
+                                    card.style.height = "600px";
+                                } else {
+                                    btn.innerHTML = "View";
+                                    x.style.display = "none";
+                                    card.style.height = "auto";
+                                }
+                            }
+                        </script>
+
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    {% endif %}
+
+
+    {% if accepted_applications.count != 0 %}
+
+    <div class="card">
+        <div class="card-body">
+            <h3 class="heading">
+                <span class="fw-semibold">Accepted Applications &nbsp;({{ accepted_applications.count }})</span>
+            </h3>
+        </div>
+    </div>
+
+
+    <div class="card w-100">
+        <div class="card-body p-4">
+            <h5 class="card-title fw-semibold mb-4">Our Applicants 🔥</h5>
+            <div class="table-responsive">
+                <table class="table text-nowrap mb-0 align-middle">
+                    <thead class="text-dark fs-4">
+
+                        <tr>
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">
+                                    #
+                                </h6>
+                            </th>
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">
+                                    Name
+                                </h6>
+                            </th>
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">
+                                    Course - Year
+                                </h6>
+                            </th>
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">
+                                    Academic Score
+                                </h6>
+                            </th>
+
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">
+                                    Status
+                                </h6>
+                            </th>
+                            <th class="border-bottom-0 justify-content-center">
+                                <h6 class="fw-semibold mb-0">
+                                    Action#1
+                                </h6>
+                            </th>
+                            <th class="border-bottom-0 justify-content-center">
+                                <h6 class="fw-semibold mb-0">
+                                    Action#2
+                                </h6>
+                            </th>
+
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for application in accepted_applications %}
+
+                        <tr>
+                            <td class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">{{ forloop.counter }}</h6>
+                            </td>
+                            <td class="border-bottom-0">
+                                <h6 class="fw-semibold mb-1">{{ application.student.first_name }}
+                                    {{application.student.last_name }}</h6>
+                                <span class="fw-normal"></span>
+                            </td>
+
+                            <td class="border-bottom-0">
+                                <div class="d-flex align-items-center gap-2">
+                                    <p>
+                                        <span class="mb-0 fw-normal">{{ application.student.course }}</span>
+                                        <br>
+                                        <span class="mb-0 fw-normal">{{ application.student.year }}</span>
+                                    </p>
+                                </div>
+                            </td>
+                            <td class="border-bottom-0">
+                                <p class="fw-semibold mb-0">
+                                    Highschool: <span style="font-weight: bold; color: black;">
+                                        {{application.student.tenth }}% </span>
+                                    <br>
+                                    Intermediate: <span style="font-weight: bold; color: black;">
+                                        {{application.student.twelfth }}% </span>
+                                    <br>
+                                    UG: <span style="font-weight: bold; color: black;"> {{ application.student.cgpa }}
+                                    </span>
+                                </p>
+                            </td>
+
+                            <td class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0 fs-4">
+                                    {% if application.status == 'pending' %}
+                                    <span class="badge bg-warning">{{ application.status|title }}</span>
+                                    {% elif application.status == 'accepted' %}
+                                    <span class="badge bg-success">{{ application.status|title }}</span>
+                                    {% else %}
+                                    <span class="badge bg-danger">{{ application.status|title }}</span>
+                                    {% endif %}
+                                </h6>
+                            </td>
+
+                            <td class="border-bottom-0">
+                                <div class="d-flex align-items-center gap-2">
+
+                                    <a class="btn btn-outline-primary text-blue float-end"
+                                        id="viewbtn-{{ application.id }}"
+                                        onclick="return myf({{ application.id }});">View Resume</a>
+
+                                </div>
+                            </td>
+                            <td class="border-bottom-0">
+                                <div class="d-flex align-items-center gap-2">
+
+                                    {% if application.status == 'pending' %}
+                                    <a href="{% url 'reject_application' application.id %}"
+                                        class="btn btn-outline-danger text-red float-end"
+                                        onclick="return confirm('Are you sure you want to REJECT the application?')">Reject</a>
+
+                                    <a href="{% url 'accept_application' application.id %}"
+                                        class="btn btn-outline-success text-green float-end"
+                                        onclick="return confirm('Are you sure you want to ACCEPT the application?')">Accept</a>
+
+                                    {% elif application.status == 'accepted' %}
+                                    <a href="{% url 'reject_application' application.id %}"
+                                        class="btn btn-outline-danger text-red float-end"
+                                        onclick="return confirm('Are you sure you want to REJECT the application?')">Reject</a>
+
+                                    <a href="{% url 'change_to_pending' application.id %}"
+                                        class="btn btn-outline-warning"
+                                        onclick="return confirm('Are you sure you want to change the application status to PENDING?')">Change
+                                        to Pending</a>
+
+                                    {% else %}
+                                    <a href="{% url 'accept_application' application.id %}"
+                                        class="btn btn-outline-success text-green float-end"
+                                        onclick="return confirm('Are you sure you want to ACCEPT the application?')">Accept</a>
+
+                                    <a href="{% url 'change_to_pending' application.id %}"
+                                        class="btn btn-outline-warning"
+                                        onclick="return confirm('Are you sure you want to change the application status to PENDING?')">Change
+                                        to Pending</a>
+
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+
+
+                        <embed id="pdfContainer-{{ application.id }}"
+                            style="display: none; border-radius: 10px; margin-top: 5%;"
+                            src="{{ application.student.resume.url }}" type="application/pdf" width="100%"
+                            height="400px" />
+
+
+                        <script>
+                            function myf(pdfId) {
+                                var x = document.getElementById("pdfContainer-" + pdfId);
+                                var btn = document.getElementById("viewbtn-" + pdfId);
+
+                                if (x.style.display === "none") {
+                                    btn.innerHTML = "Close";
+                                    x.style.display = "block";
+                                    card.style.height = "600px";
+                                } else {
+                                    btn.innerHTML = "View";
+                                    x.style.display = "none";
+                                    card.style.height = "auto";
+                                }
+                            }
+                        </script>
+
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    {% endif %}
+
+    {% if rejected_applications.count != 0 %}
+
+    <div class="card">
+        <div class="card-body">
+            <h3 class="heading">
+                <span class="fw-semibold">Rejected Applications &nbsp;({{ rejected_applications.count }})</span>
+            </h3>
+        </div>
+    </div>
+
+
+
+    <div class="card w-100">
+        <div class="card-body p-4">
+            <h5 class="card-title fw-semibold mb-4">Our Applicants 🔥</h5>
+            <div class="table-responsive">
+                <table class="table text-nowrap mb-0 align-middle">
+                    <thead class="text-dark fs-4">
+
+                        <tr>
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">
+                                    #
+                                </h6>
+                            </th>
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">
+                                    Name
+                                </h6>
+                            </th>
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">
+                                    Course - Year
+                                </h6>
+                            </th>
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">
+                                    Academic Score
+                                </h6>
+                            </th>
+
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">
+                                    Status
+                                </h6>
+                            </th>
+                            <th class="border-bottom-0 justify-content-center">
+                                <h6 class="fw-semibold mb-0">
+                                    Action#1
+                                </h6>
+                            </th>
+                            <th class="border-bottom-0 justify-content-center">
+                                <h6 class="fw-semibold mb-0">
+                                    Action#2
+                                </h6>
+                            </th>
+
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for application in rejected_applications %}
+
+                        <tr>
+                            <td class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">{{ forloop.counter }}</h6>
+                            </td>
+                            <td class="border-bottom-0">
+                                <h6 class="fw-semibold mb-1">{{ application.student.first_name }}
+                                    {{application.student.last_name }}</h6>
+                                <span class="fw-normal"></span>
+                            </td>
+
+                            <td class="border-bottom-0">
+                                <div class="d-flex align-items-center gap-2">
+                                    <p>
+                                        <span class="mb-0 fw-normal">{{ application.student.course }}</span>
+                                        <br>
+                                        <span class="mb-0 fw-normal">{{ application.student.year }}</span>
+                                    </p>
+                                </div>
+                            </td>
+                            <td class="border-bottom-0">
+                                <p class="fw-semibold mb-0">
+                                    Highschool: <span style="font-weight: bold; color: black;">
+                                        {{application.student.tenth }}% </span>
+                                    <br>
+                                    Intermediate: <span style="font-weight: bold; color: black;">
+                                        {{application.student.twelfth }}% </span>
+                                    <br>
+                                    UG: <span style="font-weight: bold; color: black;"> {{ application.student.cgpa }}
+                                    </span>
+                                </p>
+                            </td>
+
+                            <td class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0 fs-4">
+                                    {% if application.status == 'pending' %}
+                                    <span class="badge bg-warning">{{ application.status|title }}</span>
+                                    {% elif application.status == 'accepted' %}
+                                    <span class="badge bg-success">{{ application.status|title }}</span>
+                                    {% else %}
+                                    <span class="badge bg-danger">{{ application.status|title }}</span>
+                                    {% endif %}
+                                </h6>
+                            </td>
+
+                            <td class="border-bottom-0">
+                                <div class="d-flex align-items-center gap-2">
+
+                                    <a class="btn btn-outline-primary text-blue float-end"
+                                        id="viewbtn-{{ application.id }}"
+                                        onclick="return myf({{ application.id }});">View Resume</a>
+
+                                </div>
+                            </td>
+                            <td class="border-bottom-0">
+                                <div class="d-flex align-items-center gap-2">
+
+                                    {% if application.status == 'pending' %}
+                                    <a href="{% url 'reject_application' application.id %}"
+                                        class="btn btn-outline-danger text-red float-end"
+                                        onclick="return confirm('Are you sure you want to REJECT the application?')">Reject</a>
+
+                                    <a href="{% url 'accept_application' application.id %}"
+                                        class="btn btn-outline-success text-green float-end"
+                                        onclick="return confirm('Are you sure you want to ACCEPT the application?')">Accept</a>
+
+                                    {% elif application.status == 'accepted' %}
+                                    <a href="{% url 'reject_application' application.id %}"
+                                        class="btn btn-outline-danger text-red float-end"
+                                        onclick="return confirm('Are you sure you want to REJECT the application?')">Reject</a>
+
+                                    <a href="{% url 'change_to_pending' application.id %}"
+                                        class="btn btn-outline-warning"
+                                        onclick="return confirm('Are you sure you want to change the application status to PENDING?')">Change
+                                        to Pending</a>
+
+                                    {% else %}
+                                    <a href="{% url 'accept_application' application.id %}"
+                                        class="btn btn-outline-success text-green float-end"
+                                        onclick="return confirm('Are you sure you want to ACCEPT the application?')">Accept</a>
+
+                                    <a href="{% url 'change_to_pending' application.id %}"
+                                        class="btn btn-outline-warning"
+                                        onclick="return confirm('Are you sure you want to change the application status to PENDING?')">Change
+                                        to Pending</a>
+
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+
+
+                        <embed id="pdfContainer-{{ application.id }}"
+                            style="display: none; border-radius: 10px; margin-top: 5%;"
+                            src="{{ application.student.resume.url }}" type="application/pdf" width="100%"
+                            height="400px" />
+
+
+                        <script>
+                            function myf(pdfId) {
+                                var x = document.getElementById("pdfContainer-" + pdfId);
+                                var btn = document.getElementById("viewbtn-" + pdfId);
+
+                                if (x.style.display === "none") {
+                                    btn.innerHTML = "Close";
+                                    x.style.display = "block";
+                                    card.style.height = "600px";
+                                } else {
+                                    btn.innerHTML = "View";
+                                    x.style.display = "none";
+                                    card.style.height = "auto";
+                                }
+                            }
+                        </script>
+
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+{% endif %}
+
+
+</div>
+
+
+{% endblock %}

@@ -1,0 +1,159 @@
+{% extends "student/base.html" %} {% load static %}
+
+{% block title %} Student -> Confirm Application {% endblock %}
+
+{% block body %}
+
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-body">
+
+            <h5 class="card-title fw-semibold mb-4">Verify Details Carefully!</h5>
+
+            <p class="mb-0">Once submitted, no changes will be allowed.</p>
+        </div>
+    </div>
+
+    {% for message in messages %}
+
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <strong>{{ message.tag }}</strong> {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    {% endfor %}
+
+    <div class="card">
+        <div class="card-body">
+
+            <div class="col-lg-4 d-inline">
+                <div class="card mb-4">
+                    <div class="card-body text-center">
+                        <img src="{{ student.profile_pic.url }}" alt="avatar" class="rounded-circle img-fluid"
+                            style="width: 200px" />
+                    </div>
+                </div>
+            </div>
+            <div class="row flex-row">
+
+
+                <div class="mb-3 col-md-6">
+                    <label for="exampleInputEmail1" class="form-label">Name</label>
+
+                    {% if student.gender == "Male" %}
+
+                    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
+                        value="Mr. {{ student.first_name }} {{ student.last_name }}" disabled />
+
+                    {% else %}
+
+                    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
+                        value="Ms. {{ student.first_name }} {{ student.last_name }}" disabled />
+
+                    {% endif %}
+                </div>
+
+                <div class="mb-3 col-md-6">
+                    <label for="exampleInputEmail1" class="form-label">Email address</label>
+                    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
+                        value="{{ student.username }}" disabled />
+                </div>
+
+            </div>
+
+            <div class="row flex-row">
+                <div class="mb-3 col-md-6">
+                    <label for="exampleInputEmail1" class="form-label">Mobile Number</label>
+                    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
+                        value="+91 {{ student.phone_number }}" disabled />
+                </div>
+                <div class="mb-3 col-md-6">
+                    <label for="exampleInputEmail1" class="form-label">Gender</label>
+                    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
+                        value="{{ student.gender }}" disabled />
+                </div>
+            </div>
+
+            <div class="row flex-row">
+                <div class="mb-3 col-md-4">
+                    <label for="exampleInputEmail1" class="form-label">Highschool</label>
+                    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
+                        value="{{ student.tenth }}%" disabled />
+                </div>
+
+                <div class="mb-3 col-md-4">
+                    <label for="exampleInputEmail1" class="form-label">Intermediate</label>
+                    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
+                        value="{{ student.twelfth }}%" disabled />
+                </div>
+
+                <div class="mb-3 col-md-4">
+                    <label for="exampleInputEmail1" class="form-label">CGPA (Out of 10)</label>
+                    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
+                        value="{{ student.cgpa }}" disabled />
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="exampleInputEmail1" class="form-label">LinkedIn ID</label>
+                <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
+                    value="{{ student.linkedin_id }}" disabled />
+            </div>
+
+            <div class="mb-3">
+                <label for="exampleInputEmail1" class="form-label">GitHub ID</label>
+                <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
+                    value="{{ student.github_id }}" disabled />
+            </div>
+
+            
+
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="exampleCheck1" checked>
+                    I hereby declare that the information provided above is true to the best of my knowledge.
+                </div>
+
+                <div class="mb-3">
+                    <a href="{% url 'apply' job.slug %}" class="btn btn-lg btn-success w-100"
+                    onclick="return applyJob(this);"
+                    >Submit Application</a>
+                </div>
+
+            
+
+        </div>
+    </div>
+</div>
+
+<script>
+    function myf(pdfId) {
+        var x = document.getElementById("pdfContainer");
+        var btn = document.getElementById("viewbtn");
+
+        if (x.style.display === "none") {
+            btn.innerHTML = "Close";
+            x.style.display = "block";
+            card.style.height = "600px";
+        } else {
+            btn.innerHTML = "View";
+            x.style.display = "none";
+            card.style.height = "auto";
+        }
+    }
+
+    // create a function which will prevent the form from submitting and disable the submit button until the process is complete
+
+        function applyJob(button) {
+            // Disable the button to prevent multiple clicks
+            button.style.pointerEvents = 'none';
+            // change the color also
+            button.classList.remove('btn-success');
+            button.classList.add('btn-secondary');
+            // change the text
+            button.innerHTML = 'Processing... Please Wait...';
+            // return false to prevent the form from submitting
+            return true;
+        }
+</script>
+
+{% endblock %}

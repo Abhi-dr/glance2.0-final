@@ -1,0 +1,212 @@
+{% extends "student/base.html" %}
+{% load static %}
+
+{% block title %}
+Student -> {{ job.company.name }}
+{% endblock %}
+
+{% block extra_css %}
+
+<style>
+    .button {
+        display: inline-block;
+        font-size: 16px;
+        width: 250px;
+        /* Adjust width as needed */
+        position: absolute;
+        top: 16px;
+        /* Adjust vertical position as needed */
+        right: 16px;
+        /* Adjust horizontal position as needed */
+    }
+</style>
+
+{% endblock %}
+
+{% block body %}
+
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-body mb-n9">
+            <div class="col-md-5">
+            <h5 class="card-title d-block mb-2 fw-semibold">{{ job.title|title }} @{{ job.company.name|title }}</h5>
+        </div>
+
+            <!-- <div class="col-md-5">
+                {% if student.resume and student.no_of_companies_left != 0 %}
+                <a href="{% url 'confirm_application' job.slug %}" class="btn btn-success button">Apply now</a>
+                {% elif student.no_of_companies_left == 0 %}
+                <a href="#" class="btn btn-dark button">Max. Applications Reached!</a>
+                {% else %}
+                <a href="{% url 'upload_resume' %}" class="btn btn-danger button">Upload Resume First</a>
+                {% endif %}
+            </div> -->
+            <!-- <a href="#" class="btn btn-primary">Apply Now</a> -->
+        </div>
+        <div class="position-relative">
+
+            <div class="card-body">
+                <h5 class="card-title fw-semibold mb-0">Offer Details</h5>
+                <div class="d-md-flex">
+
+                    <!-- <div class="d-flex ms-4 my-4">
+                        <div class="border-right border-2 px-5 d-flex flex-column align-items-center">
+                            <span class="fw-semibold fs-6">300+</span>
+                            <span class="fw-semibold fs-6">Lecture Hours</span>
+                        </div>
+                        <div class="border-right border-2 px-5 d-flex flex-column align-items-center">
+                            <span class="fw-semibold fs-6">30+</span>
+                            <span class="fw-semibold fs-6">PDFs And DPPs</span>
+                        </div>
+                    </div> -->
+
+                    <img src="{{ job.company.logo.url }}" class="card-img-top mt-2 mb-2 float-end"
+                        style="border-radius: 5px; width: 50%; height: 100vh;" alt="...">
+
+                    <div class="position-relative">
+                        <div class="card-body">
+                            <p class="mb-0 text-wrap">{{ job.description|linebreaks }}</p>
+
+                            <p class="mb-1 fw-semibold fs-5">Date of Arrival:
+                                <span style="color: rgb(255, 137, 27);">{{ job.interview_date }}</span>
+                            </p>
+                            <p class="mb-1 fw-semibold fs-5">Role:
+                                <span style="color: rgb(255, 195, 65);">{{ job.role|title }}</span>
+                            </p>
+
+                            <p class="mb-1 fw-semibold fs-5">Job Type:
+                                <span style="color: green;">{{ job.job_type }}</span>
+                            </p>
+
+                            <p class="mb-1 fw-semibold fs-5">Salary Range:
+                                <span style="color: green;">{{ job.salary_range }}</span>
+                            </p>
+
+                            <p class="mb-1 fw-semibold fs-5">Location Flexibility:
+                                <span style="color: green;">{{ job.location_flexibility|title }}</span>
+                            </p>
+
+                            <p class="mb-1 fw-semibold fs-5">Training Period:
+                                <span style="color: green;">{{ job.training_period }}</span>
+                            </p>
+
+                            <p class="mb-1 fw-semibold fs-5">Bond Timing:
+                                <span style="color: green;">{{ job.bond_timing }}</span>
+                            </p>
+                            <p class="mb-1 fw-semibold fs-5">Interview Mode:
+                                <span style="color: green;">{{ job.interview_mode }}</span>
+                            </p>
+
+                            <p class="mb-1 fw-bolder fs-5">Deadline to Apply:
+                                <span style="color: rgb(255, 95, 27);">{{ job.deadline }}</span>
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        {% if job in applications %}
+        <a href="#" class="btn btn-danger mx-9 mb-4">Withdraw Application</a>
+
+        {% else %}
+
+        {% if student.resume and student.tenth_marksheet and student.twelfth_marksheet and student.college_profile_print and student.no_of_companies_left != 0 %}
+        <a href="{% url 'confirm_application' job.slug %}" class="btn btn-success mx-9 mb-4">Apply now</a>
+        {% elif student.no_of_companies_left == 0 %}
+        <a href="#" class="btn btn-dark mx-9 mb-4">Max. Applications Reached!</a>
+        {% else %}
+        <a href="{% url 'upload_resume' %}" class="btn btn-danger button">Upload Documents First</a>
+        {% endif %}
+
+        {% endif %}
+
+        <!-- <div class="card-body">
+            <div class="card-body">
+                <h5 class="card-title fw-semibold mb-4">This Batch Includes</h5>
+                <div class="d-md-flex align-items-center my-md-4">
+                    <div class="d-flex ms-4 my-4">
+                        <div class="border-right border-2 px-5 d-flex flex-column align-items-center">
+                            <span class="fw-semibold fs-6">300+</span>
+                            <span class="fw-semibold fs-6">Lecture Hours</span>
+                        </div>
+                        <div class="border-right border-2 px-5 d-flex flex-column align-items-center">
+                            <span class="fw-semibold fs-6">30+</span>
+                            <span class="fw-semibold fs-6">PDFs And DPPs</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="card-body">
+                <h5 class="card-title fw-semibold mb-4">Course Validation:</h5>
+                <p class="mb-0">This course is valid till 31st March 2022</p>
+
+            </div>
+            <div class="card-body">
+                <h5 class="card-title fw-semibold mb-4">Subjects:</h5>
+                <p class="mb-0">
+
+                <ul>
+                    {% for subject in subjects %}
+                    <li>
+                        -> <a href="">{{ subject.title }}</a>
+                    </li>
+                    {% endfor %}
+                </ul>
+
+                </p>
+            </div>
+            <div class="card-body">
+                <h5 class="card-title fw-semibold mb-4">Faculties </h5>
+                <div class="row row-cols-1 row-cols-md-3 g-4">
+                    <div class="col-md-2">
+                        <div class="card">
+                            <img src="../static/images/profile/user-1.jpg" class="card-img-top" alt="...">
+                            <div class="card-body">
+                                <h5 class="card-title">Maths</h5>
+                                <p class="card-text">Akash Sir</p>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="card">
+                            <img src="../static/images/profile/user-1.jpg" class="card-img-top" alt="...">
+                            <div class="card-body">
+                                <h5 class="card-title">Biology</h5>
+                                <p class="card-text">Abhishek Sir</p>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="card">
+                            <img src="../static/images/profile/user-1.jpg" class="card-img-top" alt="...">
+                            <div class="card-body">
+                                <h5 class="card-title">Physics</h5>
+                                <p class="card-text">Sachin Sir</p>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="card">
+                            <img src="../static/images/profile/user-1.jpg" class="card-img-top" alt="...">
+                            <div class="card-body">
+                                <h5 class="card-title">English</h5>
+                                <p class="card-text">Akash Sir</p>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div> -->
+        <!-- <a href="" class="btn btn-primary m-9">Apply Now</a> -->
+
+    </div>
+
+    {% endblock %}
