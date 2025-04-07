@@ -4,837 +4,661 @@
 <html lang="en">
 
 <head>
-  <meta charset="utf-8">
-  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glance Job Fair 2.0 - GLA University</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/home/style.css' %}">
+    <style>
+        .auth-buttons .btn {
+            margin-left: 10px;
+            font-weight: 500;
+        }
 
-  <title>GLA University</title>
-  <meta content="" name="description">
-  <meta content="" name="keywords">
+        .welcome-alert {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 1000;
+            animation: fadeInOut 5s forwards;
+        }
 
-  <!-- Favicons -->
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+        @keyframes fadeInOut {
+            0% {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
 
-  <!-- jQuery -->
+            10% {
+                opacity: 1;
+                transform: translateY(0);
+            }
 
-  <link href="{% static 'home/assets/img/favicon.png" rel="icon">
-  <link href="{% static 'home/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+            80% {
+                opacity: 1;
+                transform: translateY(0);
+            }
 
-  <!-- Google Fonts -->
-  <link
-    href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
-    rel="stylesheet">
-
-  <!-- Vendor CSS Files -->
-  <link href="{% static 'home/assets/vendor/bootstrap/css/bootstrap.min.css' %} " rel="stylesheet">
-  <link href="{% static 'home/assets/vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
-  <link href="{% static 'home/assets/vendor/boxicons/css/boxicons.min.css' %}" rel="stylesheet">
-  <link href="{% static 'home/assets/vendor/glightbox/css/glightbox.min.css' %}" rel="stylesheet">
-  <link href="{% static 'home/assets/vendor/swiper/swiper-bundle.min.css' %}" rel="stylesheet">
-
-  <!-- Template Main CSS File -->
-  <link href="{% static 'home/assets/css/style.css' %}" rel="stylesheet">
-
-
-  <style>
-    @media (max-width: 304px) {
-      #navbar {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-      }
-
-      #navbar ul {
-        margin: 0;
-        padding: 0;
-      }
-
-      h2 {
-        margin-top: 30%;
-      }
-
-      #navbar ul li {
-        margin-bottom: 10px;
-        /* Adjust spacing between navigation links */
-      }
-
-      .header-social-links {
-        display: none;
-        /* Hide social links on smaller screens */
-      }
-
-      .mobile-nav-toggle {
-        display: block;
-        /* Show mobile navigation toggle on smaller screens */
-      }
-    }
-
-    .alert {
-      padding: 1%;
-      margin: 2%;
-      background-color: #43A89F;
-      color: rgb(0, 0, 0);
-    }
-
-    ​ .closebtn {
-      color: white;
-      font-weight: bold;
-      float: right;
-      font-size: 29px;
-      line-height: 20px;
-      cursor: pointer;
-      transition: 0.3s;
-
-    }
-
-    ​ .closebtn:hover {
-      color: black;
-    }
-
-    .member {
-      transition: transform 0.3s ease, background-color 0.3s ease;
-      cursor: pointer;
-    }
-
-    .member:hover {
-      transform: translateY(-10px);
-      background-color: #43A89F !important;
-      color: #fff !important;
-    }
-
-    .member h4,
-    .member span,
-    .member p {
-      transition: color 0.3s ease;
-    }
-
-    .member:hover h4,
-    .member:hover span,
-    .member:hover p {
-      color: #fff !important;
-    }
-
-    .carousel-item .row [class^="col-"] {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .carousel-item .row [class^="col-"] img {
-      max-width: 100%;
-      height: auto;
-    }
-
-    .recruiter-card {
-      width: 200px;
-      height: 200px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      transition: transform 0.3s ease;
-    }
-
-    .recruiter-card:hover {
-      transform: scale(1.1);
-    }
-
-    .recruiter-logo {
-      max-width: 100px;
-      max-height: 100px;
-      transition: transform 0.3s ease;
-    }
-
-    .recruiter-card:hover .recruiter-logo {
-      transform: scale(1.2);
-    }
-
-    @media (max-width: 767px) {
-      .recruiter-card {
-        width: 150px;
-        height: 150px;
-      }
-
-      .recruiter-logo {
-        max-width: 80px;
-        max-height: 80px;
-      }
-
-      h2 {
-        margin-top: 30%;
-      }
-    }
-  </style>
+            100% {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+        }
+    </style>
 </head>
 
 <body>
-
-  <!-- ======= Header ======= -->
-  <header id="header" class="fixed-top d-flex align-items-center">
-    <div class="container d-flex align-items-center">
-
-      <div class="logo me-auto">
-        <h1>
-          <a href="{% url 'home' %}">
-            <img src="{% static 'home/assets/img/logo2.png' %}" alt="Lumia Logo" style="width: 100%; max-height:60px">
-          </a>
-        </h1>
-      </div>
-      <!-- Uncomment below if you prefer to use an image logo -->
-      <!-- <a href="index.html"><img src="assets/img/logo.png" alt="" class="img-fluid"></a>-->
+    <!-- Background Video -->
+    <div class="video-background">
+        <video autoplay muted loop>
+            <source src="{% static 'img/home/bg_video.mp4' %}" type="video/mp4">
+        </video>
+        <div class="video-overlay"></div>
     </div>
 
-    <nav id="navbar" class="navbar order-last order-lg-0">
-      <ul>
-        <li><a class="nav-link scrollto active" href="#hero">Home</a></li>
-        <li><a class="nav-link scrollto" href="#about">About</a></li>
 
-        <li><a class="nav-link scrollto" href="#contact">Contact</a></li>
-
-
-      </ul>
-      <i class="bi bi-list mobile-nav-toggle"></i>
-    </nav><!-- .navbar -->
-
-    <div class="header-social-links d-flex align-items-center">
-      <a href="https://www.facebook.com/profile.php?id=61552790286215" class="facebook"><i
-          class="bi bi-facebook"></i></a>
-      <a href="https://www.instagram.com/alumniassociationgla/" class="instagram"><i class="bi bi-instagram"></i></a>
-      <a href="https://www.linkedin.com/groups/4993377/" class="linkedin"><i class="bi bi-linkedin"></i></i></a>
+    <div class="alert alert-success welcome-alert d-none" id="welcomeAlert">
+        <i class="fas fa-check-circle me-2"></i> Welcome back! You've successfully signed in.
     </div>
 
-    </div>
-  </header><!-- End Header -->
-
-
-  <!-- ======= Hero Section ======= -->
-  <section id="hero" class="d-flex flex-column justify-content-center align-items-center">
-    <div class="container text-center text-md-left" data-aos="fade-up">
-      <h1>Welcome to GLA University</h1>
-      <h2></h2>
-      <a href="{% url 'login' %}" class="btn-get-started scrollto">Login</a>
-      &nbsp;
-      <a href="{% url 'register' %}" class="btn-get-started scrollto">Register</a>
-    </div>
-  </section><!-- End Hero -->
-
-  <main id="main">
-
-    <!-- ======= What We Do Section ======= -->
-
-    {% for message in messages %}
-
-    <div class="alert">
-      <strong>Thank You</strong> {{ message }}
-      <!-- <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> -->
-    </div>
-
-    {% endfor %}<section id="about" class="about">
-      <div class="container">
-        <div class="row mb-4">
-          <div class="section-title">
-            <h2>About</h2>
-          </div>
-          <div id="imageSlider" class="carousel slide" data-ride="carousel">
-            <div class="carousel-inner">
-              <div class="carousel-item active">
-                <img src="{% static 'home/assets/img/high.png' %}" class="d-block w-100" alt="First slide">
-              </div>
-              <div class="carousel-item">
-                <img src="{% static 'home/assets/img/cr1.png' %}" class="d-block w-100" alt="Second slide">
-              </div>
-              <div class="carousel-item">
-                <img src="{% static 'home/assets/img/cr2.jpeg' %}" class="d-block w-100" alt="Third slide">
-              </div>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#home">
+                <img src="{% static 'img/home/logo.svg' %}" alt="Glance 2.0 Logo">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#home">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#about">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#companies">Companies</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#schedule">Schedule</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#gallery">Gallery</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#team">Team</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#contact">Contact</a>
+                    </li>
+                </ul>
+                <div class="auth-buttons">
+                    <a href="{% url 'login' %}" class="btn btn-outline-light btn-sm">Sign In</a>
+                    <a href="{% url 'register' %}" class="btn btn-primary btn-sm">Sign Up</a>
+                </div>
             </div>
-            <a class="carousel-control-prev" href="#imageSlider" role="button" data-slide="prev">
-              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-              <span class="sr-only">Previous</span>
-            </a>
-            <a class="carousel-control-next" href="#imageSlider" role="button" data-slide="next">
-              <span class="carousel-control-next-icon" aria-hidden="true"></span>
-              <span class="sr-only">Next</span>
-            </a>
-          </div>
         </div>
-        <div class="row">
-          <div class="col-lg-6 pt-4 pt-lg-0">
-            <h3>About GLANCE</h3>
-            <p>GLANCE, the inaugural job fair hosted by GLA University Mathura, promises students an exciting
-              opportunity to explore diverse career paths and connect with esteemed organizations. With engaging events
-              and networking opportunities, GLANCE is set to empower students in their journey towards professional
-              success.</p>
-            <h5><strong>Benefits for students</strong></h5>
-            <ul>
-              <li><i class="bx bx-check-double"></i> Varied job and internship offers.</li>
-              <li><i class="bx bx-check-double"></i> Interactive events for company insights.</li>
-              <li><i class="bx bx-check-double"></i> Networking with recruiters and peers.</li>
-              <li><i class="bx bx-check-double"></i> Personal and professional growth.</li>
-              <li><i class="bx bx-check-double"></i>Career advancement opportunities.</li>
-            </ul>
-          </div>
-          <div class="col-lg-6 pt-4 pt-lg-0">
-            <h3><strong>Details of The Job Fair</strong></h3>
-            <ul>
-              <br>
-              <li><i>Date: 24th-25th April, 2024</i></li>
-              <br>
-              <li><i>Time: 09:00 AM onwards</i></li>
-              <br>
-              <li><i>Venue: CSED, AB-11, GLA university, Mathura</i></li>
-            </ul>
-          </div>
-        </div>
+    </nav>
 
-        <!--co-ordinator-->
-        <!-- Inside the main section -->
-        <!-- Inside the main section -->
+    <!-- Hero Section -->
+    <section id="home" class="hero-section">
 
         <div class="container">
-          <div class="section-title">
-            <h2>Our Recruiters</h2>
-          </div>
-          <div>
-            <h2 class="title-section"></h2>
-          </div>
-          <div id="recruitersCarousel" class="carousel slide" data-bs-ride="carousel" data-interval="100">
-            <div class="carousel-inner">
-
-              <div class="carousel-item active">
-                <div class="row justify-content-center align-items-center">
-                  <div class="col-md-3 recruiter-card">
-                    <img src="{% static 'home/assets/img/companies/logo.png' %}" class="img-fluid recruiter-logo"
-                      alt="Recruiter 1">
-                  </div>
-                  <div class="col-md-3 recruiter-card">
-                    <img src="{% static 'home/assets/img/companies/logo1.png' %}" class="img-fluid recruiter-logo"
-                      alt="Recruiter 2">
-                  </div>
+            <div class="row">
+                <div class="col-lg-8 hero-content">
+                    <h1 class="hero-title">Glance Job Fair 2.0</h1>
+                    <h2 class="hero-subtitle">Your Gateway to Career Excellence</h2>
+                    <div class="d-flex flex-wrap gap-3">
+                        <a href="{% url 'register' %}" class="btn btn-primary">Sign Up</a>
+                        <a href="#about" class="btn btn-outline-light">Learn More</a>
+                    </div>
                 </div>
-              </div>
-
-              <div class="carousel-item">
-                <div class="row justify-content-center align-items-center">
-                  <div class="col-md-3 recruiter-card">
-                    <img src="{% static 'home/assets/img/companies/logo2.png' %}" class="img-fluid recruiter-logo"
-                      alt="Recruiter 3">
-                  </div>
-                  <div class="col-md-3 recruiter-card">
-                    <img src="{% static 'home/assets/img/companies/logo10.png' %}" class="img-fluid recruiter-logo"
-                      alt="Recruiter 7">
-                  </div>
-                  <!-- <div class="col-md-3 recruiter-card">
-              <img src="{% static 'home/assets/img/companies/logo3.png' %}" class="img-fluid recruiter-logo" alt="Recruiter 4">
-            </div> -->
-                </div>
-              </div>
-
-              <div class="carousel-item">
-                <div class="row justify-content-center align-items-center">
-                  <div class="col-md-3 recruiter-card">
-                    <img src="{% static 'home/assets/img/companies/logo4.png' %}" class="img-fluid recruiter-logo"
-                      alt="Recruiter 5">
-                  </div>
-                  <div class="col-md-3 recruiter-card">
-                    <img src="{% static 'home/assets/img/companies/logo11.png' %}" class="img-fluid recruiter-logo"
-                      alt="Recruiter 8">
-                  </div>
-                  <!-- <div class="col-md-3 recruiter-card">
-              <img src="{% static 'home/assets/img/companies/logo5.png' %}" class="img-fluid recruiter-logo" alt="Recruiter 6">
-            </div> -->
-                </div>
-              </div>
-
-              <div class="carousel-item">
-                <div class="row justify-content-center align-items-center">
-                  <div class="col-md-3 recruiter-card">
-                    <img src="{% static 'home/assets/img/companies/logo6.png' %}" class="img-fluid recruiter-logo"
-                      alt="Recruiter 7">
-                  </div>
-                  <div class="col-md-3 recruiter-card">
-                    <img src="{% static 'home/assets/img/companies/logo9.png' %}" class="img-fluid recruiter-logo"
-                      alt="Recruiter 8">
-                  </div>
-                </div>
-              </div>
-
-              <div class="carousel-item">
-                <div class="row justify-content-center align-items-center">
-                  <div class="col-md-3 recruiter-card">
-                    <img src="{% static 'home/assets/img/companies/logo8.png' %}" class="img-fluid recruiter-logo"
-                      alt="Recruiter 5">
-                  </div>
-                  <div class="col-md-3 recruiter-card">
-                    <img src="{% static 'home/assets/img/companies/logo7.png' %}" class="img-fluid recruiter-logo"
-                      alt="Recruiter 6">
-                  </div>
-                </div>
-              </div>
-              <!-- 
-        <div class="carousel-item">
-          <div class="row justify-content-center align-items-center">
-            
-            
-          </div>
-        </div> -->
-
             </div>
-            <button class="carousel-control-prev" type="button" data-bs-target="#recruitersCarousel"
-              data-bs-slide="prev" style="color: black;">
-              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-              <span class="visually-hidden">Previous</span>
-            </button>
-            <button class="carousel-control-next" type="button" data-bs-target="#recruitersCarousel"
-              data-bs-slide="next" style="color: black;">
-              <span class="carousel-control-next-icon" aria-hidden="true"></span>
-              <span class="visually-hidden">Next</span>
-            </button>
-          </div>
         </div>
-        <!-- =======Recruiters end ======= -->
+    </section>
 
-        <!-- Inside the main section -->
-        <section id="our-team" class="our-team section-bg">
-          <div class="container">
-            <div class="section-title">
-              <h2>Our Placement Co-ordinators</h2>
+    <!-- About Section -->
+    <section id="about" class="section section-bg">
+        <div class="container">
+            <h2 class="section-title">About Glance 2.0</h2>
+            <p class="section-subtitle">The Premier Job Fair at GLA University</p>
+
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <p class="lead">Glance Job Fair 2.0 is GLA University's premier recruitment event connecting
+                        talented students with top companies across various industries.</p>
+                    <p>This year's event features:</p>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check-circle"></i> 50+ Leading Companies</li>
+                        <li><i class="fas fa-check-circle"></i> On-the-spot Interviews</li>
+                        <li><i class="fas fa-check-circle"></i> Resume Building Workshops</li>
+                        <li><i class="fas fa-check-circle"></i> Industry Expert Sessions</li>
+                        <li><i class="fas fa-check-circle"></i> Networking Opportunities</li>
+                    </ul>
+                    <div class="stats-container">
+                        <div class="stat-item">
+                            <span class="stat-number">2000+</span>
+                            <span class="stat-label">Students</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">30+</span>
+                            <span class="stat-label">Companies</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">800+</span>
+                            <span class="stat-label">Opportunities</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="ratio ratio-16x9">
+                        <iframe src="https://www.youtube.com/embed/UZQZSZMWegE" title="About Glance 2.0" allowfullscreen></iframe>
+                    </div>
+                    
+                </div>
             </div>
+        </div>
+    </section>
+
+    <!-- Companies Section -->
+    <section id="companies" class="section">
+        <div class="container">
+            <h2 class="section-title">Participating Companies</h2>
+            <p class="section-subtitle">Connect with industry leaders</p>
 
             <div class="row g-4">
-              <div class="col-lg-4 col-md-6">
-                <div
-                  class="member h-100 d-flex flex-column align-items-center text-center bg-white rounded shadow-sm p-4">
-                  <div class="member-info mt-3">
-                    <h4>Mr. Shelesh Saraswat</h4>
-                    <span>EC</span>
-                    <p>shelesh.saraswat@gla.ac.in</p>
-                  </div>
+                <div class="col-md-3 col-6">
+                    <div class="company-logo">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Google_2015_logo.svg/1200px-Google_2015_logo.svg.png"
+                            alt="Google">
+                    </div>
                 </div>
-              </div>
-
-              <div class="col-lg-4 col-md-6">
-                <div
-                  class="member h-100 d-flex flex-column align-items-center text-center bg-white rounded shadow-sm p-4">
-                  <div class="member-info mt-3">
-                    <h4>Mr. Vikas Sharma</h4>
-                    <span>BBA & B Com</span>
-                    <p>ankita.mishra@gla.ac.in</p>
-                  </div>
+                <div class="col-md-3 col-6">
+                    <div class="company-logo">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Microsoft_logo.svg/1200px-Microsoft_logo.svg.png"
+                            alt="Microsoft">
+                    </div>
                 </div>
-              </div>
-
-              <div class="col-lg-4 col-md-6">
-                <div
-                  class="member h-100 d-flex flex-column align-items-center text-center bg-white rounded shadow-sm p-4">
-                  <div class="member-info mt-3">
-                    <h4>Dr. Priyank Gupta</h4>
-                    <span>BBA & B Com</span>
-                    <p>priyank.gupta@gla.ac.in</p>
-                  </div>
+                <div class="col-md-3 col-6">
+                    <div class="company-logo">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Amazon_logo.svg/1024px-Amazon_logo.svg.png"
+                            alt="Amazon">
+                    </div>
                 </div>
-              </div>
-
-              <div class="col-lg-4 col-md-6">
-                <div
-                  class="member h-100 d-flex flex-column align-items-center text-center bg-white rounded shadow-sm p-4">
-                  <div class="member-info mt-3">
-                    <h4>Mr. Praveen Mittal </h4>
-                    <span>C.S</span>
-                    <p>praveen.mittal@gla.ac.in</p>
-                  </div>
+                <div class="col-md-3 col-6">
+                    <div class="company-logo">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Apple_logo_black.svg/488px-Apple_logo_black.svg.png"
+                            alt="Apple">
+                    </div>
                 </div>
-              </div>
-
-              <div class="col-lg-4 col-md-6">
-                <div
-                  class="member h-100 d-flex flex-column align-items-center text-center bg-white rounded shadow-sm p-4">
-                  <div class="member-info mt-3">
-                    <h4> Mr. Raisul Islam </h4>
-                    <span>Civil</span>
-                    <p>raisul.islam@gla.ac.in</p>
-                  </div>
+                <div class="col-md-3 col-6">
+                    <div class="company-logo">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Netflix_2015_logo.svg/1920px-Netflix_2015_logo.svg.png"
+                            alt="Netflix">
+                    </div>
                 </div>
-              </div>
-
-
-              <div class="col-lg-4 col-md-6">
-                <div
-                  class="member h-100 d-flex flex-column align-items-center text-center bg-white rounded shadow-sm p-4">
-                  <div class="member-info mt-3">
-                    <h4> Mr.Anuj Mangal </h4>
-                    <span>BCA</span>
-                    <p> anuj.mangal@gla.ac.in</p>
-                  </div>
+                <div class="col-md-3 col-6">
+                    <div class="company-logo">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Facebook_Logo_%282019%29.png/1024px-Facebook_Logo_%282019%29.png"
+                            alt="Facebook">
+                    </div>
                 </div>
-              </div>
-
-
-              <div class="col-lg-4 col-md-6">
-                <div
-                  class="member h-100 d-flex flex-column align-items-center text-center bg-white rounded shadow-sm p-4">
-                  <div class="member-info mt-3">
-                    <h4>Mr. Sanjeev Chauhan </h4>
-                    <span>MBA</span>
-                    <p>sanjeev.chauhan@gla.ac.in</p>
-                  </div>
+                <div class="col-md-3 col-6">
+                    <div class="company-logo">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/IBM_logo.svg/1200px-IBM_logo.svg.png"
+                            alt="IBM">
+                    </div>
                 </div>
-              </div>
-
-              <div class="col-lg-4 col-md-6">
-                <div
-                  class="member h-100 d-flex flex-column align-items-center text-center bg-white rounded shadow-sm p-4">
-                  <div class="member-info mt-3">
-                    <h4>Mr. Sanjeev Saraswat </h4>
-                    <span>MBA</span>
-                    <p>sanjeev.saraswat@gla.ac.in</p>
-                  </div>
+                <div class="col-md-3 col-6">
+                    <div class="company-logo">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Adobe_Digital_Marketing_logo.svg/1200px-Adobe_Digital_Marketing_logo.svg.png"
+                            alt="Adobe">
+                    </div>
                 </div>
-              </div>
-
-              <div class="col-lg-4 col-md-6">
-                <div
-                  class="member h-100 d-flex flex-column align-items-center text-center bg-white rounded shadow-sm p-4">
-                  <div class="member-info mt-3">
-                    <h4>Dr. Ajit Dwarika Sao</h4>
-                    <span>MBA</span>
-                    <p>ajitdwarika.sao@gla.ac.in </p>
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-lg-4 col-md-6">
-                <div
-                  class="member h-100 d-flex flex-column align-items-center text-center bg-white rounded shadow-sm p-4">
-                  <div class="member-info mt-3">
-                    <h4> Ms. Chhavi Singh </h4>
-                    <span>MBA</span>
-                    <p>chhavi.singh@gla.ac.in </p>
-                  </div>
-                </div>
-              </div>
-
-
-              <div class="col-lg-4 col-md-6">
-                <div
-                  class="member h-100 d-flex flex-column align-items-center text-center bg-white rounded shadow-sm p-4">
-                  <div class="member-info mt-3">
-                    <h4>Dr. Priyank Gupta </h4>
-                    <span>BBA & B Com</span>
-                    <p>priyank.gupta@gla.ac.in </p>
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-lg-4 col-md-6">
-                <div
-                  class="member h-100 d-flex flex-column align-items-center text-center bg-white rounded shadow-sm p-4">
-                  <div class="member-info mt-3">
-                    <h4>Mr. Mukesh Pushkarna </h4>
-                    <span>EN & EE </span>
-                    <p>mukesh.pushkarna@gla.ac.in</p>
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-lg-4 col-md-6">
-                <div
-                  class="member h-100 d-flex flex-column align-items-center text-center bg-white rounded shadow-sm p-4">
-                  <div class="member-info mt-3">
-                    <h4>Mr. Atul Uttam</h4>
-                    <span>MCA</span>
-                    <p>atul.uttam@gla.ac.in</p>
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-lg-4 col-md-6">
-                <div
-                  class="member h-100 d-flex flex-column align-items-center text-center bg-white rounded shadow-sm p-4">
-                  <div class="member-info mt-3">
-                    <h4>Mr. Bhupesh Chander Semwal</h4>
-                    <span>B Pharm & M Pharm</span>
-                    <p>bhupesh.semwal@gla.ac.in</p>
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-lg-4 col-md-6">
-                <div
-                  class="member h-100 d-flex flex-column align-items-center text-center bg-white rounded shadow-sm p-4">
-                  <div class="member-info mt-3">
-                    <h4>Mr. Pradeep Kr. Choudhary</h4>
-                    <span>B Sc & M Sc</span>
-                    <p>pradeep.choudhary@gla.ac.in</p>
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-lg-4 col-md-6">
-                <div
-                  class="member h-100 d-flex flex-column align-items-center text-center bg-white rounded shadow-sm p-4">
-                  <div class="member-info mt-3">
-                    <h4>Dr. Prabal Pratap Singh</h4>
-                    <span>B Sc. Chem.</span>
-                    <p>prabal.singh@gla.ac.in</p>
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-lg-4 col-md-6">
-                <div
-                  class="member h-100 d-flex flex-column align-items-center text-center bg-white rounded shadow-sm p-4">
-                  <div class="member-info mt-3">
-                    <h4>Mr. Yogendra Kumar</h4>
-                    <span>Diplom-ME</span>
-                    <p>yogendra.kumar@gla.ac.in</p>
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-lg-4 col-md-6">
-                <div
-                  class="member h-100 d-flex flex-column align-items-center text-center bg-white rounded shadow-sm p-4">
-                  <div class="member-info mt-3">
-                    <h4>Mr. Girijapati Sharma</h4>
-                    <span>Diploma-EE</span>
-                    <p>girijapati.sharma@gla.ac.in</p>
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-lg-4 col-md-6">
-                <div
-                  class="member h-100 d-flex flex-column align-items-center text-center bg-white rounded shadow-sm p-4">
-                  <div class="member-info mt-3">
-                    <h4>Mr. Aditya Gautam</h4>
-                    <span>Dip-CS</span>
-                    <p>aditya.gautam@gla.ac.in</p>
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-lg-4 col-md-6">
-                <div
-                  class="member h-100 d-flex flex-column align-items-center text-center bg-white rounded shadow-sm p-4">
-                  <div class="member-info mt-3">
-                    <h4>Mr. Bhagat Singh</h4>
-                    <span>Dip-CE</span>
-                    <p>bhagat.singh@gla.ac.in</p>
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-lg-4 col-md-6">
-                <div
-                  class="member h-100 d-flex flex-column align-items-center text-center bg-white rounded shadow-sm p-4">
-                  <div class="member-info mt-3">
-                    <h4>Mr. Chandrapal Singh</h4>
-                    <span>Dip-Chemical</span>
-                    <p>chandrapal.singh@gla.ac.in</p>
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-lg-4 col-md-6">
-                <div
-                  class="member h-100 d-flex flex-column align-items-center text-center bg-white rounded shadow-sm p-4">
-                  <div class="member-info mt-3">
-                    <h4>Ms. Rohini Sharma</h4>
-                    <span>Dip-EC</span>
-                    <p>rohini.sharma@gla.ac.in</p>
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-lg-4 col-md-6">
-                <div
-                  class="member h-100 d-flex flex-column align-items-center text-center bg-white rounded shadow-sm p-4">
-                  <div class="member-info mt-3">
-                    <h4>Dr. Rohit Kumar Singh</h4>
-                    <span>BSc Agg.</span>
-                    <p>kumar.rohit@gla.ac.in</p>
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-lg-4 col-md-6">
-                <div
-                  class="member h-100 d-flex flex-column align-items-center text-center bg-white rounded shadow-sm p-4">
-                  <div class="member-info mt-3">
-                    <h4>Dr.Ankita Mishra</h4>
-                    <span>BBA & B.Com</span>
-                    <p>ankita.mishta@gla.ac.in</p>
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-lg-4 col-md-6">
-                <div
-                  class="member h-100 d-flex flex-column align-items-center text-center bg-white rounded shadow-sm p-4">
-                  <div class="member-info mt-3">
-                    <h4>Mr. Alok Verma</h4>
-                    <span>LLB</span>
-                    <p>alok.verma@gla.ac.in</p>
-                  </div>
-                </div>
-              </div>
             </div>
-          </div>
-        </section>
 
-
-
-
-        <!-- Video Section -->
-        <div class="container my-5">
-          <div class="row justify-content-center">
-            <div class="col-12 col-lg-8">
-              <div class="ratio ratio-16x9">
-                <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/UZQZSZMWegE"
-                  allowfullscreen></iframe>
-              </div>
+            <div class="text-center mt-5">
+                <a href="register.html" class="btn btn-primary">Register to Meet These Companies</a>
             </div>
-          </div>
         </div>
-        <!-- End Video Section -->
+    </section>
 
-        <!-- ======= Contact Section ======= -->
-        <section id="contact" class="contact section-bg">
-          <div class="container">
+    <!-- Schedule Section -->
+    <section id="schedule" class="section section-bg">
+        <div class="container">
+            <h2 class="section-title">Event Schedule</h2>
+            <p class="section-subtitle">soon...</p>
 
-            <div class="section-title">
-              <h2>Contact Us</h2>
-              <p></p>
+           <!-- <div class="row">
+                <div class="col-lg-6">
+                    <div class="schedule-card">
+                        <div class="schedule-date">Day 1: April 17, 2025</div>
+                        <div class="schedule-event">
+                            <div class="event-time">9:00 AM - 10:00 AM</div>
+                            <div class="event-title">Opening Ceremony</div>
+                            <div class="event-location"><i class="fas fa-map-marker-alt"></i> Main Auditorium</div>
+                        </div>
+                        <div class="schedule-event">
+                            <div class="event-time">10:00 AM - 12:00 PM</div>
+                            <div class="event-title">Company Presentations</div>
+                            <div class="event-location"><i class="fas fa-map-marker-alt"></i> Seminar Halls</div>
+                        </div>
+                        <div class="schedule-event">
+                            <div class="event-time">12:00 PM - 1:00 PM</div>
+                            <div class="event-title">Lunch Break</div>
+                            <div class="event-location"><i class="fas fa-map-marker-alt"></i> Food Court</div>
+                        </div>
+                        <div class="schedule-event">
+                            <div class="event-time">1:00 PM - 5:00 PM</div>
+                            <div class="event-title">Interview Sessions (Round 1)</div>
+                            <div class="event-location"><i class="fas fa-map-marker-alt"></i> Interview Booths</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="schedule-card">
+                        <div class="schedule-date">Day 2: April 18, 2025</div>
+                        <div class="schedule-event">
+                            <div class="event-time">9:00 AM - 11:00 AM</div>
+                            <div class="event-title">Workshop: Resume Building</div>
+                            <div class="event-location"><i class="fas fa-map-marker-alt"></i> Workshop Hall A</div>
+                        </div>
+                        <div class="schedule-event">
+                            <div class="event-time">11:00 AM - 1:00 PM</div>
+                            <div class="event-title">Panel Discussion: Industry Trends</div>
+                            <div class="event-location"><i class="fas fa-map-marker-alt"></i> Main Auditorium</div>
+                        </div>
+                        <div class="schedule-event">
+                            <div class="event-time">1:00 PM - 2:00 PM</div>
+                            <div class="event-title">Lunch Break</div>
+                            <div class="event-location"><i class="fas fa-map-marker-alt"></i> Food Court</div>
+                        </div>
+                        <div class="schedule-event">
+                            <div class="event-time">2:00 PM - 5:00 PM</div>
+                            <div class="event-title">Interview Sessions (Final Round)</div>
+                            <div class="event-location"><i class="fas fa-map-marker-alt"></i> Interview Booths</div>
+                        </div>
+                    </div>
+                </div>
+            </div>-->
+        </div>
+    </section>
+
+    <!-- Glimpses of Glance 1.0 Gallery Section -->
+    <section id="gallery" class="section">
+        <div class="container">
+            <h2 class="section-title">Glimpses of Glance 1.0</h2>
+            <p class="section-subtitle">Relive the memories from our previous event</p>
+
+            <div class="gallery-filter mb-4">
+                <button class="btn btn-outline-primary active" data-filter="all">All</button>
+                <button class="btn btn-outline-primary" data-filter="inauguration">Inauguration</button>
+                <button class="btn btn-outline-primary" data-filter="interviews">Interviews</button>
+                <button class="btn btn-outline-primary" data-filter="workshops">Workshops</button>
+                <button class="btn btn-outline-primary" data-filter="cultural">Cultural</button>
             </div>
 
-            <div class="row mt-5 justify-content-center">
-
-              <div class="col-lg-10">
-
-                <div class="info-wrap">
-                  <div class="row">
-                    <div class="col-lg-4 info">
-                      <i class="bi bi-geo-alt"></i>
-                      <h4>Location:</h4>
-                      <p>Address: 17km Stone, NH-2, Mathura-Delhi Road, Mathura-281 406 (U.P.) INDIA </p>
+            <div class="row g-4 gallery-container">
+                <div class="col-md-4 col-sm-6 gallery-item" data-category="inauguration">
+                    <div class="gallery-card">
+                        <img src="{% static 'img/home/inauguration.jpg' %}"
+                            alt="Inauguration Ceremony" class="img-fluid">
+                        <div class="gallery-overlay">
+                            <div class="gallery-info">
+                                <h5>Inauguration Ceremony</h5>
+                                <p>Opening of Glance 1.0 by the University Director</p>
+                                <a href="https://source.unsplash.com/random/1200x800/?conference,inauguration"
+                                    class="gallery-popup">
+                                    <i class="fas fa-search-plus"></i>
+                                </a>
+                            </div>
+                        </div>
                     </div>
-
-                    <div class="col-lg-4 info mt-4 mt-lg-0">
-                      <i class="bi bi-envelope"></i>
-                      <h4>Email:</h4>
-                      <p>alumniassociation@gla.ac.in <br></p>
-                    </div>
-
-                    <div class="col-lg-4 info mt-4 mt-lg-0">
-                      <i class="bi bi-phone"></i>
-                      <h4>Call:</h4>
-                      <p>+91 9068405049<br></p>
-                    </div>
-                  </div>
                 </div>
 
-              </div>
-
-            </div>
-
-            <div class="row mt-5 justify-content-center">
-              <div class="col-lg-10">
-
-                <form method="post">
-
-                  {% csrf_token %}
-
-
-                  <div class="row">
-                    <div class="col-md-6 form-group">
-                      <input type="text" name="name" class="form-control" id="name" placeholder="Your Name" required>
+                <div class="col-md-4 col-sm-6 gallery-item" data-category="interviews">
+                    <div class="gallery-card">
+                        <img src="{% static 'img/home/interview.jpg' %}"
+                            alt="Interview Sessions" class="img-fluid">
+                        <div class="gallery-overlay">
+                            <div class="gallery-info">
+                                <h5>Interview Sessions</h5>
+                                <p>Students participating in on-the-spot interviews</p>
+                                <a href="https://source.unsplash.com/random/1200x800/?interview,corporate"
+                                    class="gallery-popup">
+                                    <i class="fas fa-search-plus"></i>
+                                </a>
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-md-6 form-group mt-3 mt-md-0">
-                      <input type="email" class="form-control" name="email" id="email" placeholder="Your Email"
-                        required>
+                </div>
+
+                <div class="col-md-4 col-sm-6 gallery-item" data-category="workshops">
+                    <div class="gallery-card">
+                        <img src="{% static 'img/home/workshop.jpg' %}" alt="Technical Workshop"
+                            class="img-fluid">
+                        <div class="gallery-overlay">
+                            <div class="gallery-info">
+                                <h5>Technical Workshop</h5>
+                                <p>Industry experts conducting technical workshops</p>
+                                <a href="https://source.unsplash.com/random/1200x800/?workshop,tech"
+                                    class="gallery-popup">
+                                    <i class="fas fa-search-plus"></i>
+                                </a>
+                            </div>
+                        </div>
                     </div>
-                  </div>
-                  <div class="form-group mt-3">
-                    <input type="text" class="form-control" name="subject" id="subject" placeholder="Subject" required>
-                  </div>
-                  <div class="form-group mt-3">
-                    <textarea class="form-control" name="message" rows="5" placeholder="Message" required></textarea>
-                  </div>
+                </div>
 
-                  <div class="text-center">
-                    <button class="btn btn-success mt-4" type="submit">Send Message</button>
-                  </div>
-                </form>
+                <div class="col-md-4 col-sm-6 gallery-item" data-category="cultural">
+                    <div class="gallery-card">
+                        <img src="{% static 'img/home/cultural.jpg' %}"
+                            alt="Cultural Performance" class="img-fluid">
+                        <div class="gallery-overlay">
+                            <div class="gallery-info">
+                                <h5>Cultural Performance</h5>
+                                <p>Students showcasing their talents during the event</p>
+                                <a href="https://source.unsplash.com/random/1200x800/?cultural,performance"
+                                    class="gallery-popup">
+                                    <i class="fas fa-search-plus"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-              </div>
+                <div class="col-md-4 col-sm-6 gallery-item" data-category="interviews">
+                    <div class="gallery-card">
+                        <img src="{% static 'img/home/workshop2.jpg' %}" alt="Company Booth"
+                            class="img-fluid">
+                        <div class="gallery-overlay">
+                            <div class="gallery-info">
+                                <h5>Company Booth</h5>
+                                <p>Students interacting with company representatives</p>
+                                <a href="https://source.unsplash.com/random/1200x800/?job,fair" class="gallery-popup">
+                                    <i class="fas fa-search-plus"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
+                <div class="col-md-4 col-sm-6 gallery-item" data-category="workshops">
+                    <div class="gallery-card">
+                        <img src="{% static 'img/home/cul.jpg' %}"
+                            alt="Resume Building Workshop" class="img-fluid">
+                        <div class="gallery-overlay">
+                            <div class="gallery-info">
+                                <h5>Resume Building Workshop</h5>
+                                <p>Students learning how to create effective resumes</p>
+                                <a href="https://source.unsplash.com/random/1200x800/?seminar,business"
+                                    class="gallery-popup">
+                                    <i class="fas fa-search-plus"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 col-sm-6 gallery-item" data-category="inauguration">
+                    <div class="gallery-card">
+                        <img src="{% static 'img/home/i4.jpg' %}" alt="Ribbon Cutting"
+                            class="img-fluid">
+                        <div class="gallery-overlay">
+                            <div class="gallery-info">
+                                <h5>Ribbon Cutting</h5>
+                                <p>Official inauguration of Glance 1.0</p>
+                                <a href="https://source.unsplash.com/random/1200x800/?ribbon,cutting"
+                                    class="gallery-popup">
+                                    <i class="fas fa-search-plus"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 col-sm-6 gallery-item" data-category="cultural">
+                    <div class="gallery-card">
+                        <img src="{% static 'img/home/i5.jpg' %}" alt="Award Ceremony"
+                            class="img-fluid">
+                        <div class="gallery-overlay">
+                            <div class="gallery-info">
+                                <h5>Award Ceremony</h5>
+                                <p>Recognizing outstanding participants and companies</p>
+                                <a href="https://source.unsplash.com/random/1200x800/?award,ceremony"
+                                    class="gallery-popup">
+                                    <i class="fas fa-search-plus"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 col-sm-6 gallery-item" data-category="interviews">
+                    <div class="gallery-card">
+                        <img src="{% static 'img/home/i6.jpg' %}" alt="Group Discussion"
+                            class="img-fluid">
+                        <div class="gallery-overlay">
+                            <div class="gallery-info">
+                                <h5>Group Discussion</h5>
+                                <p>Students participating in group discussion rounds</p>
+                                <a href="https://source.unsplash.com/random/1200x800/?group,discussion"
+                                    class="gallery-popup">
+                                    <i class="fas fa-search-plus"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-          </div>
-        </section><!-- End Contact Section -->
-
-  </main><!-- End #main -->
-
-  <!-- ======= Footer ======= -->
-  <footer id="footer">
-
-    <div class="footer-top">
-      <div class="container">
-        <div class="row">
-
-          <div class="col-lg-3 col-md-6 footer-contact">
-            <h3>GLA University</h3>
-            <p>
-              Address: 17km Stone, NH-2, Mathura-Delhi Road, Mathura-281 406 (U.P.) INDIA <br><br>
-              <strong>Phone:</strong> +91 90684 05049<br>
-              <strong>Email:</strong> alumniassociation@gla.ac.in <br>
-            </p>
-          </div>
-          <div class="col-lg-3 col-md-6 footer-contact">
-            <div class="">
-              <h4 class="">About Us</h4>
-              <p>The Department of Alumni Affairs at GLA University Mathura fosters connections between graduates and
-                the alma mater, facilitating networking, mentorship, and career development opportunities. Through
-                various events and initiatives, it strengthens the bond between alumni and the university, fostering a
-                vibrant and engaged alumni community.</p>
+            <div class="text-center mt-5">
+              <!--  <a href="#" class="btn btn-primary">View More Photos</a>-->
             </div>
-          </div>
-
-          <div class="col-lg-3 col-md-6 footer-contact">
-            <h4 style="text-align: center;">Social Media</h4>
-            <div class="social-links text-center text-md-right pt-3 pt-md-0">
-              {% comment %} <a href="http://glauniversity.in:8095/" class="website"><i class="bx bxl"></i></a> {% endcomment %}
-              <a href="https://www.facebook.com/profile.php?id=61552790286215" class="facebook"><i
-                  class="bx bxl-facebook"></i></a>
-              <a href="https://www.instagram.com/alumniassociationgla/" class="instagram"><i
-                  class="bx bxl-instagram"></i></a>
-              <a href="https://www.linkedin.com/groups/4993377/" class="linkedin"><i class="bx bxl-linkedin"></i></a>
-            </div>
-          </div>
         </div>
-      </div>
-    </div>
+    </section>
 
-  </footer><!-- End Footer -->
+    <!-- Team Section -->
+    <section id="team" class="section section-bg">
+        <div class="container">
+            <h2 class="section-title">Meet Our Team</h2>
+            <p class="section-subtitle">The dedicated individuals behind Glance 2.0</p>
 
-  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
-      class="bi bi-arrow-up-short"></i></a>
+            <div class="row g-4 justify-content-center">
+                <!-- Team Member 1 -->
+                <div class="col-lg-3 col-md-6">
+                    <div class="team-card">
+                        <div class="team-img">
+                            <img src="" alt="Paras Mittal" class="img-fluid">
 
-  <!-- Vendor JS Files -->
-  <script src="{% static 'home/assets/vendor/purecounter/purecounter_vanilla.js' %}"></script>
-  <script src="{% static 'home/assets/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
-  <script src="{% static 'home/assets/vendor/glightbox/js/glightbox.min.js' %}"></script>
-  <script src="{% static 'home/assets/vendor/isotope-layout/isotope.pkgd.min.js' %}"></script>
-  <script src="{% static 'home/assets/vendor/swiper/swiper-bundle.min.js' %}"></script>
-  <script src="{% static 'home/assets/vendor/waypoints/noframework.waypoints.js' %}"></script>
-  <script src="{% static 'home/assets/vendor/php-email-form/validate.js' %}"></script>
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+                        </div>
+                        <div class="team-info">
+                            <h4>Paras Mittal</h4>
+                            <p class="team-position">President Allumni Affairs</p>
+                            <p class="team-desc">Leads the overall planning and execution of Glance 2.0</p>
+                        </div>
+                    </div>
+                </div>
 
-  <!-- Bootstrap JavaScript -->
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+                <!-- Team Member 2 -->
+                <div class="col-lg-3 col-md-6">
+                    <div class="team-card">
+                        <div class="team-img">
+                            <img src="" alt="Amit Kumar" class="img-fluid">
 
+                        </div>
+                        <div class="team-info">
+                            <h4>Amit Kumar</h4>
+                            <p class="team-position">Technical Team</p>
+                            <p class="team-desc">Manages queries regarding Website</p>
+                        </div>
+                    </div>
+                </div>
 
-  <!-- Template Main JS File -->
-  <script src="{% static 'home/assets/js/main.js' %}"> </script>
+                <!-- Team Member 2 -->
+                <div class="col-lg-3 col-md-6">
+                    <div class="team-card">
+                        <div class="team-img">
+                            <img src="" alt="DK" class="img-fluid">
 
+                        </div>
+                        <div class="team-info">
+                            <h4>Divyanshu Khandelwal</h4>
+                            <p class="team-position">Technical Team Advisor</p>
+                            <p class="team-desc">Manages queries regarding Website</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Section -->
+                <section id="contact" class="section">
+                    <div class="container">
+                        <h2 class="section-title">Contact Us</h2>
+                        <p class="section-subtitle">Get in touch with our team</p>
+
+                        <div class="row">
+                            <div class="col-lg-5">
+                                <div class="contact-info">
+                                    <div class="contact-item">
+                                        <div class="contact-icon">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                        </div>
+                                        <div class="contact-details">
+                                            <h4>Location</h4>
+                                            <p>GLA University, Mathura</p>
+                                            <p>NH-2, Mathura-Delhi Highway</p>
+                                            <p>P.O. Chaumuhan, Mathura, Uttar Pradesh - 281406</p>
+                                        </div>
+                                    </div>
+                                    <div class="contact-item">
+                                        <div class="contact-icon">
+                                            <i class="fas fa-phone"></i>
+                                        </div>
+                                        <div class="contact-details">
+                                            <h4>Phone</h4>
+                                            <p>+91 9876543210</p>
+                                        </div>
+                                    </div>
+                                    <div class="contact-item">
+                                        <div class="contact-icon">
+                                            <i class="fas fa-envelope"></i>
+                                        </div>
+                                        <div class="contact-details">
+                                            <h4>Email</h4>
+                                            <p>glance@gla.ac.in</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-7">
+                                <form class="contact-form">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <input type="text" class="form-control" placeholder="Your Name" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <input type="email" class="form-control" placeholder="Your Email" required>
+                                        </div>
+                                        <div class="col-12">
+                                            <input type="text" class="form-control" placeholder="Subject" required>
+                                        </div>
+                                        <div class="col-12">
+                                            <textarea class="form-control" rows="5" placeholder="Your Message"
+                                                required></textarea>
+                                        </div>
+                                        <div class="col-12">
+                                            <button type="submit" class="btn btn-primary">Send Message</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Footer -->
+                <footer class="footer">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="footer-logo">
+                                    <img src="{% static 'img/home/logo.svg' %}" alt="Glance 2.0 Logo">
+                                </div>
+                                <p class="footer-text">Glance Job Fair 2.0 is GLA University's premier recruitment event
+                                    connecting talented students with top companies.</p>
+                                <div class="footer-social">
+                                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                                    <a href="#"><i class="fab fa-twitter"></i></a>
+                                    <a href="#"><i class="fab fa-instagram"></i></a>
+                                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <h4>Quick Links</h4>
+                                <ul class="footer-links">
+                                    <li><a href="#home">Home</a></li>
+                                    <li><a href="#about">About</a></li>
+                                    <li><a href="#companies">Companies</a></li>
+                                    <li><a href="#schedule">Schedule</a></li>
+                                    <li><a href="#gallery">Gallery</a></li>
+                                    <li><a href="#team">Team</a></li>
+                                    <li><a href="#contact">Contact</a></li>
+                                </ul>
+                            </div>
+                            <div class="col-lg-4">
+                                <h4>Contact Info</h4>
+                                <ul class="footer-links">
+                                    <li><a href="#"><i class="fas fa-map-marker-alt"></i> GLA University, Mathura</a>
+                                    </li>
+                                    <li><a href="tel:+919876543210"><i class="fas fa-phone"></i> +91 9876543210</a></li>
+                                    <li><a href="mailto:glance@gla.ac.in"><i class="fas fa-envelope"></i>
+                                            glance@gla.ac.in</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="footer-bottom">
+                            <p>&copy; 2025 Glance Job Fair 2.0. All Rights Reserved.</p>
+                        </div>
+                    </div>
+                </footer>
+
+                <!-- JavaScript -->
+                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+                <script src="{% static 'js/home/script.js' %}"></script>
+                <script>
+                    // Check if user just logged in
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const urlParams = new URLSearchParams(window.location.search);
+                        if (urlParams.get('loggedin') === 'true') {
+                            const welcomeAlert = document.getElementById('welcomeAlert');
+                            welcomeAlert.classList.remove('d-none');
+
+                            // Remove the alert after animation completes
+                            setTimeout(() => {
+                                welcomeAlert.remove();
+                            }, 5000);
+
+                            // Clean up the URL
+                            window.history.replaceState({}, document.title, window.location.pathname);
+                        }
+                    });
+
+                    // Navbar scroll effect
+                    window.addEventListener('scroll', function () {
+                        const navbar = document.querySelector('.navbar');
+                        if (window.scrollY > 50) {
+                            navbar.classList.add('navbar-scrolled');
+                        } else {
+                            navbar.classList.remove('navbar-scrolled');
+                        }
+                    });
+                </script>
 </body>
 
 </html>
