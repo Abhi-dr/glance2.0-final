@@ -1,0 +1,271 @@
+{% extends 'student/base.html' %}
+{% load static %}
+
+{% block title %}
+Student -> Edit Profile
+{% endblock %}
+
+{% block extra_css %}
+
+
+{% endblock %}
+
+{% block body %}
+
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title fw-semibold">Edit Profile</h5>
+            <p>For any corrections, contact
+                <a class="text-success" href="{% url 'support' %}">
+                    Technical Team
+                </a>
+            </p>
+        </div>
+
+        {% for message in messages %}
+
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <strong>{{ message.tag }}</strong> {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        {% endfor %}
+
+        <div class="container-xl px-4">
+
+            <hr class="mt-0">
+            <div class="row">
+                <div class="col-xl-4">
+                    <!-- Profile picture card-->
+                    <div class="card mb-4 mb-xl-0">
+
+                        <form action="{% url 'upload_profile' %}" method="post" enctype="multipart/form-data">
+
+                            {% csrf_token %}
+
+                            <div class="card-header">Profile Picture</div>
+                            <div class="card-body text-center">
+                                <!-- Profile picture image-->
+
+                                <img style="max-width: 100%; width: 90%;"
+                                    class="img-account-profile rounded-circle mb-2" src="{{ student.profile_pic.url }}"
+                                    alt="">
+                                <!-- Profile picture help block-->
+                                <div class="small font-italic text-muted mb-4">JPG or PNG no larger than 5 MB</div>
+
+                                <label for="file-upload" class="custom-file-upload mb-3">
+                                    <i class="fa fa-cloud-upload"></i> Choose Profile Picture
+                                </label>
+                                <input class="form-control" type="file" id="formFile" name="profile_pic"
+                                    accept=".webp, .png, .jpg, .jpeg" required />
+
+                                <br>
+
+                                <!-- Profile picture upload button-->
+                                <button class="btn btn-primary" type="submit">Update</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="col-xl-8">
+                    <!-- Account details card-->
+                    <div class="card mb-4">
+                        <div class="card-header">Your Details</div>
+                        <div class="card-body">
+                            <form method="post">
+
+                                {% csrf_token %}
+
+                                <!-- Form Row-->
+                                <div class="row gx-3 mb-3">
+                                    <!-- Form Group (first name)-->
+                                    <div class="col-md-6">
+                                        <label class="small mb-1" for="inputFirstName">First name</label>
+                                        <input class="form-control" id="inputFirstName" type="text"
+                                            placeholder="Enter your first name" name="first_name"
+                                            value="{{ student.first_name }}">
+                                    </div>
+                                    <!-- Form Group (last name)-->
+                                    <div class="col-md-6">
+                                        <label class="small mb-1" for="inputLastName">Last name</label>
+                                        <input class="form-control" id="inputLastName" type="text"
+                                            placeholder="Enter your last name" name="last_name"
+                                            value="{{ student.last_name }}">
+                                    </div>
+                                </div>
+
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="small mb-1" for="inputUsername">Email Address</label>
+                                        <input class="form-control" id="inputUsername" type="text"
+                                            value="{{ student.username }}" disabled>
+                                    </div>
+
+                                    <!-- Form Group (phone number)-->
+                                    <div class="col-md-6">
+                                        <label class="small mb-1" for="inputPhone">Phone number</label>
+                                        <input class="form-control" id="inputPhone" type="tel"
+                                            placeholder="Enter your phone number" value="{{ student.phone_number }}"
+                                            disabled>
+                                    </div>
+
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-12 mb-3">
+                                        <div class="alert alert-info" role="alert">
+                                            <i class="fas fa-info-circle"></i> Educational details can only be set once. After setting a value, it cannot be changed. Please contact support for any changes if needed.
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label for="course" class="small mb-1">Course</label>
+                                        <select class="form-select form-control" id="course" name="course" {% if student.course %}disabled{% endif %}>
+                                            <option value="" {% if not student.course %}selected{% endif %}>Select
+                                                Course</option>
+                                            <option value="B.Tech Computer Science" {% if student.course == 'B.Tech Computer Science' %}selected{% endif %}>B.Tech
+                                                Computer Science</option>
+                                            <option value="B.Tech Information Technology" {% if student.course == 'B.Tech Information Technology' %}selected{% endif %}>
+                                                B.Tech Information Technology</option>
+                                            <option value="B.Tech Electronics" {% if student.course == 'B.Tech Electronics' %}selected{% endif %}>B.Tech
+                                                Electronics</option>
+                                            <option value="B.Tech Electrical" {% if student.course == 'B.Tech Electrical' %}selected{% endif %}>B.Tech Electrical</option>
+                                            <option value="B.Tech Mechanical" {% if student.course == 'B.Tech Mechanical' %}selected{% endif %}>B.Tech Mechanical</option>
+                                            <option value="B.Tech Civil" {% if student.course == 'B.Tech Civil' %}selected{% endif %}>B.Tech Civil</option>
+                                            <option value="BCA" {% if student.course == 'BCA' %}selected{% endif %}>BCA
+                                            </option>
+                                            <option value="MCA" {% if student.course == 'MCA' %}selected{% endif %}>MCA
+                                            </option>
+                                            <option value="M.Tech Computer Science" {% if student.course == 'M.Tech Computer Science' %}selected{% endif %}>M.Tech
+                                                Computer Science</option>
+                                            <option value="M.Tech Information Technology" {% if student.course == 'M.Tech Information Technology' %}selected{% endif %}>
+                                                M.Tech Information Technology</option>
+                                            <option value="MBA" {% if student.course == 'MBA' %}selected{% endif %}>MBA
+                                            </option>
+                                            <option value="B.Com" {% if student.course == 'B.Com' %}selected{% endif %}>
+                                                B.Com</option>
+                                            <option value="M.Com" {% if student.course == 'M.Com' %}selected{% endif %}>
+                                                M.Com</option>
+                                            <option value="BBA" {% if student.course == 'BBA' %}selected{% endif %}>BBA
+                                            </option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Backlogs field -->
+                                    <div class="col-md-6 mb-3">
+                                        <label class="small mb-1" for="inputBacklogs">Backlogs</label>
+                                        <input class="form-control" id="inputBacklogs" type="number" name="backlog"
+                                            value="{{ student.backlog }}"
+                                            min="0" max="15"
+                                            placeholder="Enter number of backlogs"
+                                            {% if student.backlog >= 0 %} disabled {% endif %}>
+                                    </div>
+
+                                </div>
+
+                                <!-- Form Row        -->
+                                <div class="row gx-3 mb-3">
+                                    <!-- Form Group (organization name)-->
+                                    <div class="col-md-6">
+                                        <label class="small mb-1" for="inputLocation">Gender</label>
+
+                                        <select class="form-select form-control" name="gender" id="gender">
+                                            <option value="Male" {% if student.gender == 'Male' %}selected{% endif %}>Male
+                                            </option>
+                                            <option value="Female" {% if student.gender == 'Female' %}selected{% endif %}>
+                                                Female</option>
+                                            <option value="Other" {% if student.gender == 'Other' %}selected{% endif %}>
+                                                Other</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <label class="small mb-1" for="inputLocation">Year</label>
+
+                                        <select class="form-select form-control" name="year" id="year" {% if student.year %}disabled{% endif %}>
+                                            <option value="" {% if not student.year %}selected{% endif %}>Select Year
+                                            </option>
+                                            <option value="1st Year" {% if student.year == '1st Year' %}selected{% endif %}>1st Year
+                                            </option>
+                                            <option value="2nd Year" {% if student.year == '2nd Year' %}selected{% endif %}>
+                                                2nd Year</option>
+                                            <option value="3rd Year" {% if student.year == '3rd Year' %}selected{% endif %}>
+                                                3rd Year</option>
+                                            <option value="4th Year" {% if student.year == '4th Year' %}selected{% endif %}>
+                                                4th Year</option>
+                                        </select>
+                                    </div>
+
+                                </div>
+
+                                <div class="row">
+                                    <!-- Form Group (location)-->
+                                    <div class="col-md-4 mb-3">
+                                        <label class="small mb-1" for="inputHighschool">Highscool</label>
+                                        <input class="form-control" id="inputHighschool" type="text"
+                                            placeholder="Highscool Percentage %" name="tenth"
+                                            value="{% if student.tenth %}{{ student.tenth }}{% endif %}"
+                                            {% if student.tenth %}disabled{% endif %}>
+                                        <small class="text-muted">Enter percentage without % symbol</small>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="small mb-1" for="inputIntermediate">Intermediate</label>
+                                        <input class="form-control" id="inputIntermediate" type="text"
+                                            placeholder="Intermediate Percentage %" name="twelfth"
+                                            value="{% if student.twelfth %}{{ student.twelfth }}{% endif %}"
+                                            {% if student.twelfth %}disabled{% endif %}>
+                                        <small class="text-muted">Enter percentage without % symbol</small>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="small mb-1" for="inputCGPA">Current CGPA</label>
+                                        <input class="form-control" id="inputCGPA" type="text"
+                                            placeholder="Current CGPA (out of 10)" name="cgpa"
+                                            value="{% if student.cgpa %}{{ student.cgpa }}{% endif %}"
+                                            {% if student.cgpa %}disabled{% endif %}>
+                                        <small class="text-muted">Enter CGPA value</small>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="small mb-1" for="inputLinkedIn">LinkedIn</label>
+                                    <input class="form-control" id="inputLinkedIn" type="text" name="linkedin_id"
+                                        value="{% if student.linkedin_id %}{{ student.linkedin_id }}{% endif %}"
+                                        placeholder="Enter your LinkedIn profile URL">
+                                </div>
+
+
+                                <div class="mb-3">
+                                    <label class="small mb-1" for="inputGitHub">GitHub</label>
+                                    <input class="form-control" id="inputGitHub" type="text" name="github_id"
+                                        value="{% if student.github_id %}{{ student.github_id }}{% endif %}"
+                                        placeholder="Enter your GitHub profile URL">
+                                </div>
+
+                                <!-- Form Row-->
+                                <div class="row gx-3 mb-3">
+                                    
+
+                                    <!-- Form Group (birthday)-->
+                                    <div class="col-md-6">
+                                        <label class="small mb-1" for="inputBirthday">Date of joining</label>
+                                        <input class="form-control" id="inputBirthday" type="text"
+                                            value="{{ student.date_joined }}" disabled>
+                                    </div>
+                                </div>
+                                
+
+                                <!-- Save changes button-->
+                                <button class="btn btn-success w-100" type="submit">Save changes</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

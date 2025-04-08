@@ -6,64 +6,92 @@ from django.core.mail import send_mail
 from datetime import datetime
 from django.db.models import Q
 
+# ========================================= DASHBOARD =========================================
+
 
 @login_required(login_url='login')
 def home(request):
     
     student = Student.objects.get(id=request.user.id)
-    no_of_companies_applied = Application.objects.filter(student=student).count()
-    
-    no_of_companies_applied_in_percentage = no_of_companies_applied * 50
-    
-    # Companies ============
-    
-    companies_count = Job.objects.all().count()
-    
-    # Jobs =================
-    
-    all_eligible_jobs = Job.objects.filter(
-        tenth_percentage__lte=student.tenth,
-        twelfth_percentage__lte=student.twelfth,
-        cgpa_criteria__lte=student.cgpa,
-    ).exclude(applications__student=student)
-    
-    # exclude the jobs which the student has already applied on the same date
-    
-    for application in Application.objects.filter(student=student):
-        all_eligible_jobs = all_eligible_jobs.exclude(interview_date=application.job.interview_date)
 
-    eligible_companies_count = (all_eligible_jobs.count() / companies_count) * 100
+    # Initialize variables with default values
+    no_of_companies_applied = 0
+    eligible_jobs = []
+    all_eligible_jobs = []
+    eligible_companies_count = 0
+    applications = []
     
-    eligible_jobs = Job.objects.filter(
-        tenth_percentage__lte=student.tenth,
-        twelfth_percentage__lte=student.twelfth,
-        cgpa_criteria__lte=student.cgpa,
-    ).exclude(applications__student=student)
+    # Get application count safely
+    no_of_companies_applied = Application.objects.filter(student=student).count()
+    no_of_companies_applied_in_percentage = min(no_of_companies_applied * 50, 100)  # Cap at 100%
     
-    for application in Application.objects.filter(student=student):
-        eligible_jobs = eligible_jobs.exclude(interview_date=application.job.interview_date)
+    # Get total companies count safely
+    companies_count = Job.objects.all().count() or 1  # Avoid division by zero
     
-     # exclude the jobs which requres no backlog and if the student have backlogs
+    # Check if student has complete profile
+    has_complete_profile = all([
+        student.tenth is not None,
+        student.twelfth is not None,
+        student.cgpa is not None
+    ])
     
-    if student.backlog > 0:
-        all_eligible_jobs = all_eligible_jobs.exclude(is_backlog_allowed=False)
-        eligible_jobs = eligible_jobs.exclude(is_backlog_allowed=False)
-    
-    applications = Application.objects.filter(student=student)
+    if has_complete_profile:
+        # Get eligible jobs with proper error handling
+        try:
+            # Base query for eligible jobs
+            all_eligible_jobs = Job.objects.filter(
+                tenth_percentage__lte=student.tenth,
+                twelfth_percentage__lte=student.twelfth,
+                cgpa_criteria__lte=student.cgpa,
+            ).exclude(applications__student=student)
+            
+            # Handle backlog restrictions
+            if student.backlog > 0:
+                all_eligible_jobs = all_eligible_jobs.exclude(is_backlog_allowed=False)
+            
+            # Get applications to handle interview date conflicts
+            applications = Application.objects.filter(student=student)
+            
+            # Exclude jobs with interview date conflicts
+            for application in applications:
+                if application.job and application.job.interview_date:
+                    all_eligible_jobs = all_eligible_jobs.exclude(
+                        interview_date=application.job.interview_date
+                    )
+            
+            # Calculate percentage of eligible companies
+            eligible_companies_count = int((all_eligible_jobs.count() / companies_count) * 100)
+            
+            # Create duplicate for displaying limited results
+            eligible_jobs = all_eligible_jobs[:3]  # First 3 jobs for dashboard
+
+        except Exception as e:
+            # Log the exception for debugging
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Error in home view: {str(e)}")
+            
+            # Set empty queryset
+            all_eligible_jobs = Job.objects.none()
+            eligible_jobs = Job.objects.none()
+            eligible_companies_count = 0
+    else:
+        messages.info(request, "Complete your profile to see eligible jobs for you 🔥")
+        all_eligible_jobs = Job.objects.none()
+        eligible_jobs = Job.objects.none()
     
     parameters = {
         "student": student,
-        'no_of_companies_applied': no_of_companies_applied,
-        "eligible_jobs": eligible_jobs[:3],
-        # 'companies': companies,
-        'all_eligible_jobs': all_eligible_jobs,
-        'no_of_companies_applied_in_percentage': no_of_companies_applied_in_percentage,
-        "eligible_companies_count": int(eligible_companies_count),
-        
-        "applications": applications
+        "no_of_companies_applied": no_of_companies_applied,
+        "eligible_jobs": eligible_jobs,
+        "all_eligible_jobs": all_eligible_jobs,
+        "no_of_companies_applied_in_percentage": no_of_companies_applied_in_percentage,
+        "eligible_companies_count": eligible_companies_count,
+        "applications": applications,
+        "has_complete_profile": has_complete_profile
     }
     
-    return render(request, 'student/index.html', parameters)
+    return render(request, "student/index.html", parameters)
 
 # ================================== MY JOBS ===============================================
 
@@ -377,70 +405,7 @@ def notifications(request):
     
     return render(request, 'student/notifications.html', parameters)
 
-# ================================== STUDENT PROFILE ===========================================
 
-@login_required(login_url='login')
-def my_profile(request):
-    
-    student = Student.objects.get(id=request.user.id)
-    
-    parameters = {
-        "student": student
-    }
-    
-    return render(request, 'student/my_profile.html', parameters)
-
-# ================================== EDIT PROFILE ===========================================
-
-@login_required(login_url='login')
-def edit_profile(request):
-    
-    student = Student.objects.get(id=request.user.id)
-    
-    if request.method == "POST":
-        first_name = request.POST['first_name']
-        last_name = request.POST['last_name']
-        phone = request.POST['phone_number']
-        gender = request.POST["gender"]
-        
-        linkedin_id = request.POST['linkedin_id']
-        github_id = request.POST['github_id']
-        
-        student.first_name = first_name
-        student.last_name = last_name
-        student.phone = phone
-        student.gender = gender
-        student.linkedin_id = linkedin_id
-        student.github_id = github_id
-        
-        student.save()
-        
-        messages.success(request, "Profile updated successfully")
-        return redirect('my_profile')
-    
-    parameters = {
-        "student": student
-    }
-    
-    return render(request, 'student/edit_profile.html', parameters) 
-
-
-# ================================== UPLOAD PROFILE ===========================================
-
-@login_required(login_url='login')
-def upload_profile(request):
-
-    if request.method == 'POST':
-
-        student = Student.objects.get(id=request.user.id)
-
-        student.profile_pic = request.FILES['profile_pic']
-        student.save()
-
-        messages.success(request, 'Profile Picture Updated Successfully')
-
-        return redirect('my_profile')
-    
 # ================================== SUPPORT ===========================================
 
 @login_required(login_url='login')

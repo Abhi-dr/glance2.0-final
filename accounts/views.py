@@ -3,8 +3,10 @@ from django.contrib import auth
 from django.contrib import messages
 from django.http import JsonResponse
 
-from accounts.models import Student
+from accounts.models import Student, Administrator
 from django.core.mail import send_mail
+from django_ratelimit.decorators import ratelimit
+
 
 import requests
 
@@ -22,36 +24,53 @@ def send_email_async(to, subject, text):
 
 # =============================== LOGIN =========================
 
+@ratelimit(key='post:username', rate='3/m', method=['POST'], block=False)
 def login(request):
-    if request.method == 'POST':
-        email = request.POST.get('email').strip().lower()
-        password = request.POST.get('password')
-        
-        # if email.split("@")[-1] != "gla.ac.in":
-        #     messages.error(request, "Please use a valid GLA Mail ID")
-        #     return redirect("login")
+    if request.user.is_authenticated:
+        # Redirect based on user type
+        if hasattr(request.user, 'student'):
+            return redirect('student')
+        elif hasattr(request.user, 'administrator'):
+            return redirect('administration')
+        else:
+            return redirect('home')  # Default fallback
 
-        if Student.objects.filter(username=email).exists():
-            user = auth.authenticate(username=email, password=password)
+    if getattr(request, 'limited', False):
+        messages.error(request, "Too many login attempts for this Username. Please try again after 1 minute.")
+        return redirect('login')
+
+    next_url = request.GET.get('next', '')
+
+    if request.method == 'POST':
+        username = request.POST.get('email').strip().lower()
+        password = request.POST.get('password')
+
+        if Student.objects.filter(username=username).exists():
+            user = auth.authenticate(username=username, password=password)
 
             if user is not None:
                 auth.login(request, user)
-                # send_email_async(
-                #     to=email,
-                #     subject='GLA University - Login Alert',
-                #     text='You have successfully logged in to your account.'
-                # )
-                return redirect('student')
-            
-        else:
-            # Check if user is staff
-            user = auth.authenticate(username=email, password=password)
-            if user is not None and user.is_staff:
-                auth.login(request, user)
-                # Redirect staff to administration dashboard
-                return redirect('administration')
+                return redirect(next_url if next_url else 'student')
 
-    return render(request, 'accounts/login.html')
+            messages.error(request, "Invalid Password")
+            return redirect("login")
+
+        elif Administrator.objects.filter(username=username).exists():
+            user = auth.authenticate(username=username, password=password)
+
+            if user is not None:
+                auth.login(request, user)
+                return redirect(next_url if next_url else 'administration')
+
+            messages.error(request, "Invalid Password")
+            return redirect("login")
+
+        else:
+            messages.error(request, "Invalid Username or Password")
+            return redirect("login")
+
+    return render(request, 'accounts/login.html', {'next': next_url})
+
 
 # ===================================== REGISTER ==============================
 

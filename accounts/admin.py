@@ -1,7 +1,7 @@
 from django.contrib import admin
 from import_export.admin import ImportExportModelAdmin
 from .resources import CompanyResource, JobResource, StudentResource, ApplicationResource
-from .models import Company, Job, Student, Application, Notification
+from .models import Company, Job, Student, Application, Notification, Administrator
 
 
 class NotificationAdmin(admin.ModelAdmin):
@@ -26,6 +26,11 @@ class StudentAdmin(ImportExportModelAdmin):
     search_fields = ('first_name', 'last_name', 'username', "year", "phone_number")
     exclude = ('email', 'password', 'last_login', 'is_superuser', 'groups', 'user_permissions', 'is_staff', 'is_active', 'date_joined')
 
+class AdministratorAdmin(admin.ModelAdmin):
+    list_display = ('username',)
+    exclude = ('email', 'password', 'last_login', 'is_superuser', 'groups', 'user_permissions', 'is_staff', 'is_active', 'date_joined')
+
+
 class ApplicationAdmin(ImportExportModelAdmin):
     resource_class = ApplicationResource
     list_display = ('student', 'job', 'status')
@@ -38,5 +43,6 @@ class ApplicationAdmin(ImportExportModelAdmin):
 admin.site.register(Company, CompanyAdmin)
 admin.site.register(Job, JobAdmin)
 admin.site.register(Student, StudentAdmin)
+admin.site.register(Administrator, AdministratorAdmin)
 admin.site.register(Application, ApplicationAdmin)
 admin.site.register(Notification)

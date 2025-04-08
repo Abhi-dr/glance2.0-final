@@ -100,7 +100,7 @@ class Student(User):
     cgpa = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
     tenth = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
     twelfth = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
-    backlog = models.IntegerField(blank=True, null=True, default=0)
+    backlog = models.IntegerField(blank=True, null=True)
 
     resume = models.FileField(upload_to='student_resumes/', blank=True, null=True)
     
@@ -124,6 +124,7 @@ class Student(User):
 
     def get_profile_score(self):
         score = 0
+        
         if self.tenth_marksheet:
             score += 10
         if self.twelfth_marksheet:
@@ -131,16 +132,56 @@ class Student(User):
         if self.college_profile_print:
             score += 10
         if self.resume:
-            score += 30
+            score += 10
+        
         if self.linkedin_id:
-            score += 10
+            score += 5
         if self.github_id:
-            score += 10
+            score += 5
         if self.profile_pic:
-            score += 20
-
+            score += 10
+        
+        if self.phone_number:
+            score += 5
+        if self.gender:
+            score += 5
+        if self.course:
+            score += 5
+        if self.year:
+            score += 5
+        
+        if self.cgpa:
+            score += 5
+        if self.backlog:
+            score += 5
+        if self.tenth:
+            score += 5
+        if self.twelfth:
+            score += 5
+        
         # return score in percentage
         return score
+
+# ============================================ ADMINISTRATOR =========================================
+
+class Administrator(User):
+    gender_choices = (
+        ("Male", "Male"),
+        ("Female", "Female"),
+        ("Prefer not to say", "Prefer not to say")
+    )
+    phone_number = models.CharField(max_length=12)
+    
+    gender = models.CharField(
+        max_length=17, choices=gender_choices, blank=True, null=True)
+
+    
+    profile_pic = models.ImageField(
+        upload_to="student_profile/", blank=True, null=True, default="/student_profile/default.jpg")
+    
+    class Meta:
+        verbose_name_plural = "Administrators"
+        verbose_name = "Administrator"
 
 # ============================================ APPLICATION =========================================
 

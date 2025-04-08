@@ -22,7 +22,9 @@ Student -> Home
 
     @keyframes html-progress {
         to {
-            --progress-value: {{ eligible_companies_count }};
+            --progress-value: {{eligible_companies_count}}
+
+            ;
         }
     }
 
@@ -34,7 +36,9 @@ Student -> Home
 
     @keyframes css-progress {
         to {
-            --progress-value: {{no_of_companies_applied_in_percentage}};
+            --progress-value: {{no_of_companies_applied_in_percentage}}
+
+            ;
         }
     }
 
@@ -42,11 +46,13 @@ Student -> Home
         to {
             --progress-value: 43;
         }
-    }
+}
 
     @keyframes js-progress {
         to {
-            --progress-value: {{student.get_profile_score}};
+            --progress-value: {{student.get_profile_score}}
+
+            ;
         }
     }
 
@@ -107,7 +113,6 @@ Student -> Home
         width: 0;
         height: 0;
     }
-    }
 </style>
 
 
@@ -143,7 +148,7 @@ Student -> Home
                                         <span class="">
                                             <i class=""></i>
                                         </span>
-                                        <p class="text-dark me-1 fs-3 mb-0"></p>
+                                        <p class=" me-1 fs-3 mb-0"></p>
                                         <p class="fs-3 mb-0"></p>
                                     </div>
                                     <div class="d-flex align-items-center">
@@ -182,7 +187,7 @@ Student -> Home
                                         {{ no_of_companies_applied }}
                                     </h4>
                                     <div class="d-flex align-items-center mb-3">
-                                        <p class="text-dark me-1 fs-3 mb-0">Left: {{ student.no_of_companies_left }}
+                                        <p class=" me-1 fs-3 mb-0">Left: {{ student.no_of_companies_left }}
                                             more</p>
                                         <!-- <p class="fs-3 mb-0">Keep it up</p> -->
                                     </div>
@@ -289,7 +294,7 @@ Student -> Home
                                             class="me-1 rounded-circle bg-light-success round-20 d-flex align-items-center justify-content-center">
                                             <i class="ti ti-arrow-up-right text-success"></i>
                                         </span>
-                                        <p class="text-dark me-1 fs-3 mb-0">Top</p>
+                                        <p class=" me-1 fs-3 mb-0">Top</p>
 
 
 
@@ -336,7 +341,7 @@ Student -> Home
                                 </div>
                             </div>
 
-                            
+
 
                             {% endif %}
                         </div>
@@ -354,7 +359,7 @@ Student -> Home
                         class="me-2 rounded-circle bg-light-danger round-20 d-flex align-items-center justify-content-center">
                         <i class="ti ti-arrow-down-right text-danger"></i>
                       </span>
-                      <p class="text-dark me-1 fs-3 mb-0">+9%</p>
+                      <p class=" me-1 fs-3 mb-0">+9%</p>
                       <p class="fs-3 mb-0">last year</p>
                     </div>
                   </div>
@@ -393,12 +398,13 @@ Student -> Home
                         {% for application in applications %}
 
                         <li class="timeline-item d-flex position-relative overflow-hidden">
-                            <div class="timeline-time text-dark flex-shrink-0 text-end">{{application.job.company.name|title|truncatechars:15 }}</div>
+                            <div class="timeline-time flex-shrink-0 text-end">
+                                {{application.job.company.name|title|truncatechars:15 }}</div>
                             <div class="timeline-badge-wrap d-flex flex-column align-items-center">
-                                <span class="timeline-badge border-2 border border-success flex-shrink-0 my-8"></span>
+                                <span class="timeline-badge border-2 border-success flex-shrink-0 my-8"></span>
                                 <span class="timeline-badge-border d-block flex-shrink-0"></span>
                             </div>
-                            <div class="timeline-desc fs-3 text-dark mt-n1">{{ application.job.interview_date }}
+                            <div class="timeline-desc fs-3 mt-n1">{{ application.job.interview_date }}
                                 <br>
                                 <a class="btn btn-outline-{{ application.get_color_based_on_status }} btn-sm mt-1">
                                     {{ application.status|title }}
@@ -416,40 +422,40 @@ Student -> Home
 
 
                         <li class="timeline-item d-flex position-relative overflow-hidden">
-                            <div class="timeline-time text-dark flex-shrink-0 text-end">Not Available</div>
+                            <div class="timeline-time  flex-shrink-0 text-end">Not Available</div>
                             <div class="timeline-badge-wrap d-flex flex-column align-items-center">
-                                <span class="timeline-badge border-2 border border-primary flex-shrink-0 my-8"></span>
+                                <span class="timeline-badge border-2 border-primary flex-shrink-0 my-8"></span>
                                 <span class="timeline-badge-border d-block flex-shrink-0"></span>
                             </div>
-                            <div class="timeline-desc fs-3 text-dark mt-n1 fw-semibold">Please Apply First
+                            <div class="timeline-desc fs-3  mt-n1 fw-semibold">Please Apply First
                             </div>
                         </li>
                         <li class="timeline-item d-flex position-relative overflow-hidden">
-                            <div class="timeline-time text-dark flex-shrink-0 text-end">Not Available</div>
+                            <div class="timeline-time  flex-shrink-0 text-end">Not Available</div>
                             <div class="timeline-badge-wrap d-flex flex-column align-items-center">
-                                <span class="timeline-badge border-2 border border-success flex-shrink-0 my-8"></span>
+                                <span class="timeline-badge border-2 border-success flex-shrink-0 my-8"></span>
                                 <span class="timeline-badge-border d-block flex-shrink-0"></span>
                             </div>
-                            <div class="timeline-desc fs-3 text-dark mt-n1 fw-semibold">Please Apply First
+                            <div class="timeline-desc fs-3  mt-n1 fw-semibold">Please Apply First
                             </div>
                         </li>
                         <li class="timeline-item d-flex position-relative overflow-hidden">
-                            <div class="timeline-time text-dark flex-shrink-0 text-end">Not Available</div>
+                            <div class="timeline-time  flex-shrink-0 text-end">Not Available</div>
                             <div class="timeline-badge-wrap d-flex flex-column align-items-center">
-                                <span class="timeline-badge border-2 border border-danger flex-shrink-0 my-8"></span>
+                                <span class="timeline-badge border-2 border-danger flex-shrink-0 my-8"></span>
                                 <span class="timeline-badge-border d-block flex-shrink-0"></span>
                             </div>
-                            <div class="timeline-desc fs-3 text-dark mt-n1 fw-semibold">Please Apply First
+                            <div class="timeline-desc fs-3  mt-n1 fw-semibold">Please Apply First
                             </div>
                         </li>
                         <li class="timeline-item d-flex position-relative overflow-hidden">
-                            <div class="timeline-time text-dark flex-shrink-0 text-end">Not Available</div>
+                            <div class="timeline-time  flex-shrink-0 text-end">Not Available</div>
                             <div class="timeline-badge-wrap d-flex flex-column align-items-center">
-                                <span class="timeline-badge border-2 border border-warning flex-shrink-0 my-8"></span>
+                                <span class="timeline-badge border-2 border-warning flex-shrink-0 my-8"></span>
                             </div>
-                            <div class="timeline-desc fs-3 text-dark mt-n1 fw-semibold">Please Apply First
+                            <div class="timeline-desc fs-3  mt-n1 fw-semibold">Please Apply First
                             </div>
-                        </li>                   
+                        </li>
 
                         {% endif %}
                     </ul>
@@ -465,7 +471,7 @@ Student -> Home
                     <h5 class="card-title fw-semibold mb-4">Best Matches For You 🔥</h5>
                     <div class="table-responsive">
                         <table class="table text-nowrap mb-0 align-middle">
-                            <thead class="text-dark fs-4">
+                            <thead class=" fs-4">
 
                                 <tr>
                                     <th class="border-bottom-0">
@@ -574,7 +580,8 @@ Student -> Home
                 <div class="card">
                     <img src="{{ job.company.logo.url }}" class="card-img-top" alt="...">
                     <div class="card-body">
-                        <h5 class="card-title">{{ job.company.name|title|truncatechars:10 }} For ({{ job.title|truncatechars:5 }})</h5>
+                        <h5 class="card-title">{{ job.company.name|title|truncatechars:10 }} For ({{
+                            job.title|truncatechars:5 }})</h5>
                         <p class="card-text">
                             {{ job.description|truncatechars:25 }}...
                         </p>
