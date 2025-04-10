@@ -183,66 +183,66 @@ class Administrator(User):
         verbose_name_plural = "Administrators"
         verbose_name = "Administrator"
 
-# # ============================================ APPLICATION =========================================
+# ============================================ APPLICATION =========================================
 
-# class Application(models.Model):
-#     student = models.ForeignKey(Student, on_delete=models.CASCADE)
-#     job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name="applications")
-#     application_date = models.DateTimeField(auto_now_add=True)
-#     status_choices = (
-#         ('pending', 'Pending'),
-#         ('accepted', 'Accepted'),
-#         ('rejected', 'Rejected'),
-#     )
-#     status = models.CharField(max_length=20, choices=status_choices, default='pending')
+class Application(models.Model):
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name="applications")
+    application_date = models.DateTimeField(auto_now_add=True)
+    status_choices = (
+        ('pending', 'Pending'),
+        ('accepted', 'Accepted'),
+        ('rejected', 'Rejected'),
+    )
+    status = models.CharField(max_length=20, choices=status_choices, default='pending')
     
-#     def __str__(self):
-#         return f"{self.student.first_name} applied for {self.job.title}"
+    def __str__(self):
+        return f"{self.student.first_name} applied for {self.job.title}"
     
-#     class Meta:
-#         verbose_name_plural = "Applications"
-#         verbose_name = "Application"
+    class Meta:
+        verbose_name_plural = "Applications"
+        verbose_name = "Application"
         
         
-#     def get_color_based_on_status(self):
-#         if self.status == 'pending':
-#             return 'warning'
-#         elif self.status == 'accepted':
-#             return 'success'
-#         else:
-#             return 'danger'
+    def get_color_based_on_status(self):
+        if self.status == 'pending':
+            return 'warning'
+        elif self.status == 'accepted':
+            return 'success'
+        else:
+            return 'danger'
     
     
     
-#     # def get_all_applications_count_of_particular_job
+    # def get_all_applications_count_of_particular_job
         
 
-# # =========================================== ALUMNI REGISTRATIOSN =================================
+# =========================================== ALUMNI REGISTRATIOSN =================================
 
-# class AlumniRegistration(models.Model):
-#     name = models.CharField(max_length=100)
-#     email = models.EmailField()
-#     phone_number = models.CharField(max_length=12)
-#     company = models.CharField(max_length=100)
-#     designation = models.CharField(max_length=100)
-#     passout_year = models.IntegerField()
-#     linkedin_id = models.URLField(blank=True)
-#     profile_pic = models.ImageField(upload_to='alumni_profile/', blank=True, null=True)
+class AlumniRegistration(models.Model):
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
+    phone_number = models.CharField(max_length=12)
+    company = models.CharField(max_length=100)
+    designation = models.CharField(max_length=100)
+    passout_year = models.IntegerField()
+    linkedin_id = models.URLField(blank=True)
+    profile_pic = models.ImageField(upload_to='alumni_profile/', blank=True, null=True)
     
-#     def __str__(self):
-#         return self.name
+    def __str__(self):
+        return self.name
     
-#     class Meta:
-#         verbose_name_plural = "Alumni Registrations"
-#         verbose_name = "Alumni Registration"
+    class Meta:
+        verbose_name_plural = "Alumni Registrations"
+        verbose_name = "Alumni Registration"
 
-# # ========================================== NOTIFICATIONS =========================================
+# ========================================== NOTIFICATIONS =========================================
     
-# class Notification(models.Model):
-#     title = models.CharField(max_length=255)
-#     description = models.TextField()
-#     timeStamp = models.DateTimeField(auto_now_add=True, blank=True)
+class Notification(models.Model):
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    timeStamp = models.DateTimeField(auto_now_add=True, blank=True)
     
-#     def __str__(self):
-#         return self.title
+    def __str__(self):
+        return self.title
 
