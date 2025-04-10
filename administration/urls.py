@@ -21,7 +21,7 @@ urlpatterns = [
     # path("reject_application/<int:id>", views.reject_application, name="reject_application"),
     # path("change_to_pending/<int:id>", views.change_to_pending, name="change_to_pending"),
     
-    # # ======================== Company / Job Modifications ========================
+    # # ======================== Company / Job Modifications ======================
     
     # path("add_company", views.add_company, name="add_company"),
     # path("add_job/<int:id>", views.add_job, name="add_job"),
