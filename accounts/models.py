@@ -6,79 +6,79 @@ from django.core.validators import MinValueValidator
 
 # ======================================================= COMPANY ===========================================
 
-# class Company(models.Model):
-#     name = models.CharField(max_length=100)
-#     description = models.TextField()
-#     location = models.CharField(max_length=100)
-#     website = models.URLField(blank=True, null=True)
-#     size = models.CharField(max_length=50)
-#     social_media_links = models.URLField(blank=True)
-#     benefits_perks = models.TextField(blank=True)
-#     mail_id = models.EmailField(blank=True, null=True)
-#     logo = models.ImageField(upload_to='company_logos/', blank=True, null=True)
+class Company(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.TextField()
+    location = models.CharField(max_length=100)
+    website = models.URLField(blank=True, null=True)
+    size = models.CharField(max_length=50)
+    social_media_links = models.URLField(blank=True)
+    benefits_perks = models.TextField(blank=True)
+    mail_id = models.EmailField(blank=True, null=True)
+    logo = models.ImageField(upload_to='company_logos/', blank=True, null=True)
     
-#     class Meta:
-#         verbose_name_plural = "Companies"
-#         verbose_name = "Company"
+    class Meta:
+        verbose_name_plural = "Companies"
+        verbose_name = "Company"
     
-#     def __str__(self):
-#         return self.name
+    def __str__(self):
+        return self.name
     
-# # ======================================================= JOB ===========================================
+# ======================================================= JOB ===========================================
 
-# class Job(models.Model):
+class Job(models.Model):
     
-#     interview_date_choice = (
-#         ("25th April, 2024", "25th April, 2024"),
-#         ("24th April, 2024", "24th April, 2024"),
-#     )
+    interview_date_choice = (
+        ("25th April, 2024", "25th April, 2024"),
+        ("24th April, 2024", "24th April, 2024"),
+    )
     
-#     company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='jobs')
-#     title = models.CharField(max_length=100)
-#     description = models.TextField()
-#     interview_date = models.CharField(max_length=100, choices=interview_date_choice, default="25th April, 2024")
-#     deadline = models.DateField()
-#     interview_mode = models.CharField(max_length=100, blank=True)
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='jobs')
+    title = models.CharField(max_length=100)
+    description = models.TextField()
+    interview_date = models.CharField(max_length=100, choices=interview_date_choice, default="25th April, 2024")
+    deadline = models.DateField()
+    interview_mode = models.CharField(max_length=100, blank=True)
     
-#     # Criteria
-#     tenth_percentage = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
-#     twelfth_percentage = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
-#     cgpa_criteria = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
-#     is_backlog_allowed = models.BooleanField(default=True)
+    # Criteria
+    tenth_percentage = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
+    twelfth_percentage = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
+    cgpa_criteria = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
+    is_backlog_allowed = models.BooleanField(default=True)
     
-#     no_of_openings = models.IntegerField()
-#     job_type = models.CharField(max_length=30)
-#     salary_range = models.CharField(max_length=100, blank=True)
-#     location_flexibility = models.CharField(max_length=100, blank=True)
-#     training_period = models.CharField(max_length=100, blank=True)
-#     bond_timing = models.CharField(max_length=100, blank=True)
+    no_of_openings = models.IntegerField()
+    job_type = models.CharField(max_length=30)
+    salary_range = models.CharField(max_length=100, blank=True)
+    location_flexibility = models.CharField(max_length=100, blank=True)
+    training_period = models.CharField(max_length=100, blank=True)
+    bond_timing = models.CharField(max_length=100, blank=True)
     
-#     role = models.CharField(max_length=100)
+    role = models.CharField(max_length=100)
     
-#     # SLug for the better urls
-#     slug = models.SlugField(max_length=100, unique=True, null=True, blank=True)
+    # SLug for the better urls
+    slug = models.SlugField(max_length=100, unique=True, null=True, blank=True)
     
-#     def __str__(self):
-#         return self.title
+    def __str__(self):
+        return self.title
 
-#     def save(self, *args, **kwargs):
-#         # Generate unique slug based on title and company name
-#         if not self.slug:
-#             base_slug = slugify(f"{self.company.name}-{self.title}")
-#             slug = base_slug
-#             counter = 1
-#             while Job.objects.filter(slug=slug).exists():
-#                 slug = f"{base_slug}-{counter}"
-#                 counter += 1
-#             self.slug = slug
-#         super().save(*args, **kwargs)
+    def save(self, *args, **kwargs):
+        # Generate unique slug based on title and company name
+        if not self.slug:
+            base_slug = slugify(f"{self.company.name}-{self.title}")
+            slug = base_slug
+            counter = 1
+            while Job.objects.filter(slug=slug).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            self.slug = slug
+        super().save(*args, **kwargs)
         
-#     # def is_student_eligible(self, student):
-#     #     return (
-#     #         student.tenth >= self.tenth_percentage and
-#     #         student.twelfth >= self.twelfth_percentage and
-#     #         student.cgpa >= self.cgpa_criteria
-#     #     )            
+    # def is_student_eligible(self, student):
+    #     return (
+    #         student.tenth >= self.tenth_percentage and
+    #         student.twelfth >= self.twelfth_percentage and
+    #         student.cgpa >= self.cgpa_criteria
+    #     )            
     
 # ======================================================= STUDENT ===========================================
 
