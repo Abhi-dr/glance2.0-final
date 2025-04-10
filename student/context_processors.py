@@ -5,7 +5,8 @@ from datetime import datetime, timedelta
 
 def user_context_processor(request):
     
-    if request.path.startswith('/tera0mera1_dknaman/'):
+    # Skip for admin panel URLs
+    if request.path.startswith('/mClk3W)$t=/'):
         return {} 
     
     user_type = None
@@ -16,13 +17,11 @@ def user_context_processor(request):
             if hasattr(request.user, 'student'):
                 user_type = 'student'
                 user_object = request.user.student
-            elif hasattr(request.user, 'instructor'):
-                user_type = 'instructor'
-                user_object = request.user.instructor
             elif hasattr(request.user, 'administrator'):
                 user_type = 'administrator'
                 user_object = request.user.administrator
-        except (Student.DoesNotExist):
+        except Exception:
+            # Handle any exceptions gracefully
             pass
 
     return {
