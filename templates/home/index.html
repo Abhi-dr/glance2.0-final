@@ -40,6 +40,71 @@
             transform: translateY(-20px);
         }
     }
+
+    /* Companies Section Styles */
+    .companies-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 2rem;
+        margin-top: 3rem;
+    }
+
+    .company-card {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-radius: 15px;
+        padding: 2rem;
+        text-align: center;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .company-logo {
+        height: 100px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .company-logo img {
+        max-height: 100%;
+        max-width: 100%;
+        object-fit: contain;
+    }
+
+    @media (max-width: 768px) {
+        .companies-grid {
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .company-card {
+            padding: 1.5rem;
+        }
+
+        .company-logo {
+            height: 80px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .companies-grid {
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+        }
+
+        .company-card {
+            padding: 1rem;
+        }
+
+        .company-logo {
+            height: 60px;
+        }
+    }
 </style>
 
 {% endblock %}
@@ -110,61 +175,62 @@
 <section id="companies" class="section">
     <div class="container">
         <h2 class="section-title">Participating Companies</h2>
-        <p class="section-subtitle">Connect with industry leaders</p>
+        <p class="section-subtitle">Coming Soon...</p>
+      
 
-        <div class="row g-4">
-            <div class="col-md-3 col-6">
+      <!--  <div class="companies-grid">
+            <div class="company-card">
                 <div class="company-logo">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Google_2015_logo.svg/1200px-Google_2015_logo.svg.png"
+                    <img src="{% static 'img/home/company/jio.png' %}"
                         alt="Google">
                 </div>
             </div>
-            <div class="col-md-3 col-6">
+            <div class="company-card">
                 <div class="company-logo">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Microsoft_logo.svg/1200px-Microsoft_logo.svg.png"
                         alt="Microsoft">
                 </div>
             </div>
-            <div class="col-md-3 col-6">
+            <div class="company-card">
                 <div class="company-logo">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Amazon_logo.svg/1024px-Amazon_logo.svg.png"
                         alt="Amazon">
                 </div>
             </div>
-            <div class="col-md-3 col-6">
+            <div class="company-card">
                 <div class="company-logo">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Apple_logo_black.svg/488px-Apple_logo_black.svg.png"
                         alt="Apple">
                 </div>
             </div>
-            <div class="col-md-3 col-6">
+            <div class="company-card">
                 <div class="company-logo">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Netflix_2015_logo.svg/1920px-Netflix_2015_logo.svg.png"
                         alt="Netflix">
                 </div>
             </div>
-            <div class="col-md-3 col-6">
+            <div class="company-card">
                 <div class="company-logo">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Facebook_Logo_%282019%29.png/1024px-Facebook_Logo_%282019%29.png"
                         alt="Facebook">
                 </div>
             </div>
-            <div class="col-md-3 col-6">
+            <div class="company-card">
                 <div class="company-logo">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/IBM_logo.svg/1200px-IBM_logo.svg.png"
                         alt="IBM">
                 </div>
             </div>
-            <div class="col-md-3 col-6">
+            <div class="company-card">
                 <div class="company-logo">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Adobe_Digital_Marketing_logo.svg/1200px-Adobe_Digital_Marketing_logo.svg.png"
                         alt="Adobe">
                 </div>
-            </div>
+            </div>-->
         </div>
 
         <div class="text-center mt-5">
-            <a href="register.html" class="btn btn-primary">Register to Meet These Companies</a>
+            <a href="{% url 'register' %}" class="btn btn-primary">Register to Meet These Companies</a>
         </div>
     </div>
 </section>
@@ -173,29 +239,29 @@
 <section id="schedule" class="section section-bg">
     <div class="container">
         <h2 class="section-title">Event Schedule</h2>
-        <p class="section-subtitle">soon...</p>
+        <p class="section-subtitle"></p>
 
-        <!-- <div class="row">
+        <div class="row">
             <div class="col-lg-6">
                 <div class="schedule-card">
                     <div class="schedule-date">Day 1: April 17, 2025</div>
                     <div class="schedule-event">
                         <div class="event-time">9:00 AM - 10:00 AM</div>
                         <div class="event-title">Opening Ceremony</div>
-                        <div class="event-location"><i class="fas fa-map-marker-alt"></i> Main Auditorium</div>
+                        <div class="event-location"><i class="fas fa-map-marker-alt"></i> CSED</div>
                     </div>
                     <div class="schedule-event">
                         <div class="event-time">10:00 AM - 12:00 PM</div>
-                        <div class="event-title">Company Presentations</div>
-                        <div class="event-location"><i class="fas fa-map-marker-alt"></i> Seminar Halls</div>
+                        <div class="event-title">Company Registrations</div>
+                        <div class="event-location"><i class="fas fa-map-marker-alt"></i> CSED</div>
                     </div>
-                    <div class="schedule-event">
+                  <!-- <div class="schedule-event">
                         <div class="event-time">12:00 PM - 1:00 PM</div>
                         <div class="event-title">Lunch Break</div>
                         <div class="event-location"><i class="fas fa-map-marker-alt"></i> Food Court</div>
-                    </div>
+                    </div>--> 
                     <div class="schedule-event">
-                        <div class="event-time">1:00 PM - 5:00 PM</div>
+                        <div class="event-time">12:00 PM - 5:00 PM</div>
                         <div class="event-title">Interview Sessions (Round 1)</div>
                         <div class="event-location"><i class="fas fa-map-marker-alt"></i> Interview Booths</div>
                     </div>
@@ -206,27 +272,27 @@
                     <div class="schedule-date">Day 2: April 18, 2025</div>
                     <div class="schedule-event">
                         <div class="event-time">9:00 AM - 11:00 AM</div>
-                        <div class="event-title">Workshop: Resume Building</div>
-                        <div class="event-location"><i class="fas fa-map-marker-alt"></i> Workshop Hall A</div>
+                        <div class="event-title">Company Registrations</div>
+                        <div class="event-location"><i class="fas fa-map-marker-alt"></i>CSED</div>
                     </div>
-                    <div class="schedule-event">
+                   <!-- <div class="schedule-event">
                         <div class="event-time">11:00 AM - 1:00 PM</div>
                         <div class="event-title">Panel Discussion: Industry Trends</div>
                         <div class="event-location"><i class="fas fa-map-marker-alt"></i> Main Auditorium</div>
-                    </div>
+                    </div>-->
                     <div class="schedule-event">
-                        <div class="event-time">1:00 PM - 2:00 PM</div>
-                        <div class="event-title">Lunch Break</div>
-                        <div class="event-location"><i class="fas fa-map-marker-alt"></i> Food Court</div>
+                        <div class="event-time">11:00 AM - 2:00 PM</div>
+                        <div class="event-title">Interview Sessions (Round 2)</div>
+                        <div class="event-location"><i class="fas fa-map-marker-alt"></i> Acamedic Block XI</div>
                     </div>
                     <div class="schedule-event">
                         <div class="event-time">2:00 PM - 5:00 PM</div>
                         <div class="event-title">Interview Sessions (Final Round)</div>
-                        <div class="event-location"><i class="fas fa-map-marker-alt"></i> Interview Booths</div>
+                        <div class="event-location"><i class="fas fa-map-marker-alt"></i> CSED</div>
                     </div>
                 </div>
             </div>
-        </div>-->
+        </div>
     </div>
 </section>
 
@@ -241,13 +307,13 @@
             <button class="btn btn-outline-primary" data-filter="inauguration">Inauguration</button>
             <button class="btn btn-outline-primary" data-filter="interviews">Interviews</button>
             <button class="btn btn-outline-primary" data-filter="workshops">Workshops</button>
-            <button class="btn btn-outline-primary" data-filter="cultural">Cultural</button>
+            <button class="btn btn-outline-primary" data-filter="Team">Team</button>
         </div>
 
         <div class="row g-4 gallery-container">
             <div class="col-md-4 col-sm-6 gallery-item" data-category="inauguration">
                 <div class="gallery-card">
-                    <img src="{% static 'img/home/inauguration.jpg' %}" alt="Inauguration Ceremony" class="img-fluid">
+                    <img src="{% static 'img/home/i1.jpg' %}" alt="Inauguration Ceremony" class="img-fluid">
                     <div class="gallery-overlay">
                         <div class="gallery-info">
                             <h5>Inauguration Ceremony</h5>
@@ -263,7 +329,7 @@
 
             <div class="col-md-4 col-sm-6 gallery-item" data-category="interviews">
                 <div class="gallery-card">
-                    <img src="{% static 'img/home/interview.jpg' %}" alt="Interview Sessions" class="img-fluid">
+                    <img src="{% static 'img/home/inv.jpg' %}" alt="Interview Sessions" class="img-fluid">
                     <div class="gallery-overlay">
                         <div class="gallery-info">
                             <h5>Interview Sessions</h5>
@@ -279,7 +345,7 @@
 
             <div class="col-md-4 col-sm-6 gallery-item" data-category="workshops">
                 <div class="gallery-card">
-                    <img src="{% static 'img/home/workshop.jpg' %}" alt="Technical Workshop" class="img-fluid">
+                    <img src="{% static 'img/home/w.jpg' %}" alt="Technical Workshop" class="img-fluid">
                     <div class="gallery-overlay">
                         <div class="gallery-info">
                             <h5>Technical Workshop</h5>
@@ -292,14 +358,14 @@
                 </div>
             </div>
 
-            <div class="col-md-4 col-sm-6 gallery-item" data-category="cultural">
+            <div class="col-md-4 col-sm-6 gallery-item" data-category="Team">
                 <div class="gallery-card">
-                    <img src="{% static 'img/home/cultural.jpg' %}" alt="Cultural Performance" class="img-fluid">
+                    <img src="{% static 'img/home/workshop.jpg' %}" alt="Team Performance" class="img-fluid">
                     <div class="gallery-overlay">
                         <div class="gallery-info">
-                            <h5>Cultural Performance</h5>
+                            <h5>Team Performance</h5>
                             <p>Students showcasing their talents during the event</p>
-                            <a href="https://source.unsplash.com/random/1200x800/?cultural,performance"
+                            <a href="https://source.unsplash.com/random/1200x800/?Team,performance"
                                 class="gallery-popup">
                                 <i class="fas fa-search-plus"></i>
                             </a>
@@ -310,7 +376,7 @@
 
             <div class="col-md-4 col-sm-6 gallery-item" data-category="interviews">
                 <div class="gallery-card">
-                    <img src="{% static 'img/home/workshop2.jpg' %}" alt="Company Booth" class="img-fluid">
+                    <img src="{% static 'img/home/inv1.jpg' %}" alt="Company Booth" class="img-fluid">
                     <div class="gallery-overlay">
                         <div class="gallery-info">
                             <h5>Company Booth</h5>
@@ -325,7 +391,7 @@
 
             <div class="col-md-4 col-sm-6 gallery-item" data-category="workshops">
                 <div class="gallery-card">
-                    <img src="{% static 'img/home/cul.jpg' %}" alt="Resume Building Workshop" class="img-fluid">
+                    <img src="{% static 'img/home/w1.jpg' %}" alt="Resume Building Workshop" class="img-fluid">
                     <div class="gallery-overlay">
                         <div class="gallery-info">
                             <h5>Resume Building Workshop</h5>
@@ -341,10 +407,10 @@
 
             <div class="col-md-4 col-sm-6 gallery-item" data-category="inauguration">
                 <div class="gallery-card">
-                    <img src="{% static 'img/home/i4.jpg' %}" alt="Ribbon Cutting" class="img-fluid">
+                    <img src="{% static 'img/home/i.jpg' %}" alt="Ribbon Cutting" class="img-fluid">
                     <div class="gallery-overlay">
                         <div class="gallery-info">
-                            <h5>Ribbon Cutting</h5>
+                            <h5>Inauguration Ceremony</h5>
                             <p>Official inauguration of Glance 1.0</p>
                             <a href="https://source.unsplash.com/random/1200x800/?ribbon,cutting" class="gallery-popup">
                                 <i class="fas fa-search-plus"></i>
@@ -354,13 +420,13 @@
                 </div>
             </div>
 
-            <div class="col-md-4 col-sm-6 gallery-item" data-category="cultural">
+            <div class="col-md-4 col-sm-6 gallery-item" data-category="Team">
                 <div class="gallery-card">
-                    <img src="{% static 'img/home/i5.jpg' %}" alt="Award Ceremony" class="img-fluid">
+                    <img src="{% static 'img/home/t.jpg' %}" alt="Award Ceremony" class="img-fluid">
                     <div class="gallery-overlay">
                         <div class="gallery-info">
-                            <h5>Award Ceremony</h5>
-                            <p>Recognizing outstanding participants and companies</p>
+                            <h5></h5>
+                            <p>Team of Glance 1.0</p>
                             <a href="https://source.unsplash.com/random/1200x800/?award,ceremony" class="gallery-popup">
                                 <i class="fas fa-search-plus"></i>
                             </a>
@@ -371,7 +437,7 @@
 
             <div class="col-md-4 col-sm-6 gallery-item" data-category="interviews">
                 <div class="gallery-card">
-                    <img src="{% static 'img/home/i6.jpg' %}" alt="Group Discussion" class="img-fluid">
+                    <img src="{% static 'img/home/inv4.jpg' %}" alt="Group Discussion" class="img-fluid">
                     <div class="gallery-overlay">
                         <div class="gallery-info">
                             <h5>Group Discussion</h5>
@@ -403,13 +469,13 @@
             <div class="col-lg-3 col-md-6">
                 <div class="team-card">
                     <div class="team-img">
-                        <img src="" alt="Paras Mittal" class="img-fluid">
+                        <img src="{% static 'img/home/team/pv.jpg' %}" alt="Paras Mittal" class="img-fluid">
 
                     </div>
                     <div class="team-info">
-                        <h4>Paras Mittal</h4>
-                        <p class="team-position">President Allumni Affairs</p>
-                        <p class="team-desc">Leads the overall planning and execution of Glance 2.0</p>
+                        <h4>Prince Vohra</h4>
+                        <p class="team-position">Vice President </p>
+                        <p class="team-desc"></p>
                     </div>
                 </div>
             </div>
@@ -418,13 +484,13 @@
             <div class="col-lg-3 col-md-6">
                 <div class="team-card">
                     <div class="team-img">
-                        <img src="" alt="Amit Kumar" class="img-fluid">
+                        <img src="{% static 'img/home/team/nk.jpg' %}" alt="Mr. Nishant Kumar" class="img-fluid">
 
                     </div>
                     <div class="team-info">
-                        <h4>Amit Kumar</h4>
-                        <p class="team-position">Technical Team</p>
-                        <p class="team-desc">Manages queries regarding Website</p>
+                        <h4>Mr. Nishant Kumar</h4>
+                        <p class="team-position">Senior Executive</p>
+                        <p class="team-desc"></p>
                     </div>
                 </div>
             </div>
@@ -433,16 +499,16 @@
             <div class="col-lg-3 col-md-6">
                 <div class="team-card">
                     <div class="team-img">
-                        <img src="" alt="DK" class="img-fluid">
+                        <img src="{% static 'img/home/team/db.jpg' %}" alt="DK" class="img-fluid">
 
                     </div>
                     <div class="team-info">
-                        <h4>Divyanshu Khandelwal</h4>
-                        <p class="team-position">Technical Team Advisor</p>
-                        <p class="team-desc">Manages queries regarding Website</p>
+                        <h4>Ms Divyanshee Badyal</h4>
+                        <p class="team-position">Executive</p>
+                        <p class="team-desc">(For Greater Noida Campus) </p>
                     </div>
                 </div>
-            </div>
+            </div> 
 
             <!-- Contact Section -->
             <section id="contact" class="section">
