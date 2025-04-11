@@ -1,0 +1,20 @@
+f"""
+Dear {first_name},
+
+Congratulations on successfully registering for { job.title.title() } for GLANCE - the Mega Job Fair! 
+
+Your commitment to your professional journey is commendable. Here are some key details:
+
+- Date: April 24th & 25th April, 2024
+- Opportunity: Connect with recruiters, explore job and internship prospects, and expand your network.
+- Reminder: You can apply to a maximum of two (2) companies.
+
+Best of luck! For any queries or assistance, reach out to us at support.glance@gla.ac.in.
+
+Looking forward to seeing you at GLANCE!
+
+Best regards,
+Technical Team
+Department of Alumni Affairs
+GLA University
+"""

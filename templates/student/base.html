@@ -1,0 +1,488 @@
+{% load static %}
+
+<!doctype html>
+<html lang="en" data-bs-theme="dark">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>
+        {% block title %}
+        {% endblock %}
+    </title>
+    <link rel="shortcut icon" type="image/png" href="{% static 'img/dashboardimages/logos/favicon.png' %}" />
+    <link rel="stylesheet" href="{% static 'css/student/dashboard/styles.min.css' %}" />
+    <style>
+        body {
+            background: linear-gradient(to bottom right, #0a0057, #fff);
+            background-repeat: no-repeat;
+        }
+
+        [data-bs-theme="dark"] {
+            body {
+                background: linear-gradient(to bottom right, #000000, #4f4f4f);
+                background-repeat: no-repeat;
+            }
+
+            aside,
+            header {
+                background: #212529;
+            }
+
+
+            span,
+            h2,
+            h3,
+            h4,
+            h5,
+            h6,
+            p,
+            ul,
+            li,
+            a,
+            button,
+            input,
+            label {
+                color: #f0f0f0;
+            }
+
+            .hide-menu,
+            i {
+                color: rgb(236, 236, 236);
+            }
+
+            .dropdown-item:hover i,
+            .dropdown-item:hover p {
+                color: black;
+                /* Set the text and icon color to black on hover */
+            }
+        }
+
+        [data-bs-theme="dark"] .form-control {
+            color: #f0f0f0;
+        }
+
+        [data-bs-theme="dark"] select>option {
+            color: #000000;
+        }
+    </style>
+
+    <style>
+        .themeToggle {
+            color: #bbb;
+            width: 3em;
+        }
+
+        .st-sunMoonThemeToggleBtn {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .st-sunMoonThemeToggleBtn .themeToggleInput {
+            opacity: 0;
+            width: 55%;
+            aspect-ratio: 1;
+        }
+
+        .st-sunMoonThemeToggleBtn svg {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.4s ease;
+            transform: rotate(40deg);
+        }
+
+        .st-sunMoonThemeToggleBtn svg .sunMoon {
+            transform-origin: center center;
+            transition: inherit;
+            transform: scale(1);
+        }
+
+        .st-sunMoonThemeToggleBtn svg .sunRay {
+            transform-origin: center center;
+            transform: scale(0);
+        }
+
+        .st-sunMoonThemeToggleBtn svg mask>circle {
+            transition: transform 0.64s cubic-bezier(0.41, 0.64, 0.32, 1.575);
+            transform: translate(0px, 0px);
+        }
+
+        .st-sunMoonThemeToggleBtn svg .sunRay2 {
+            animation-delay: 0.05s !important;
+        }
+
+        .st-sunMoonThemeToggleBtn svg .sunRay3 {
+            animation-delay: 0.1s !important;
+        }
+
+        .st-sunMoonThemeToggleBtn svg .sunRay4 {
+            animation-delay: 0.17s !important;
+        }
+
+        .st-sunMoonThemeToggleBtn svg .sunRay5 {
+            animation-delay: 0.25s !important;
+        }
+
+        .st-sunMoonThemeToggleBtn svg .sunRay5 {
+            animation-delay: 0.29s !important;
+        }
+
+        .st-sunMoonThemeToggleBtn .themeToggleInput:checked+svg {
+            transform: rotate(90deg);
+        }
+
+        .st-sunMoonThemeToggleBtn .themeToggleInput:checked+svg mask>circle {
+            transform: translate(16px, -3px);
+        }
+
+        .st-sunMoonThemeToggleBtn .themeToggleInput:checked+svg .sunMoon {
+            transform: scale(0.55);
+        }
+
+        .st-sunMoonThemeToggleBtn .themeToggleInput:checked+svg .sunRay {
+            animation: showRay1832 0.4s ease 0s 1 forwards;
+        }
+
+        @keyframes showRay1832 {
+            0% {
+                transform: scale(0);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* Add this to your existing CSS */
+        .sidebar-collapsed {
+            display: none;
+        }
+
+        @media (min-width: 992px) {
+            .sidebar-expanded {
+                display: block;
+            }
+
+            .sidebar-collapsed {
+                display: none;
+            }
+        }
+    </style>
+
+    <script>
+        // Apply theme immediately before page loads to prevent flashing
+        (function () {
+            const theme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-bs-theme', theme);
+        })();
+    </script>
+
+    {% block extra_css %}
+
+    {% endblock %}
+
+</head>
+
+<body style="background-attachment: fixed;">
+    <!--  Body Wrapper -->
+    <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
+        data-sidebar-position="fixed" data-header-position="fixed">
+        <!-- Sidebar Start -->
+        <aside class="left-sidebar" id="sidebar">
+            <!-- Sidebar scroll-->
+            <div>
+                <div class="brand-logo d-flex align-items-center justify-content-between">
+                    <a href="{% url 'student' %}" class="text-nowrap logo-img">
+                        <img src="{% static 'img/student/alumnilogo.png' %}" alt="" style="width: 100%;" />
+                        <!-- <img src="{% static 'img/home/logo.svg' %}" width="110%" alt="Glance 2.0 Logo"> -->
+                    </a>
+                    <div class="close-btn d-block  d-xl-none sidebartoggler cursor-pointer" id="sidebarCollapse">
+                        <i class="ti ti-x fs-8"></i>
+                    </div>
+                </div>
+                <!-- Sidebar navigation-->
+                <nav class="sidebar-nav scroll-sidebar" data-simplebar="">
+                    <ul id="sidebarnav">
+                        <li class="nav-small-cap">
+                            <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
+                            <span class="hide-menu">Main</span>
+                        </li>
+
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="{% url 'student' %}" aria-expanded="false">
+                                <span>
+                                    <i class="ti ti-layout-dashboard"></i>
+                                </span>
+                                <span class="hide-menu">Dashboard</span>
+                            </a>
+                        </li>
+
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="{% url 'my_applications' %}" aria-expanded="false">
+                                <span>
+                                    <i class="ti ti-cards"></i>
+                                </span>
+                                <span class="hide-menu">My Applications</span>
+                            </a>
+                        </li>
+
+                        <li class="nav-small-cap">
+                            <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
+                            <span class="hide-menu">Extra</span>
+                        </li>
+
+
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="{% url 'upload_resume' %}" aria-expanded="false">
+                                <span>
+                                    <i class="ti ti-file-description"></i>
+                                </span>
+
+                                {% if student.resume %}
+
+                                <span class="hide-menu">Update Documents</span>
+
+                                {% else %}
+                                <span class="hide-menu">Upload Documents</span>
+                                {% endif %}
+                            </a>
+                        </li>
+
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="{% url 'all_jobs' %}" aria-expanded="false">
+                                <span>
+                                    <i class="ti ti-article"></i>
+                                </span>
+                                <span class="hide-menu">All Jobs</span>
+                            </a>
+                        </li>
+
+
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="{% url 'notifications' %}" aria-expanded="false">
+                                <span>
+                                    <i class="ti ti-alert-circle"></i>
+                                </span>
+                                <span class="hide-menu">What's New</span>
+                            </a>
+                        </li>
+                        <li class="nav-small-cap">
+                            <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
+                            <span class="hide-menu">Help Desk</span>
+                        </li>
+
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="{% url 'support' %}" aria-expanded="false">
+                                <span>
+                                    <i class="ti ti-user"></i>
+                                </span>
+                                <span class="hide-menu">Support</span>
+                            </a>
+                        </li>
+
+
+
+                        {% comment %}
+                        <!-- <li class="nav-small-cap">
+                            <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
+                            <span class="hide-menu">AUTH</span>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="https://endeavourinstitute.in/login" aria-expanded="false">
+                                <span>
+                                    <i class="ti ti-login"></i>
+                                </span>
+                                <span class="hide-menu">Login</span>
+                            </a>
+                        </li> {% endcomment %}
+                        {% comment %} <li class="sidebar-item">
+                            <a class="sidebar-link" href="https://endeavourinstitute.in/login" aria-expanded="false">
+                                <span>
+                                    <i class="ti ti-user-plus"></i>
+                                </span>
+                                <span class="hide-menu">Register</span>
+                            </a>
+                        </li>
+                         {% endcomment %}
+                        
+                        
+                    </ul>
+                    <div class="">
+                        <!-- <div class="d-flex">
+                            <div class="unlimited-access-title me-3">
+                                <h6 class="fw-semibold fs-4 mb-6 text-dark w-85">Upgrade to pro</h6>
+                                <a href="https://endeavourinstitute.in/login"
+                                    class="btn btn-primary fs-2 fw-semibold lh-sm">Buy Pro</a>
+                            </div>
+                            <div class="unlimited-access-img">
+                                <img src="{% static 'img/dashboard/images/backgrounds/rocket.png' %}" alt="" class="img-fluid">
+                            </div>
+                        </div> -->
+            </div>
+            </nav>
+            <!-- End Sidebar navigation -->
+    </div>
+    <!-- End Sidebar scroll-->
+    </aside>
+    <!--  Sidebar End -->
+
+
+    <!--  Main wrapper -->
+    <div class="body-wrapper">
+        <!--  Header Start -->
+        <header class="app-header">
+            <nav class="navbar navbar-expand-lg navbar-light">
+                <ul class="navbar-nav">
+                    <li class="nav-item d-block d-xl-none">
+                        <a class="nav-link sidebartoggler nav-icon-hover" id="headerCollapse" href="javascript:void(0)">
+                            <i class="ti ti-menu-2"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-icon-hover" href="{% url 'notifications' %}">
+                            <i class="ti ti-bell-ringing"></i>
+                            <!-- <div class="notification bg-primary rounded-circle"></div> -->
+                        </a>
+                    </li>
+                </ul>
+                <div class="navbar-collapse justify-content-end px-0" id="navbarNav">
+                    <ul class="navbar-nav flex-row ms-auto align-items-center justify-content-end">
+
+
+                        <label for="themeToggle" class="themeToggle st-sunMoonThemeToggleBtn" type="checkbox">
+                            <input type="checkbox" id="themeToggle" class="themeToggleInput" />
+                            <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor" stroke="none">
+                                <mask id="moon-mask">
+                                    <rect x="0" y="0" width="20" height="20" fill="white"></rect>
+                                    <circle cx="11" cy="3" r="8" fill="black"></circle>
+                                </mask>
+                                <circle class="sunMoon" cx="10" cy="10" r="8" mask="url(#moon-mask)"></circle>
+                                <g>
+                                    <circle class="sunRay sunRay1" cx="18" cy="10" r="1.5"></circle>
+                                    <circle class="sunRay sunRay2" cx="14" cy="16.928" r="1.5"></circle>
+                                    <circle class="sunRay sunRay3" cx="6" cy="16.928" r="1.5"></circle>
+                                    <circle class="sunRay sunRay4" cx="2" cy="10" r="1.5"></circle>
+                                    <circle class="sunRay sunRay5" cx="6" cy="3.1718" r="1.5"></circle>
+                                    <circle class="sunRay sunRay6" cx="14" cy="3.1718" r="1.5"></circle>
+                                </g>
+                            </svg>
+                        </label>
+
+
+                        <a href="{% url 'logout' %}" class="btn btn-primary">Logout</a>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link nav-icon-hover" href="javascript:void(0)" id="drop2"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                <img src="{{ student.profile_pic.url }}" alt="" width="35" height="35"
+                                    class="rounded-circle">
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-end dropdown-menu-animate-up"
+                                aria-labelledby="drop2">
+                                <div class="message-body">
+                                    <a href="{% url 'my_profile' %}"
+                                        class="d-flex align-items-center gap-2 dropdown-item">
+                                        <i class="ti ti-user fs-6"></i>
+                                        <p class="mb-0 fs-3">My Profile</p>
+                                    </a>
+                                    <a href="{% url 'edit_profile' %}"
+                                        class="d-flex align-items-center gap-2 dropdown-item">
+                                        <i class="ti ti-mail fs-6"></i>
+                                        <p class="mb-0 fs-3">Edit Profile</p>
+                                    </a>
+                                    <a href="{% url 'logout' %}"
+                                        class="btn btn-outline-primary mx-3 mt-2 d-block">Logout</a>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="row-cols-lg-3">
+                    <span class="fw-semibold">Hi, {{ student.first_name }}</span>
+                </div>
+            </nav>
+        </header>
+        <!--  Header End -->
+
+        {% block body %}
+        {% endblock %}
+
+    </div>
+    </div>
+
+    {% block myjs %}
+    {% endblock %}
+
+
+
+
+    <script src="{% static 'js/dashboard/libs/jquery/dist/jquery.min.js' %}"></script>
+    <script src="{% static 'js/dashboard/libs/bootstrap/dist/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'js/dashboard/js/sidebarmenu.js' %}"></script>
+    <script src="{% static 'js/dashboard/js/app.min.js' %}"></script>
+    <script src="{% static 'js/dashboard/libs/apexcharts/dist/apexcharts.min.js' %}"></script>
+    <script src="{% static 'js/dashboard/libs/simplebar/dist/simplebar.js' %}"></script>
+    <script src="{% static 'js/dashboard/js/dashboard.js' %}"></script>
+
+    <script>
+        // Get references to the sidebar and the toggle button
+        const sidebar = document.getElementById('sidebar');
+        const sidebarCollapse = document.getElementById('sidebarCollapse');
+
+        // Function to close the sidebar
+        function closeSidebar() {
+            sidebar.classList.remove('show');
+        }
+
+        // Event listener for clicks on the toggle button
+        sidebarCollapse.addEventListener('click', function () {
+            sidebar.classList.toggle('show');
+        });
+
+        // Event listener for clicks outside the sidebar
+        document.addEventListener('click', function (event) {
+            const target = event.target;
+            if (!sidebar.contains(target) && target !== sidebarCollapse) {
+                closeSidebar();
+            }
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const themeToggleButton = document.getElementById('themeToggle');
+            if (themeToggleButton) {
+                // Update button text based on current theme
+                const currentTheme = document.documentElement.getAttribute('data-bs-theme');
+                themeToggleButton.innerHTML = currentTheme === 'dark' ? 'Light Mode' : 'Dark Mode';
+                themeToggleButton.classList.add(currentTheme === 'dark' ? 'btn-outline-light' : 'btn-outline-dark');
+
+                // Add click event listener for theme toggle
+                themeToggleButton.addEventListener('click', () => {
+                    const currentTheme = document.documentElement.getAttribute('data-bs-theme');
+                    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+                    // Apply theme change
+                    document.documentElement.setAttribute('data-bs-theme', newTheme);
+                    localStorage.setItem('theme', newTheme);
+
+                    // Update button appearance
+                    if (newTheme === 'dark') {
+                        themeToggleButton.innerHTML = 'Light Mode';
+                        themeToggleButton.classList.remove('btn-outline-dark');
+                        themeToggleButton.classList.add('btn-outline-light');
+                    } else {
+                        themeToggleButton.innerHTML = 'Dark Mode';
+                        themeToggleButton.classList.remove('btn-outline-light');
+                        themeToggleButton.classList.add('btn-outline-dark');
+                    }
+                });
+            }
+        });
+    </script>
+
+
+</body>
+
+</html>

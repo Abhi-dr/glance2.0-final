@@ -1,0 +1,215 @@
+{% extends "administration/base.html" %}
+{% load static %}
+
+{% block title %}
+Administration -> Add Job
+{% endblock %}
+
+{% block extra_css %}
+
+<style>
+    .star {
+        color: red;
+        display: inline;
+    }
+</style>
+
+{% endblock %}
+
+{% block body %}
+
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title fw-semibold mb-0">{{ company.name|title }} </i> </h5>
+
+        </div>
+        <div class="container px-4">
+            <form action="{% url 'add_job' company.id %}" method="POST">
+                {% csrf_token %}
+
+                <hr class="mt-0">
+                <div class="row">
+
+                    <div class="w-100">
+
+                        <div class="card">
+                            <div class="card-header">Add Job</div>
+                            <div class="card-body h-100">
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="job_title" class="form-label">Job Title
+                                                <div class="star">*</div>
+                                            </label>
+                                            <input type="text" class="form-control" id="job_title" name="title"
+                                                required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="job_type" class="form-label">Job Type</label>
+                                            <select class="form-select" id="job_type" name="job_type" required>
+                                                <option value="Full Time">Full Time</option>
+                                                <option value="Part Time">Part Time</option>
+                                                <option value="Internship">Internship</option>
+                                                <option value="Contract">Contract</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="job_location" class="form-label">Job Location</label>
+                                            <!-- select tag with remote, hybrid and on-site -->
+                                            <select class="form-select" id="job_location" name="location_flexibility"
+                                                required>
+                                                <option value="Remote">Remote</option>
+                                                <option value="Hybrid">Hybrid</option>
+                                                <option value="On-Site">On-Site</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="job_salary" class="form-label">Job Salary</label>
+                                            <input type="text" class="form-control" id="job_salary" name="salary_range"
+                                                required>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="mb-3">
+                                        <label for="job_description" class="form-label">Job Description</label>
+                                        <textarea class="form-control" rows="4" id="job_description" name="description"
+                                            required></textarea>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <!-- interview date -->
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="interview_date" class="form-label
+                                            ">Interview Date</label>
+                                            <input type="date" class="form-control" id="interview_date"
+                                                name="interview_date" required>
+                                        </div>
+                                    </div>
+                                    <!-- deadline -->
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="deadline" class="form-label">Deadline</label>
+                                            <input type="date" class="form-control" id="deadline" name="deadline"
+                                                required>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <!-- 10th 12th and cgpa -->
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label for="tenth" class="form-label">10th Percentage</label>
+                                            <input type="text" class="form-control" id="tenth" name="tenth_percentage"
+                                                required>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label for="twelfth" class="form-label">12th Percentage</label>
+                                            <input type="text" class="form-control" id="twelfth"
+                                                name="twelfth_percentage" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label for="cgpa" class="form-label">CGPA</label>
+                                            <input type="text" class="form-control" id="cgpa" name="cgpa" required>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- no of openings -->
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="no_of_openings" class="form-label
+                                            ">No of Openings</label>
+
+                                            <input type="number" class="form-control" id="no_of_openings"
+                                                name="no_of_openings" required>
+                                        </div>
+                                    </div>
+                                    <!-- job Role -->
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="job_role" class="form-label">Job Role</label>
+                                            <!-- add job roles in the form of options -->
+                                            <select class="form-select" id="job_role" name="role" required>
+                                                <option value="Software Developer">Software Developer</option>
+                                                <option value="Data Analyst">Data Analyst</option>
+                                                <option value="Business Analyst">Business Analyst</option>
+                                                <option value="Web Developer">Web Developer</option>
+                                                <option value="UI/UX Designer">UI/UX Designer</option>
+                                                <option value="Product Manager">Product Manager</option>
+                                                <option value="Digital Marketing">Digital Marketing</option>
+                                                <option value="Content Writer">Content Writer</option>
+                                                <option value="HR">HR</option>
+                                                <option value="Finance">Finance</option>
+                                                <option value="Operations">Operations</option>
+                                                <option value="Others">Others</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="">
+                                        <div class="mb-3">
+                                            <label for="job_role" class="form-label">Interview Mode</label>
+                                            <select class="form-select" id="job_role" name="interview_mode" required>
+                                                <option value="Software Developer" selected>Online Mode</option>
+                                                <option value="Software Developer">At GLA Campus</option>
+                                                <option value="Software Developer">In The Company</option>
+                                            </select>
+                                        </div>
+
+                                        <!-- <div class="col-md-4">
+                                            <div class="form-check mb-3">
+                                                <label class="form-check-label" for="allow_backlog_students">Allow Backlog Students</label>
+                                                <input class="form-check-input" type="checkbox" checked name="is_backlog_allowed" id="allow_backlog_students">
+                                            </div>
+                                        </div> -->
+                                    </div>
+                                </div>
+
+                                <div class="">
+                                    <div class="col-md-12">
+                                        <button type="submit" class="btn btn-success w-100 mt-3">ADD &nbsp; JOB</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+        </div>
+
+
+
+
+
+        </form>
+
+    </div>
+</div>
+
+{% endblock %}

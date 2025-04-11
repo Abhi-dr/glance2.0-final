@@ -1,0 +1,217 @@
+{% extends "student/base.html" %} {% load static %} {% block title %} Student ->
+Profile {% endblock %} {% block body %}
+
+<div class="container-fluid">
+  <div class="card">
+    <div class="card-body d-inline-flex">
+      <h5 class="card-title fw-semibold">Profile | &nbsp;</h5>
+      <p class="mb-0">Yha Shakal Nahi, Akal Kaam Aati Hai🔥</p>
+
+      <button class="btn badge text-bg-light-danger w-md-10 px-4 ms-auto">
+        <span class="fw-bold text-black">
+          Profile Score: <strong> {{ student.get_profile_score }}%🔥 </strong>
+        </span>
+      </button>
+
+    </div>
+  </div>
+
+
+{% for message in messages %}
+
+<div class="alert {{ message.tags }} alert-dismissible fade show" role="alert">
+  <strong>{{ message.tag }}</strong> {{ message }}
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+
+{% endfor %}
+
+<div class="container">
+  <div class="row">
+    <div class="col-lg-4">
+      <div class="card mb-4">
+        <div class="card-body text-center">
+          <img src="{{ student.profile_pic.url }}" alt="avatar" class="rounded-circle img-fluid"
+            style="width: 150px;" />
+          <h5 class="my-3">
+            {{ student.first_name }} {{ student.last_name }}
+          </h5>
+          <h5 class="my-3">
+            {% if student.course %}
+            {{ student.course }}
+            {% else %}
+            Course not set
+            {% endif %}
+            | {% if student.year %}
+            <b>{{ student.year }} </b>
+            {% else %}
+            <span class="text-danger">Year not set</span>
+            {% endif %}
+          </h5>
+
+          <div class="d-flex justify-content-center mb-2">
+            <a type="button" href="{% url 'edit_profile' %}" class="btn btn-outline-primary ms-1">
+              Update Profile
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-8">
+      <div class="card mb-4">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-sm-3">
+              <p class="mb-0">Name</p>
+            </div>
+            <div class="col-sm-9">
+              <p class="fw-semibold mb-0">
+                {{ student.first_name }} {{ student.last_name }}
+              </p>
+            </div>
+          </div>
+          <hr />
+          <div class="row">
+            <div class="col-sm-3">
+              <p class="mb-0">Email</p>
+            </div>
+            <div class="col-sm-9">
+              <p class="fw-semibold mb-0">{{ student.username }}</p>
+            </div>
+          </div>
+          <hr />
+          <div class="row">
+            <div class="col-sm-3">
+              <p class="mb-0">Phone</p>
+            </div>
+            <div class="col-sm-9">
+              <p class="fw-semibold mb-0">+91 {{ student.phone_number }}</p>
+            </div>
+          </div>
+          <hr />
+          <div class="row">
+            <div class="col-sm-3">
+              <p class="mb-0">LinkedIn</p>
+            </div>
+            <div class="col-sm-9">
+              {% if not student.linkedin_id %}
+              <a href="{% url 'edit_profile' %}" class="btn btn-dark mb-0">Not Updated</a>
+              {% else %}
+              <a href="{{ student.linkedin_id }}" target="_blank" class="btn btn-outline-secondary mb-0">
+                {{ student.linkedin_id }}</a>
+              {% endif %}
+            </div>
+          </div>
+          <hr />
+
+          <!-- GitHub -->
+          <div class="row">
+            <div class="col-sm-3">
+              <p class="mb-0">GitHub</p>
+            </div>
+            <div class="col-sm-9">
+              {% if not student.github_id %}
+              <a href="{% url 'edit_profile' %}" class="btn btn-dark mb-0">Not Available</a>
+
+              {% else %}
+              <a href="{{ student.github_id }}" target="_blank" class="btn btn-outline-dark mb-0">
+                {{ student.github_id }}</a>
+              {% endif %}
+            </div>
+          </div>
+          <hr />
+
+          <!-- Gender -->
+          <div class="row">
+            <div class="col-sm-3">
+              <p class="mb-0">Gender</p>
+            </div>
+            <div class="col-sm-9">
+              {% if not student.gender %}
+              <a href="{% url 'edit_profile' %}" class="btn btn-dark mb-0">Not Available</a>
+
+              {% else %}
+              <p class="mb-0">
+                {{ student.gender }}
+              </p>
+              {% endif %}
+            </div>
+          </div>
+
+          <hr />
+          <div class="row">
+            <div class="col-sm-3">
+              <p class="mb-0 fs-3 fw-bolder">Educational Details</p>
+            </div><span></span>
+
+            <div class="col-sm-3">
+              <p class="mb-0 fw-bold">Highschool</p>
+            </div>
+
+            <div class="col-sm-9">
+              {% if student.tenth %}
+              <p class="fw-semibold mb-0">
+                {{ student.tenth }}%
+              </p>
+
+              {% else %}
+              <p class="text-danger fw-semibold mb-0">Not Updated</p>
+              {% endif %}
+            </div>
+
+            <div class="col-sm-3">
+              <p class="mb-0 fw-bold">Intermediate</p>
+            </div>
+            <div class="col-sm-9">
+              {% if student.twelfth %}
+              <p class="fw-semibold mb-0">
+                {{ student.twelfth }}%
+              </p>
+              {% else %}
+              <p class="text-danger fw-semibold mb-0">Not Updated</p>
+              {% endif %}
+            </div>
+
+            <div class="col-sm-3">
+              <p class="mb-0 fw-bold">Current CGPA</p>
+            </div>
+            <div class="col-sm-9">
+              {% if student.cgpa %}
+              <p class="fw-semibold mb-0">
+                {{ student.cgpa }}
+              </p>
+              {% else %}
+              <p class="text-danger fw-semibold mb-0">Not Updated</p>
+              {% endif %}
+            </div>
+
+          </div>
+          <hr />
+
+          <div class="row">
+
+            <div class="col-sm-3">
+              <p class="mb-0 fw-bolder fs-3">Backlogs</p>
+            </div>
+
+            <div class="col-sm-9">
+              {% if student.backlog == 0 %}
+              <p class="fw-semibold mb-0 text-success">{{ student.backlog }}</p>
+              {% elif student.backlog %}
+              <p class="fw-semibold mb-0 text-danger">{{ student.backlog }}</p>
+              {% else %}
+              <p class="fw-semibold mb-0 text-danger">Not Updated</p>
+              {% endif %}
+            </div>
+          </div>
+          <hr />
+
+          <a href="{% url 'edit_profile' %}" class="btn btn-outline-warning w-100">Edit Profile</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+{% endblock %}

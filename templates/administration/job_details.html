@@ -1,0 +1,101 @@
+{% extends "administration/base.html" %}
+{% load static %}
+
+{% block title %}
+Administration -> {{ job.company.name }}
+{% endblock %}
+
+{% block extra_css %}
+
+<style>
+    .button {
+        display: inline-block;
+        font-size: 16px;
+        width: 250px;
+        /* Adjust width as needed */
+        position: absolute;
+        top: 16px;
+        /* Adjust vertical position as needed */
+        right: 16px;
+        /* Adjust horizontal position as needed */
+    }
+</style>
+
+{% endblock %}
+
+{% block body %}
+
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-body d-inline-flex mb-n9">
+            <h5 class="card-title fw-semibold">{{ job.title|title }} @{{ job.company.name|title }}</h5>
+
+            <a href="#" class="btn btn-outline-dark button">Edit Details</a>
+
+            <!-- <a href="#" class="btn btn-primary">Apply Now</a> -->
+        </div>
+        <div class="position-relative">
+
+            <div class="card-body">
+                <h5 class="card-title fw-semibold mb-0">Offer Details</h5>
+                <div class="d-md-flex my-md-4">
+
+                    <!-- <div class="d-flex ms-4 my-4">
+                        <div class="border-right border-2 px-5 d-flex flex-column align-items-center">
+                            <span class="fw-semibold fs-6">300+</span>
+                            <span class="fw-semibold fs-6">Lecture Hours</span>
+                        </div>
+                        <div class="border-right border-2 px-5 d-flex flex-column align-items-center">
+                            <span class="fw-semibold fs-6">30+</span>
+                            <span class="fw-semibold fs-6">PDFs And DPPs</span>
+                        </div>
+                    </div> -->
+
+
+                    <div class="position-relative">
+                        <div class="card-body">
+                            <p class="mb-0">{{ job.description|linebreaks }}</p>
+
+                            <p class="mb-1 fw-semibold fs-5">Role:
+                                <span style="color: rgb(255, 195, 65);">{{ job.role }}</span>
+                            </p>
+
+                            <p class="mb-1 fw-semibold fs-5">Job Type:
+                                <span style="color: green;">{{ job.get_job_type_display }}</span>
+                            </p>
+
+                            <p class="mb-1 fw-semibold fs-5">Salary Range:
+                                <span style="color: green;">{{ job.salary_range }}</span>
+                            </p>
+
+                            <p class="mb-1 fw-semibold fs-5">Location Flexibility:
+                                <span style="color: green;">{{ job.location_flexibility }}</span>
+                            </p>
+
+                            <p class="mb-1 fw-semibold fs-5">Training Period:
+                                <span style="color: green;">{{ job.training_period }}</span>
+                            </p>
+
+                            <p class="mb-1 fw-semibold fs-5">Bond Timing:
+                                <span style="color: green;">{{ job.bond_timing }}</span>
+                            </p>
+                            <p class="mb-1 fw-semibold fs-5">Interview Mode:
+                                <span style="color: green;">{{ job.interview_mode }}</span>
+                            </p>
+                        </div>
+                    </div>
+
+
+
+                    <img src="{{ job.company.logo.url }}" class="card-img-top mt-2 mb-2 float-end"
+                        style="border-radius: 5px; width: 50%; height: 100vh;" alt="...">
+
+                </div>
+            </div>
+        </div>
+
+        <a href="#" class="btn btn-outline-dark mx-9 mb-4">EDIT DETAILS</a>
+
+    </div>
+
+    {% endblock %}

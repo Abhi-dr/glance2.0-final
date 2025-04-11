@@ -1,0 +1,51 @@
+{% extends 'student/base.html' %}
+{% load static %}
+
+{% block title %}
+Student -> My Applications
+{% endblock %}
+
+{% block body %}
+
+
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title fw-bolder">Our Technical Support Team</h5>
+        </div>
+        <div class="card-body p-4">
+            <h5 class="card-title fs-5 fw-semibold mb-4">We're Here To Help You</h5>
+
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+
+                <a class="col-md-6">
+                    <div class="card">
+                        <img class="rounded" src="https://media.licdn.com/dms/image/D4D03AQE5aRvlIt9qrQ/profile-displayphoto-shrink_200_200/0/1675533655966?e=2147483647&v=beta&t=iJptHZ4RlxZgD24_tlxwiryU_S4UanJXBcrNnXf5m9w" alt="notes" class="img-fluid" style="width: 100%">
+
+                        <div class="card-body">
+                            <h5 class="card-title">Paras Mittal</h5>
+                            <span class="d-flex align-items-center mb-2">Technical Team Head</span>
+                            <h6>Contact Number: 7078152876</h6>
+
+                        </div>
+                    </div>
+                </a>
+
+                <a class="col-md-6">
+                    <div class="card">
+                        <img class="rounded" src="https://media.licdn.com/dms/image/D5603AQFAg4bLtt5vmQ/profile-displayphoto-shrink_400_400/0/1713328919329?e=1718841600&v=beta&t=Gvv7CYjCZzMihsOzmg3fCqhQ3XkX9X1mhDPd9ELERfk" alt="notes" class="img-fluid" style="width: 100%">
+
+                        <div class="card-body">
+                            <h5 class="card-title">Amit</h5>
+                            <span class="d-flex align-items-center mb-2">Technical Support Volunteer </span>
+                                <h6>Contact Number: 9119713774</h6>
+
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+        </div>
+    </div>
+
+    {% endblock %}

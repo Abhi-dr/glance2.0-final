@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Glance Job Fair Terms & Conditions</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    h1 {
+      text-align: center;
+    }
+    h2 {
+      margin-top: 30px;
+    }
+    ul {
+      list-style-type: disc;
+      padding-left: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Glance Job Fair Terms & Conditions</h1>
+
+  <h2>Eligibility:</h2>
+  <ul id="eligibility"></ul>
+
+  <h2>Registration:</h2>
+  <ul id="registration"></ul>
+
+  <h2>Application Process:</h2>
+  <ul id="application-process"></ul>
+
+  <h2>Entry Requirements:</h2>
+  <ul id="entry-requirements"></ul>
+
+  <h2>Interview & Selection:</h2>
+  <ul id="interview-selection"></ul>
+
+  <h2>Cancellation/Postponement:</h2>
+  <ul id="cancellation-postponement"></ul>
+
+  <h2>Job Offer Process:</h2>
+  <ul id="job-offer-process"></ul>
+
+  <h2>Disclaimer of Liability:</h2>
+  <ul id="disclaimer-of-liability"></ul>
+
+  <h2>Copyrights & Privacy:</h2>
+  <ul id="copyrights-privacy"></ul>
+
+  <h2>Changes & Termination:</h2>
+  <ul id="changes-termination"></ul>
+
+  <h2>Feedback:</h2>
+  <ul id="feedback"></ul>
+
+  <p id="agreement"></p>
+
+  <h2>Additional Notes:</h2>
+  <ul id="additional-notes"></ul>
+
+  <script>
+    const terms = {
+      eligibility: ["Current GLA University students with good academic standing and valid work authorization in India can participate."],
+      registration: ["Pre-register online with accurate information. Supplying false information may disqualify you."],
+      "application-process": ["Apply to a maximum of two (2) companies from the official Fair participant list. Timely registration is strongly recommended. Late applications might be considered on a case-by-case basis, but submitting your application before the deadline significantly increases your chances of securing an interview slot."],
+      "entry-requirements": ["A valid college ID or government-issued ID (e.g., Aadhaar Card) is mandatory. Professional conduct is expected throughout the Fair."],
+      "interview-selection": [
+        "Companies shortlist candidates based on their own criteria. The Department of Alumni Affairs facilitates the Fair but is not involved in the selection process. Interview participation and job offers are at the discretion of the company and student. We'll try to reschedule conflicting interviews for the last available slot, but rescheduling cannot be guaranteed due to limited control over company schedules.",
+        "Important Note: Withdrawing from the Glance Job Fair after your name appears on the final interview list may have consequences for your future participation in similar events organized by the Department of Alumni Affairs."
+      ],
+      "cancellation-postponement": ["GLA University reserves the right to cancel or postpone the Fair due to unforeseen circumstances. Neither GLA University nor the Department of Alumni Affairs are liable for any damages or losses incurred."],
+      "job-offer-process": ["GLA University and the Department of Alumni Affairs are not involved in the communication of offer letters or joining letters. Contact the respective employer regarding job offer delays or issues."],
+      "disclaimer-of-liability": ["GLA University and the Department of Alumni Affairs act solely as a facilitator, connecting students with potential employers. Neither GLA University nor the Department of Alumni Affairs assumes liability for any losses incurred during the Fair or job search process, including but not limited to not receiving an offer letter or joining letter. We will try our best to protect your data, but in case of data theft or any other unforeseen circumstances, GLA University and the Department of Alumni Affairs are not liable for any losses."],
+      "copyrights-privacy": ["All materials are protected by copyright laws. Reproduction or use without permission is strictly prohibited. Personal information is handled according to applicable privacy laws and GLA University's privacy policy (available on the University website)."],
+      "changes-termination": ["GLA University reserves the right to modify these Terms and Conditions or terminate your participation for violating them or engaging in inappropriate behavior. We may update these Terms and Conditions without prior notice. Participants are encouraged to periodically review these Terms and Conditions for any changes."],
+      feedback: ["We welcome your feedback! Submit suggestions and comments to the event organizers for consideration in future events."],
+      agreement: "By registering, you agree to be bound by these Terms and Conditions.",
+      "additional-notes": [
+        "Meeting the application criteria does not guarantee an interview.",
+        "Selection decisions rest solely with the participating companies.",
+        "DAA cannot guarantee a reschedule for conflicting interviews due to limited control over company schedules.",
+        "DAA is not responsible for the outcome of the selection process."
+      ]
+    };
+
+    for (const [key, value] of Object.entries(terms)) {
+      const element = document.getElementById(key);
+      if (element) {
+        if (Array.isArray(value)) {
+          value.forEach((item) => {
+            const li = document.createElement("li");
+            li.textContent = item;
+            element.appendChild(li);
+          });
+        } else {
+          element.textContent = value;
+        }
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,320 @@
+{% extends "student/base.html" %} {% load static %} 
+
+{% block title %} Student -> Upload Documents {% endblock %} 
+
+{% block body %}
+
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-body">
+            {% if student.resume %}
+
+            <h5 class="card-title fw-semibold mb-4">Update Documents</h5>
+
+            {% else %}
+
+            <h5 class="card-title fw-semibold mb-4">Upload Documents</h5>
+
+            {% endif %}
+
+            <p class="mb-0">Remember! This is a crucial step towards your success</p>
+        </div>
+    </div>
+
+    {% for message in messages %}
+
+    <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert">
+      <strong>{{ message.tag }}</strong> {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    
+    {% endfor %}
+
+    <div class="card">
+        <div class="card-body">
+            <div class="row flex-row">
+                <div class="mb-3 col-md-6">
+                    <label for="exampleInputEmail1" class="form-label">Name</label>
+
+                    {% if student.gender == "Male" %}
+
+                    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
+                        value="Mr. {{ student.first_name }} {{ student.last_name }}" disabled />
+
+                    {% else %}
+
+                    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
+                        value="Ms. {{ student.first_name }} {{ student.last_name }}" disabled />
+
+                    {% endif %}
+                </div>
+
+                <div class="mb-3 col-md-6">
+                    <label for="exampleInputEmail1" class="form-label">Email address</label>
+                    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
+                        value="{{ student.username }}" disabled />
+                </div>
+
+            </div>
+
+            <div class="row flex-row">
+                <div class="mb-3 col-md-6">
+                    <label for="exampleInputEmail1" class="form-label">Mobile Number</label>
+                    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
+                        value="+91 {{ student.phone_number }}" disabled />
+                </div>
+                <div class="mb-3 col-md-6">
+                    <label for="exampleInputEmail1" class="form-label">Gender</label>
+                    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
+                        value="{{ student.gender }}" disabled />
+                </div>
+
+            </div>
+
+            <div class="row flex-row">
+                
+                <div class="mb-3 col-md-4">
+                    <label for="exampleInputEmail1" class="form-label">Highschool</label>
+                    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
+                        value="{{ student.tenth }}%" disabled />
+                </div>
+
+                <div class="mb-3 col-md-4">
+                    <label for="exampleInputEmail1" class="form-label">Intermediate</label>
+                    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
+                        value="{{ student.twelfth }}%" disabled />
+                </div>
+
+                <div class="mb-3 col-md-4">
+                    <label for="exampleInputEmail1" class="form-label">CGPA (Out of 10)</label>
+                    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
+                        value="{{ student.cgpa }}" disabled />
+                </div>
+            </div>
+
+            {% if student.resume %}
+
+            <div class="card" id="card-title-2">
+                <div class="card-header">
+                    <h5 class="card-title">My Resume</h5>
+                </div>
+                <div class="card-footer d-sm-flex justify-content-between align-items-center">
+                    <div class="card-footer-link mb-4 mb-sm-0">
+                        <p class="card-text d-inline">
+                            - {{ student.first_name }} {{ student.last_name }}
+                        </p>
+                    </div>
+
+                    <div class="d-inline-flex">
+                        <a href="{{ student.resume.url }}" download
+                            class="btn btn-outline-primary text-blue mx-1">Download</a>
+
+                        <a class="btn btn-outline-primary text-blue float-end" id="viewbtn"
+                            onclick="return myf();">
+                            View
+                        </a>
+                    </div>
+                </div>
+                <embed id="pdfContainer" style="display: none; border-radius: 10px; margin: 3%;"
+                    src="{{ student.resume.url }}" type="application/pdf" width="94%" height="400px" />
+            </div>
+
+            {% endif %}
+
+            {% if student.tenth_marksheet %}
+
+            <div class="card" id="card-title-2">
+                <div class="card-header">
+                    <h5 class="card-title">My Highschool Marksheet</h5>
+                </div>
+                <div class="card-footer d-sm-flex justify-content-between align-items-center">
+                    <div class="card-footer-link mb-4 mb-sm-0">
+                        <p class="card-text d-inline">
+                            - {{ student.first_name }} {{ student.last_name }}
+                        </p>
+                    </div>
+
+                    <div class="d-inline-flex">
+                        <a href="{{ student.tenth_marksheet.url }}" download
+                            class="btn btn-outline-primary text-blue mx-1">Download</a>
+
+                        <a class="btn btn-outline-primary text-blue float-end" id="viewbtn2"
+                            onclick="return myf2();">
+                            View
+                        </a>
+                    </div>
+                </div>
+                <embed id="pdfContainer2" style="display: none; border-radius: 10px; margin: 3%;"
+                    src="{{ student.tenth_marksheet.url }}" type="application/pdf" width="94%" height="400px" />
+            </div>
+
+            {% endif %}
+
+            {% if student.twelfth_marksheet %}
+
+            <div class="card" id="card-title-2">
+                <div class="card-header">
+                    <h5 class="card-title">My Intermediate Marksheet</h5>
+                </div>
+                <div class="card-footer d-sm-flex justify-content-between align-items-center">
+                    <div class="card-footer-link mb-4 mb-sm-0">
+                        <p class="card-text d-inline">
+                            - {{ student.first_name }} {{ student.last_name }}
+                        </p>
+                    </div>
+
+                    <div class="d-inline-flex">
+                        <a href="{{ student.twelfth_marksheet.url }}" download
+                            class="btn btn-outline-primary text-blue mx-1">Download</a>
+
+                        <a class="btn btn-outline-primary text-blue float-end" id="viewbtn3"
+                            onclick="return myf3();">
+                            View
+                        </a>
+                    </div>
+                </div>
+                <embed id="pdfContainer3" style="display: none; border-radius: 10px; margin: 3%;"
+                    src="{{ student.twelfth_marksheet.url }}" type="application/pdf" width="94%" height="400px" />
+            </div>
+
+            {% endif %}
+
+
+            {% if student.college_profile_print %}
+
+            <div class="card" id="card-title-2">
+                <div class="card-header">
+                    <h5 class="card-title">College Profile</h5>
+                </div>
+                <div class="card-footer d-sm-flex justify-content-between align-items-center">
+                    <div class="card-footer-link mb-4 mb-sm-0">
+                        <p class="card-text d-inline">
+                            - {{ student.first_name }} {{ student.last_name }}
+                        </p>
+                    </div>
+
+                    <div class="d-inline-flex">
+                        <a href="{{ student.college_profile_print.url }}" download
+                            class="btn btn-outline-primary text-blue mx-1">Download</a>
+
+                        <a class="btn btn-outline-primary text-blue float-end" id="viewbtn4"
+                            onclick="return myf4();">
+                            View
+                        </a>
+                    </div>
+                </div>
+                <embed id="pdfContainer4" style="display: none; border-radius: 10px; margin: 3%;"
+                    src="{{ student.college_profile_print.url }}" type="application/pdf" width="94%" height="400px" />
+            </div>
+
+            {% endif %}
+
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="mb-4">
+                    <label for="formFile" class="form-label">Upload Resume</label>
+                    <input class="form-control" type="file" id="formFile" name="resume" accept=".pdf"/>
+                </div>
+
+                <div class="mb-4">
+                    <label for="formFile" class="form-label">HighSchool Marksheet</label>
+                    <input class="form-control" type="file" id="formFile" name="tenth_marksheet" accept=".pdf"/>
+                </div>
+
+                <div class="mb-4">
+                    <label for="formFile" class="form-label">Intermediate Marksheet</label>
+                    <input class="form-control" type="file" id="formFile" name="twelfth_marksheet" accept=".pdf"/>
+                </div>
+
+                <div class="mb-4">
+                    <label for="formFile" class="form-label">College Profile Print</label>
+                    <ul>
+                        <li>
+                            <small>1. Go to <a href="glauniversity.in/8085">glauniversity.in/8085</a></small>                            
+                        </li>
+                        <li>
+                            <small>2. Click on 'Main Account' section</small>
+                        </li>
+                        <li>
+                            <small>3. Click on <b>'Profile Print'</b></small>
+                        </li>
+                        <li>
+                            <small>4. Click on <b>'Print'</b> button to download</small>
+                        </li>
+                    </ul>
+                    <input class="form-control" type="file" id="formFile" name="college_profile_print"/>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100">
+                    Upload Documents
+                </button>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    function myf(pdfId) {
+        var x = document.getElementById("pdfContainer");
+        var btn = document.getElementById("viewbtn");
+
+        if (x.style.display === "none") {
+            btn.innerHTML = "Close";
+            x.style.display = "block";
+            card.style.height = "600px";
+        } else {
+            btn.innerHTML = "View";
+            x.style.display = "none";
+            card.style.height = "auto";
+        }
+    }
+
+    function myf2(pdfId) {
+        var x = document.getElementById("pdfContainer2");
+        var btn = document.getElementById("viewbtn2");
+
+        if (x.style.display === "none") {
+            btn.innerHTML = "Close";
+            x.style.display = "block";
+            card.style.height = "600px";
+        } else {
+            btn.innerHTML = "View";
+            x.style.display = "none";
+            card.style.height = "auto";
+        }
+    }
+
+    function myf3(pdfId) {
+        var x = document.getElementById("pdfContainer3");
+        var btn = document.getElementById("viewbtn3");
+
+        if (x.style.display === "none") {
+            btn.innerHTML = "Close";
+            x.style.display = "block";
+            card.style.height = "600px";
+        } else {
+            btn.innerHTML = "View";
+            x.style.display = "none";
+            card.style.height = "auto";
+        }
+    }
+
+    function myf4(pdfId) {
+        var x = document.getElementById("pdfContainer4");
+        var btn = document.getElementById("viewbtn4");
+
+        if (x.style.display === "none") {
+            btn.innerHTML = "Close";
+            x.style.display = "block";
+            card.style.height = "600px";
+        } else {
+            btn.innerHTML = "View";
+            x.style.display = "none";
+            card.style.height = "auto";
+        }
+    }
+</script>
+
+{% endblock %}
