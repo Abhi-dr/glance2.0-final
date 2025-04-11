@@ -1,8 +1,5 @@
-{% extends 'home/base.html' %}
-{% load static %}
-{% block title %}Login{% endblock %}
-
-{% block css %}
+{% extends 'home/base.html' %} {% load static %} {% block title %}Login{%
+endblock %} {% block css %}
 <style>
   /* Reset and base styles */
   * {
@@ -200,8 +197,12 @@
   }
 
   @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
 
   .validation-icon {
@@ -239,14 +240,14 @@
   .password-container input {
     padding-right: 2.5rem;
   }
-  
+
   /* Hover approach for password visibility */
   .password-container:hover input[type="password"] {
     -webkit-text-security: none !important;
     font-size: inherit;
     color: inherit;
   }
-  
+
   /* Validation icon adjustment for password containers */
   .password-container .validation-icon {
     right: 1rem;
@@ -311,7 +312,7 @@
     .login-page {
       padding-top: 80px;
     }
-    
+
     .login-container {
       padding: 1.5rem;
       margin: 0.5rem;
@@ -325,44 +326,42 @@
     .login-header p {
       font-size: 0.9rem;
     }
-    
+
     .validation-message {
       font-size: 0.7rem;
     }
-    
+
     .whatsapp-support a span {
       font-size: 0.9rem;
     }
   }
-  
+
   /* Small phones */
   @media (max-width: 350px) {
     .login-page {
       padding-top: 90px;
     }
-    
+
     .login-container {
       padding: 1rem;
     }
-    
-    .form-group label, 
+
+    .form-group label,
     .form-group input {
       font-size: 0.9rem;
     }
-    
+
     .login-button {
       padding: 0.8rem;
       font-size: 0.9rem;
     }
-    
+
     .whatsapp-support a span {
       font-size: 0.8rem;
     }
   }
 </style>
-{% endblock %}
-
-{% block body %}
+{% endblock %} {% block body %}
 <div class="login-page">
   <div class="login-container">
     <div class="login-header">
@@ -407,17 +406,22 @@
         </div>
       </div>
       <button type="submit" class="login-button">Login</button>
-      <p class="security-notice">Your security is our priority. All data is encrypted.</p>
+      <p class="security-notice">
+        Your security is our priority. All data is encrypted.
+      </p>
     </form>
-    
+
     <!-- WhatsApp Support -->
     <div class="whatsapp-support">
-      <a href="https://wa.me/919760564415?text=Hello%2C%20I%20need%20assistance%20with%20Glance%20login" target="_blank">
+      <a
+        href="https://wa.me/917078152876?text=Hello%2C%20I%20need%20assistance%20with%20Glance%20login"
+        target="_blank"
+      >
         <div class="whatsapp-icon"></div>
         <span>Need help? Connect with our technical team</span>
       </a>
     </div>
-    
+
     <div class="signup-link">
       Don't have an account? <a href="{% url 'register' %}">Sign up</a>
     </div>
@@ -435,12 +439,12 @@
       const container = input.parentElement;
       const isValid = input.checkValidity();
 
-      if (isValid && input.value.trim() !== '') {
+      if (isValid && input.value.trim() !== "") {
         container.classList.remove("invalid");
         container.classList.add("valid");
       } else {
         container.classList.remove("valid");
-        if (input.value.trim() !== '') {
+        if (input.value.trim() !== "") {
           container.classList.add("invalid");
         } else {
           container.classList.remove("invalid");
@@ -456,7 +460,7 @@
     });
 
     // Form submission handling
-    form.addEventListener("submit", function(e) {
+    form.addEventListener("submit", function (e) {
       if (isSubmitting) {
         e.preventDefault();
         return;
@@ -464,9 +468,9 @@
 
       // Check all inputs
       let hasError = false;
-      inputs.forEach(input => {
+      inputs.forEach((input) => {
         // Manually validate each input
-        if (input.value.trim() === '') {
+        if (input.value.trim() === "") {
           input.parentElement.classList.add("invalid");
           hasError = true;
         } else if (!input.checkValidity()) {
