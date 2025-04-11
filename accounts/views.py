@@ -75,34 +75,38 @@ def login(request):
 # ===================================== REGISTER ==============================
 
 def register(request):
-    if request.method=="POST":
+    if request.method == "POST":
         username = request.POST.get("email").strip().lower()
         first_name = request.POST.get("first_name").strip().title()
         last_name = request.POST.get("last_name").strip().title()
         phone_number = request.POST.get("mobile_number")
-        # tenth = request.POST.get("tenth").replace("%", "").strip()
-        # twelfth = request.POST.get("twelfth").replace("%", "").strip()
-        # cgpa = request.POST.get("cgpa").replace("%", "").strip()
-        # gender = request.POST.get("gender")
-        # backlog = request.POST.get("backlog")
-        # year = request.POST.get("year")
-        # course = request.POST.get("course")
-        
-        # if username.split("@")[-1] != "gla.ac.in":
-        #     messages.error(request, "Please use a valid GLA Mail ID")
-        #     return redirect("login")
-        
         password = request.POST.get("password")
+        terms_accepted = request.POST.get("terms")
+        
+        # Validate required fields
+        if not all([username, first_name, last_name, phone_number, password, terms_accepted]):
+            messages.error(request, "All fields are required, including accepting the Terms and Conditions")
+            return redirect("register")
 
+        # Check if email already exists
+        if Student.objects.filter(username=username).exists():
+            messages.error(request, "Email already registered")
+            return redirect("register")
+
+        # Check if mobile number already exists
+        if Student.objects.filter(phone_number=phone_number).exists():
+            messages.error(request, "Mobile number already registered")
+            return redirect("register")
+
+        # Create student account
         new_user = Student.objects.create(
             username=username,
             first_name=first_name,
-            last_name = last_name,
-            phone_number = phone_number
+            last_name=last_name,
+            phone_number=phone_number
         )
 
         new_user.set_password(password)
-
         new_user.save()
         
         myfile = f"""Dear {first_name},
@@ -133,10 +137,9 @@ GLA University"""
         # send_mail(email_subject, email_body, email_from, email_to)  
         
         messages.success(request, "Account created successfully")
-
         return redirect("login")
     
-    return render(request,"accounts/register.html")
+    return render(request, "accounts/register.html")
 
 # =================================== logout ============================
 
@@ -148,8 +151,13 @@ def logout(request):
 
 def check_username_availability(request):
     username = request.GET.get('username', '')
-    data = {'is_available': not Student.objects.filter(username=username).exists()}
-    return JsonResponse(data)
+    is_available = not Student.objects.filter(username=username).exists()
+    return JsonResponse({'available': is_available})
+
+def check_mobile_availability(request):
+    mobile = request.GET.get('mobile', '')
+    is_available = not Student.objects.filter(phone_number=mobile).exists()
+    return JsonResponse({'available': is_available})
 
 # =================================== Terms and Conditions ============
 
