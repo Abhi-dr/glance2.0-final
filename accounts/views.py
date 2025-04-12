@@ -42,29 +42,32 @@ def login(request):
     next_url = request.GET.get('next', '')
 
     if request.method == 'POST':
-        username = request.POST.get('email').strip()  # Removed .lower() to preserve case
+        username = request.POST.get('email').strip().lower()
         password = request.POST.get('password')
 
-        # First check if it's a student
         if Student.objects.filter(username=username).exists():
             user = auth.authenticate(username=username, password=password)
+
             if user is not None:
                 auth.login(request, user)
                 return redirect(next_url if next_url else 'student')
+
             messages.error(request, "Invalid Password")
             return redirect("login")
 
-        # Then check if it's an administrator
-        if Administrator.objects.filter(username=username).exists():
+        elif Administrator.objects.filter(username=username).exists():
             user = auth.authenticate(username=username, password=password)
+
             if user is not None:
                 auth.login(request, user)
                 return redirect(next_url if next_url else 'administration')
+
             messages.error(request, "Invalid Password")
             return redirect("login")
 
-        messages.error(request, "Invalid Username or Password")
-        return redirect("login")
+        else:
+            messages.error(request, "Invalid Username or Password")
+            return redirect("login")
 
     return render(request, 'accounts/login.html', {'next': next_url})
 
@@ -77,23 +80,19 @@ def register(request):
         first_name = request.POST.get("first_name").strip().title()
         last_name = request.POST.get("last_name").strip().title()
         phone_number = request.POST.get("mobile_number")
-        # tenth = request.POST.get("tenth").replace("%", "").strip()
-        # twelfth = request.POST.get("twelfth").replace("%", "").strip()
-        # cgpa = request.POST.get("cgpa").replace("%", "").strip()
-        # gender = request.POST.get("gender")
-        # backlog = request.POST.get("backlog")
-        # year = request.POST.get("year")
-        # course = request.POST.get("course")
         
-        # if username.split("@")[-1] != "gla.ac.in":
-        #     messages.error(request, "Please use a valid GLA Mail ID")
-        #     return redirect("login")
+        # Check if email already exists
+        if Student.objects.filter(username=username).exists():
+            messages.error(request, "Email Already Registered")
+            return redirect("register")
+        
+        # Check if mobile number already exists
+        if Student.objects.filter(phone_number=phone_number).exists():
+            messages.error(request, "Mobile Number Already Registered")
+            return redirect("register")
         
         password = request.POST.get("password")
 
-        if Student.objects.filter(username=username).exists():
-            messages.error(request, "Email Already Registered")
-            return redirect("login")
         new_user = Student.objects.create(
             username=username,
             first_name=first_name,
@@ -149,6 +148,13 @@ def logout(request):
 def check_username_availability(request):
     username = request.GET.get('username', '')
     data = {'is_available': not Student.objects.filter(username=username).exists()}
+    return JsonResponse(data)
+
+# ====================== check Mobile availability ====================
+
+def check_mobile_availability(request):
+    mobile = request.GET.get('mobile', '')
+    data = {'is_available': not Student.objects.filter(phone_number=mobile).exists()}
     return JsonResponse(data)
 
 # =================================== Terms and Conditions ============

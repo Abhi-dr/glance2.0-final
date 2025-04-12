@@ -611,34 +611,32 @@
 </div>
 
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
+  document.addEventListener("DOMContentLoaded", function() {
     const form = document.getElementById("registerForm");
     const inputs = document.querySelectorAll(".input-container input");
     const password = document.getElementById("password");
     const confirmPassword = document.getElementById("confirm_password");
-    const emailInput = document.getElementById("email");
-    const mobileInput = document.getElementById("mobile_number");
     const termsCheckbox = document.getElementById("terms");
+    const registerButton = document.querySelector(".register-button");
     const passReqs = {
       length: document.getElementById("length"),
       lowercase: document.getElementById("lowercase"),
       uppercase: document.getElementById("uppercase"),
-      number: document.getElementById("number"),
+      number: document.getElementById("number")
     };
-    let isSubmitting = false;
-
-    // Real-time validation for all inputs
+    
+    // Basic real-time validation
     inputs.forEach((input) => {
-      input.addEventListener("input", function () {
+      input.addEventListener("input", function() {
         validateInput(this);
       });
     });
-
-    // Function to validate input fields
+    
+    // Simple validation function
     function validateInput(input) {
       const container = input.parentElement;
       const isValid = input.checkValidity();
-
+      
       if (isValid && input.value.trim() !== "") {
         container.classList.remove("invalid");
         container.classList.add("valid");
@@ -651,147 +649,73 @@
         }
       }
     }
-
+    
     // Password requirements validation
-    password.addEventListener("input", function () {
+    password.addEventListener("input", function() {
       const val = this.value;
-
+      
       // Check each requirement
       passReqs.length.classList.toggle("valid", val.length >= 8);
       passReqs.lowercase.classList.toggle("valid", /[a-z]/.test(val));
       passReqs.uppercase.classList.toggle("valid", /[A-Z]/.test(val));
       passReqs.number.classList.toggle("valid", /[0-9]/.test(val));
-
+      
       // Also validate confirm password if it has a value
       if (confirmPassword.value) {
         validatePasswordMatch();
       }
     });
-
+    
     // Password matching validation
     function validatePasswordMatch() {
       const container = confirmPassword.parentElement;
-
+      
       if (confirmPassword.value === "") {
-        confirmPassword.setCustomValidity("");
-        container.classList.remove("valid");
-        container.classList.remove("invalid");
+        container.classList.remove("valid", "invalid");
       } else if (confirmPassword.value !== password.value) {
-        confirmPassword.setCustomValidity("Passwords do not match");
-        container.classList.remove("valid");
         container.classList.add("invalid");
+        container.classList.remove("valid");
       } else {
-        confirmPassword.setCustomValidity("");
-        container.classList.remove("invalid");
         container.classList.add("valid");
+        container.classList.remove("invalid");
       }
     }
-
+    
     confirmPassword.addEventListener("input", validatePasswordMatch);
-
-    // Email uniqueness check
-    emailInput.addEventListener("blur", async function () {
-      const email = this.value;
-      if (email && email.trim() !== "" && this.checkValidity()) {
-        try {
-          const response = await fetch(
-            `/check_username_availability/?username=${email}`
-          );
-          const data = await response.json();
-          const container = this.parentElement;
-
-          if (data.available) {
-            container.classList.remove("invalid");
-            container.classList.add("valid");
-            container.querySelector(".validation-message").style.display =
-              "none";
-          } else {
-            container.classList.remove("valid");
-            container.classList.add("invalid");
-            container.querySelector(".validation-message").style.display =
-              "block";
-          }
-        } catch (error) {
-          console.error("Error checking email availability:", error);
-        }
-      }
-    });
-
-    // Mobile number uniqueness check
-    mobileInput.addEventListener("blur", async function () {
-      const mobile = this.value;
-      if (mobile && mobile.trim() !== "" && this.checkValidity()) {
-        try {
-          const response = await fetch(
-            `/check_mobile_availability/?mobile=${mobile}`
-          );
-          const data = await response.json();
-          const container = this.parentElement;
-
-          if (data.available) {
-            container.classList.remove("invalid");
-            container.classList.add("valid");
-            container.querySelector(".validation-message").style.display =
-              "none";
-          } else {
-            container.classList.remove("valid");
-            container.classList.add("invalid");
-            container.querySelector(".validation-message").style.display =
-              "block";
-          }
-        } catch (error) {
-          console.error("Error checking mobile availability:", error);
-        }
-      }
-    });
-
-    // Form submission handling
-    form.addEventListener("submit", function (e) {
-      if (isSubmitting) {
-        e.preventDefault();
-        return;
-      }
-
-      // Check all inputs
+    
+    // Handle form submission
+    form.addEventListener("submit", function(e) {
+      // Basic client-side validation before submission
       let hasError = false;
+      
+      // Validate all inputs
       inputs.forEach((input) => {
-        // Manually validate each input
-        if (input.value.trim() === "") {
-          input.parentElement.classList.add("invalid");
-          hasError = true;
-        } else if (!input.checkValidity()) {
+        if (!input.checkValidity() || input.value.trim() === "") {
           input.parentElement.classList.add("invalid");
           hasError = true;
         }
       });
-
-      // Final validation
-      if (
-        password.value !== confirmPassword.value &&
-        password.value.trim() !== "" &&
-        confirmPassword.value.trim() !== ""
-      ) {
+      
+      // Validate password match
+      if (password.value !== confirmPassword.value) {
         confirmPassword.parentElement.classList.add("invalid");
         hasError = true;
       }
-
-      // Terms validation
+      
+      // Check terms
       if (!termsCheckbox.checked) {
         hasError = true;
-        alert("You must agree to the Terms and Conditions to register");
+        alert("You must agree to the Terms and Conditions");
       }
-
+      
+      // Prevent submission if there are errors
       if (hasError) {
         e.preventDefault();
-        return;
+      } else {
+        registerButton.textContent = "Registering...";
+        registerButton.disabled = true;
       }
-
-      isSubmitting = true;
-      this.querySelector("button[type='submit']").disabled = true;
     });
-
-    // Remove password toggle functionality (we're using hover instead)
-    const passwordContainers = document.querySelectorAll(".password-container");
   });
 </script>
 {% endblock %}
