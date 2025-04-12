@@ -106,7 +106,14 @@
 
                     {% if user.is_authenticated %}
 
+                    {% if user_type == 'student' %}
                     <a href="{% url 'student' %}" class="btn btn-outline-light btn-sm">Dashboard</a>
+                    {% elif user_type == 'administrator' %}
+                    <a href="{% url 'administration' %}" class="btn btn-outline-light btn-sm">Dashboard</a>
+                    {% else %}
+                    <a href="{% url 'home' %}" class="btn btn-outline-light btn-sm">Dashboard</a>
+                    {% endif %}
+                    
                     <a href="{% url 'logout' %}" class="btn btn-primary btn-sm">Logout</a>
 
                     {% else %}
@@ -145,13 +152,13 @@
                 <div class="col-lg-4">
                     <h4>Quick Links</h4>
                     <ul class="footer-links">
-                        <li><a href="#home">Home</a></li>
-                        <li><a href="#about">About</a></li>
-                        <li><a href="#companies">Companies</a></li>
-                        <li><a href="#schedule">Schedule</a></li>
-                        <li><a href="#gallery">Gallery</a></li>
-                        <li><a href="#team">Team</a></li>
-                        <li><a href="#contact">Contact</a></li>
+                        <li><a href="{% url 'home' %}">Home</a></li>
+                        <li><a href="{% url 'home' %}#about">About</a></li>
+                        <li><a href="{% url 'home' %}#companies">Companies</a></li>
+                        <li><a href="{% url 'home' %}#schedule">Schedule</a></li>
+                        <li><a href="{% url 'home' %}#gallery">Gallery</a></li>
+                        <li><a href="{% url 'home' %}#team">Team</a></li>
+                        <li><a href="{% url 'home' %}#contact">Contact</a></li>
                     </ul>
                 </div>
                 <div class="col-lg-4">
