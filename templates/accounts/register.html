@@ -1,490 +1,797 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
+{% extends 'home/base.html' %} {% load static %} {% block title %} Register{% endblock %} {% block css %}
+<style>
+  /* Reset and base styles */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Arial", sans-serif;
+  }
 
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <link rel="apple-touch-icon" sizes="76x76" href="{% static 'img/apple-icon.png' %}">
-  <link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}">
-  <title>
-    Register Here!
-  </title>
-  <!--     Fonts and icons     -->
-  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
-  <!-- Nucleo Icons -->
-  <link href="{% static 'css/accounts/nucleo-icons.css' %}" rel="stylesheet" />
-  <link href="{% static 'css/accounts/nucleo-svg.css' %}" rel="stylesheet" />
-  <!-- Font Awesome Icons -->
-  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
-  <link href="{% static 'css/accounts/nucleo-svg.css' %}" rel="stylesheet" />
-  <!-- CSS Files -->
-  <link id="pagestyle" href="{% static 'css/accounts/argon-dashboard.css' %}" rel="stylesheet" />
+  /* Main container styles */
+  .register-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    position: relative;
+    overflow: hidden;
+    padding-top: 70px; /* Add padding for the navbar */
+  }
 
-  <style>
+  /* Register container */
+  .register-container {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    margin-top: 3%;
+    margin-bottom: 3%;
+    -webkit-backdrop-filter: blur(10px);
+    padding: 2.5rem;
+    border-radius: 15px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 500px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    animation: popup 0.5s ease-out;
+    position: relative;
+    z-index: 1;
+  }
 
-    body{
-      background-color: rgb(23, 23, 23);
+  /* Animation for register container */
+  @keyframes popup {
+    0% {
+      transform: scale(0.8);
+      opacity: 0;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  /* Header styles */
+  .register-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .register-header h1 {
+    color: white;
+    font-size: 2.2rem;
+    margin-bottom: 0.5rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  .register-header p {
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  /* Form styles */
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .form-row {
+    display: flex;
+    gap: 15px;
+  }
+
+  .form-row .form-group {
+    flex: 1;
+  }
+
+  .form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: white;
+    font-weight: 500;
+  }
+
+  .form-group input,
+  .form-group select {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    font-size: 1rem;
+    color: white;
+    transition: all 0.3s ease;
+  }
+
+  .form-group input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .form-group input:focus,
+  .form-group select:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.4);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+  }
+
+  /* Button styles */
+  .register-button {
+    width: 100%;
+    padding: 1rem;
+    background: linear-gradient(45deg, #2196f3, #1976d2);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .register-button::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.2),
+      transparent
+    );
+    transition: 0.5s;
+  }
+
+  .register-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  }
+
+  .register-button:hover::before {
+    left: 100%;
+  }
+
+  /* Login link styles */
+  .login-link {
+    text-align: center;
+    margin-top: 1.5rem;
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .login-link a {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s;
+  }
+
+  .login-link a:hover {
+    color: #2196f3;
+    text-decoration: underline;
+  }
+
+  /* Alert styles */
+  .alert {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    animation: slideIn 0.3s ease;
+  }
+
+  @keyframes slideIn {
+    from {
+      transform: translateY(-10px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  /* Validation icon styles */
+  .input-container {
+    position: relative;
+  }
+
+  .validation-message {
+    color: #ff4d4f;
+    font-size: 0.8rem;
+    margin-top: 0.3rem;
+    display: none;
+    animation: fadeIn 0.2s ease;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .validation-icon {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .input-container.valid .validation-icon {
+    opacity: 1;
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%2340C057"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>');
+  }
+
+  .input-container.invalid .validation-icon {
+    opacity: 1;
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23FF4D4F"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>');
+  }
+
+  .input-container.invalid .validation-message {
+    display: block;
+  }
+
+  /* Password visibility styles */
+  .password-container {
+    position: relative;
+  }
+
+  .password-container input {
+    padding-right: 2.5rem;
+  }
+
+  /* Hover approach for password visibility */
+  .password-container:hover input[type="password"] {
+    -webkit-text-security: none !important;
+    font-size: inherit;
+    color: inherit;
+  }
+
+  /* Validation icon adjustment for password containers */
+  .password-container .validation-icon {
+    right: 1rem;
+  }
+
+  /* WhatsApp Support */
+  .whatsapp-support {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1rem;
+    padding: 0.8rem;
+    background: rgba(37, 211, 102, 0.1);
+    border-radius: 8px;
+    border: 1px solid rgba(37, 211, 102, 0.3);
+    transition: all 0.3s;
+  }
+
+  .whatsapp-support:hover {
+    background: rgba(37, 211, 102, 0.2);
+  }
+
+  .whatsapp-support a {
+    display: flex;
+    align-items: center;
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .whatsapp-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 10px;
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%2325D366"><path d="M17.498 14.382c-.301-.15-1.767-.867-2.04-.966-.273-.101-.473-.15-.673.15-.197.295-.771.964-.944 1.162-.175.195-.349.21-.646.075-.3-.15-1.263-.465-2.403-1.485-.888-.795-1.484-1.77-1.66-2.07-.174-.3-.019-.465.13-.615.136-.135.301-.345.451-.523.146-.181.194-.301.297-.496.1-.21.049-.39-.025-.54-.075-.15-.672-1.62-.922-2.206-.24-.584-.487-.51-.672-.51-.172-.015-.371-.015-.571-.015-.2 0-.523.074-.797.359-.273.3-1.045 1.02-1.045 2.475s1.07 2.865 1.219 3.075c.149.195 2.105 3.195 5.1 4.485.714.3 1.27.48 1.704.629.714.227 1.365.195 1.88.121.574-.091 1.767-.721 2.016-1.426.255-.705.255-1.29.18-1.425-.074-.135-.27-.21-.57-.345m-5.446 7.443h-.016c-1.77 0-3.524-.48-5.055-1.38l-.36-.214-3.75.975 1.005-3.645-.239-.375c-.99-1.576-1.516-3.391-1.516-5.26 0-5.445 4.455-9.885 9.942-9.885 2.654 0 5.145 1.035 7.021 2.91 1.875 1.859 2.909 4.35 2.909 6.99-.004 5.444-4.46 9.885-9.935 9.885M20.52 3.449C18.24 1.245 15.24 0 12.045 0 5.463 0 .104 5.334.101 11.893c0 2.096.549 4.14 1.595 5.945L0 24l6.335-1.652c1.746.943 3.71 1.444 5.71 1.447h.006c6.585 0 11.946-5.336 11.949-11.896 0-3.176-1.24-6.165-3.495-8.411"/></svg>');
+    background-size: contain;
+    background-repeat: no-repeat;
+  }
+
+  /* Password requirements indicator */
+  .password-requirements {
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .req-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.2rem;
+  }
+
+  .req-item:before {
+    content: "";
+    width: 12px;
+    height: 12px;
+    margin-right: 8px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.3);
+    transition: background-color 0.3s;
+  }
+
+  .req-item.valid:before {
+    background-color: #40c057;
+  }
+
+  /* Security notice */
+  .security-notice {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-top: 0.5rem;
+    text-align: center;
+  }
+
+  /* Terms and conditions checkbox */
+  .terms-checkbox {
+    margin-bottom: 1.5rem;
+  }
+
+  .checkbox-container {
+    display: flex;
+    align-items: center;
+  }
+
+  .checkbox-container input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin-right: 10px;
+    cursor: pointer;
+    accent-color: #2196f3;
+  }
+
+  .checkbox-container label {
+    color: white;
+    font-size: 0.9rem;
+    margin-bottom: 0;
+    cursor: pointer;
+  }
+
+  .checkbox-container a {
+    color: #2196f3;
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+
+  .checkbox-container a:hover {
+    text-decoration: underline;
+  }
+
+  /* Responsive styles */
+  @media (max-width: 768px) {
+    .register-container {
+      padding: 2rem;
+      margin: 1rem;
+      max-width: 90%;
     }
 
-    .input-container {
-      position: relative;
+    .register-header h1 {
+      font-size: 1.8rem;
     }
 
-    .validation-icon {
-      position: absolute;
-      top: 70%;
-      right: 4%;
-      transform: translateY(-50%);
-      width: 20px;
-      height: 20px;
-      background-size: cover;
-      display: none;
+    .form-row {
+      gap: 10px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .register-page {
+      padding-top: 80px;
     }
 
-    #password-input:valid+.validation-icon,
-    #confirm-password-input:valid+.validation-icon {
-      background-image: url('https://img.icons8.com/glyph-neue/64/40C057/double-tick.png');
-      /* Replace with your green check icon image path */
-      display: block;
+    .register-container {
+      padding: 1.5rem;
+      margin: 0.5rem;
+      width: 95%;
     }
 
-    #password-input:invalid+.validation-icon,
-    #confirm-password-input:invalid+.validation-icon {
-      background-image: url('https://img.icons8.com/emoji/48/cross-mark-emoji.png');
-      /* Replace with your red cross icon image path */
-      display: block;
+    .register-header h1 {
+      font-size: 1.5rem;
     }
-    
+
+    .register-header p {
+      font-size: 0.9rem;
+    }
+
+    .form-row {
+      flex-direction: column;
+      gap: 0;
+    }
+
     .password-requirements {
-      margin-top: 5px;
-      font-size: 0.85rem;
+      font-size: 0.7rem;
     }
-    
-    .requirement {
-      margin-bottom: 3px;
-      color: #dc3545;
+
+    .whatsapp-support a span {
+      font-size: 0.9rem;
     }
-    
-    .requirement.valid {
-      color: #40C057;
+
+    .validation-message {
+      font-size: 0.7rem;
     }
-  </style>
-</head>
+  }
 
-<body class="w-100">
-  <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg position-absolute top-0 z-index-3 w-100 shadow-none my-3 navbar-transparent mt-4">
-    <div class="container">
-      <a class="navbar-brand font-weight-bolder ms-lg-0 ms-3 text-white" href="{% url 'home' %}">
-        🔥 THE GLANCE 🔥
-      </a>
+  /* Small phones */
+  @media (max-width: 350px) {
+    .register-page {
+      padding-top: 90px;
+    }
 
+    .register-container {
+      padding: 1rem;
+    }
 
-      <a class="btn btn-outline-white" href="{% url 'home' %}">
-        Home
-      </a>
+    .form-group label,
+    .form-group input,
+    .form-group select {
+      font-size: 0.9rem;
+    }
+
+    .register-button {
+      padding: 0.8rem;
+      font-size: 0.9rem;
+    }
+
+    .whatsapp-support a span {
+      font-size: 0.8rem;
+    }
+  }
+</style>
+{% endblock %} {% block body %}
+<div class="register-page">
+  <div class="register-container">
+    <div class="register-header">
+      <h1>Create Account</h1>
+      <p>Join us to get started</p>
     </div>
-  </nav>
-  <!-- End Navbar -->
-  <main class="main-content  mt-0">
-    <div class="page-header align-items-start min-vh-50 pt-6 pb-11 m-3 border-radius-lg"
-      style="background-image: url('https://images.shiksha.com/mediadata/images/articles/1663131815phpZ3WZxB.jpeg'); background-position: center;">
-      <span class="mask bg-gradient-dark opacity-6"></span>
-      <div class="container">
-        <div class="row justify-content-center">
-          <div class="col-lg-5 text-center mx-auto">
-            <h1 class="text-white mb-2 mt-5">Welcome!</h1>
-            <p class="text-lead text-white">
-              Bringing Out The Potential In You
-            </p>
+
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+
+    <form role="form" method="post" id="registerForm">
+      {% csrf_token %}
+
+      <!-- First Name and Last Name in one line -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="first_name">First Name</label>
+          <div class="input-container">
+            <input
+              type="text"
+              id="first_name"
+              name="first_name"
+              placeholder="Enter your first name"
+              required
+            />
+            <div class="validation-icon"></div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="last_name">Last Name</label>
+          <div class="input-container">
+            <input
+              type="text"
+              id="last_name"
+              name="last_name"
+              placeholder="Enter your last name"
+              required
+            />
+            <div class="validation-icon"></div>
           </div>
         </div>
       </div>
-    </div>
 
-    <div class="container bg-black">
-      <div class="row mt-lg-n10 mt-md-n11 mt-n10 justify-content-center">
-
-        <div class="col-xl-7 col-lg-5 col-md-7">
-          <div class="card z-index-0" style="border: 1px solid rgb(255, 150, 63);">
-            <div class="card-header text-center">
-              <h5>Your Talent Is Our Biggest Asset</h5>
-            </div>
-            <div class="card-body">
-
-              <form role="form" method="post">
-                {% csrf_token %}
-                <div class="mb-3">
-                  <label for="exampleInputEmail1" class="form-label">Email address</label>
-                  <input type="email" class="form-control" id="username" name="email" aria-label="Email Address"
-                    placeholder="Enter your Mail ID" pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}" required>
-                  <span id="username-feedback"></span>
-
-                </div>
-
-                <div class="row">
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <input type="text" class="form-control" placeholder="First name" aria-label="first_name"
-                        name="first_name" required>
-                    </div>
-                  </div>
-
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <input type="text" class="form-control" placeholder="Last name" aria-label="last_name"
-                        name="last_name" value="">
-                    </div>
-                  </div>
-                </div>
-
-                <div class="mb-3">
-                  <input type="number" class="form-control" placeholder="Mobile Number *" aria-label="Mobile Number"
-                    name="mobile_number"
-                    minlength="10" maxlength="10" pattern="[0-9]{10}" required>
-                </div>
-
-                <!-- <div class="row">
-                  <div class="col-md-4">
-                    <label for="subject" class="form-label">Class 10th Percentage
-                    </label>
-
-                    <div class="form-group">
-                      <input type="number" step=".01" class="form-control" placeholder="Percentage %"
-                        aria-label="first_name" name="tenth" required>
-                    </div>
-                  </div>
-
-                  <div class="col-md-4">
-                    <label for="subject" class="form-label">Class 12th Percentage</label>
-                    <div class="form-group">
-                      <input type="number" step=".01" class="form-control" placeholder="Percentage %"
-                        aria-label="last_name" name="twelfth" required>
-                    </div>
-                  </div>
-
-                  <div class="col-md-4">
-                    <label for="subject" class="form-label">Current CGPA</label>
-                    <div class="form-group">
-                      <input type="number" step=".01" class="form-control" placeholder="Current CGPA (Out of 10)"
-                        name="cgpa" required max="10" id="cgpaInput">
-                    </div>
-                  </div>
-
-                  <div class="">
-                    <label for="subject" class="form-label">Backlogs</label>
-                    <div class="form-group">
-                      <input type="number" class="form-control" placeholder="Number of active backlogs"
-                        aria-label="last_name" name="backlog" required>
-                    </div>
-                  </div>
-                </div> -->
-
-
-                <!-- <div class="row mb-4">
-                  <div class="col-md-6">
-
-                    <label for="subject" class="form-label">Gender</label>
-                    <select name="gender" id="subject" class="form-control" required>
-
-                      <option value="Male" selected>Male</option>
-                      <option value="Female">Female</option>
-                      <option value="Prefer not to say">Prefer not to say</option>
-
-                    </select>
-                  </div>
-
-
-                  <div class="col-md-6">
-
-                    <label for="subject" class="form-label">Year of study or Alumni</label>
-                    <select name="year" id="subject" class="form-control" required>
-
-                      <option value="1st Year">1st Year</option>
-                      <option value="2nd Year">2nd Year</option>
-                      <option value="3rd Year" selected>3rd Year</option>
-                      <option value="4th Year">4th Year</option>
-                      <option value="Alumni">Passed Out / Alumni</option>
-
-                    </select>
-                  </div>
-
-
-                  <div class="mb-3">
-
-                    <label for="subject" class="form-label">Course</label>
-                    <select name="course" id="subject" class="form-control" required>
-
-                      <option value="B.Tech" selected>B.Tech</option>
-                      <option value="M.Tech">M.Tech</option>
-                      <option value="MBA">MBA</option>
-                      <option value="BBA">BBA</option>
-                      <option value="BCA">BCA</option>
-                      <option value="MCA">MCA</option>
-                      <option value="B.Sc">B.Sc</option>
-                      <option value="M.Sc">M.Sc</option>
-                      <option value="B.Com">B.Com</option>
-                      <option value="M.Com">M.Com</option>
-                      <option value="B.Pharma">B.Pharma</option>
-                      <option value="M.Pharma">M.Pharma</option>
-                      <option value="BBA LLB">BBA LLB</option>
-                      <option value="LLB">LLB</option>
-                      <option value="Other">Other</option>
-                    </select>
-                  </div> -->
-
-                  <!-- <div class="mb-3">
-                  <label for="subject" class="form-label">Subject</label>
-                  <select name="subject" id="subject" class="form-control">
-
-                    {% for subject in subjects %}
-
-                    <option value="{{ subject.id }}">{{ subject.name }} by {{ subject.teacher.first_name }}
-                      {{subject.teacher.last_name }} </option>
-
-                    {% endfor %}
-
-                  </select>
-                </div> -->
-
-                  <div class="mb-3 input-container">
-                    <label for="password" class="form-label">Password</label>
-                    <input type="password" class="form-control form-control-lg" placeholder="Password"
-                      aria-label="Password" name="password" id="password-input"
-                      pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?!.*\s).{8,}$"
-                      title="Must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters"
-                      required>
-                    <div class="validation-icon"></div>
-                    <div class="password-requirements">
-                      <div id="length" class="requirement">✓ At least 8 characters</div>
-                      <div id="lowercase" class="requirement">✓ At least 1 lowercase letter</div>
-                      <div id="uppercase" class="requirement">✓ At least 1 uppercase letter</div>
-                      <div id="number" class="requirement">✓ At least 1 number</div>
-                      <div id="no-space" class="requirement">✓ No spaces</div>
-                    </div>
-                  </div>
-
-                  <div class="mb-3 input-container">
-                    <label for="confirm-password" class="form-label">Confirm Password</label>
-                    <input type="password" class="form-control form-control-lg" placeholder="Confirm Password"
-                      aria-label="Confirm Password" name="confirm_password" id="confirm-password-input"
-                      required>
-                    <div class="validation-icon"></div>
-                    <div id="password-match-message"></div>
-                  </div>
-
-                  <div class="form-check form-check-info text-start">
-                    <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" checked required>
-                    <label class="form-check-label" for="flexCheckDefault">
-                      I agree the <a href="{% url 'tnc' %}" target="_blank" class="text-dark font-weight-bolder">Terms
-                        and Conditions</a>
-                    </label>
-                  </div>
-
-                  <div class="text-center">
-                    <button type="submit" class="btn bg-gradient-dark w-100 my-4 mb-2 mybtn"
-                      id="signup-button">Register</button>
-                  </div>
-                  </a>
-
-                  <p class="text-sm mt-3 mb-0 text-center">Already have an account? <a href="{% url 'login' %}"
-                      class="text-dark font-weight-bolder">Login</a></p>
-                  <!-- <p class="text-sm mt-3 mb-0 text-center">Are you an Alumni of GLAU? <a href="{% url 'alumni_registration' %}"
-                      class="text-dark font-weight-bolder">Skip Registration and Direct Apply</a></p> -->
-
-
-
-              </form>
+      <!-- Email and Mobile Number in one line -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <div class="input-container">
+            <input
+              type="email"
+              id="email"
+              name="email"
+              placeholder="Enter your email"
+              pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
+              title="Please enter a valid Email ID"
+              required
+            />
+            <div class="validation-icon"></div>
+            <div class="validation-message">
+              This email is already registered. Please use a different email.
             </div>
           </div>
-
         </div>
 
-        <div class="card-footer text-center pt-0 px-lg-2 px-1 mt-2 mb-4">
-          <p class="mb-4 text-sm mx-auto">
-            For any query <a href="https://wa.me/918273619318" target="_blank" class="text-dark font-weight-bolder">
-              WhatsApp Our Technical Team</a>
-          </p>
+        <div class="form-group">
+          <label for="mobile_number">Mobile Number</label>
+          <div class="input-container">
+            <input
+              type="tel"
+              id="mobile_number"
+              name="mobile_number"
+              placeholder="10-digit mobile number"
+              pattern="[0-9]{10}"
+              title="Please enter a valid 10-digit mobile number"
+              required
+            />
+            <div class="validation-icon"></div>
+            <div class="validation-message">
+              This mobile number is already registered. Please use a different
+              number.
+            </div>
+          </div>
         </div>
-
       </div>
 
-      <br><br>
-  </main>
-  <!--   Core JS Files   -->
-  <script src="/js/core/popper.min.js"></script>
-  <script src="/js/core/bootstrap.min.js"></script>
-  <script src="/js/plugins/perfect-scrollbar.min.js"></script>
-  <script src="/js/plugins/smooth-scrollbar.min.js"></script>
-  <script>
-    var win = navigator.platform.indexOf('Win') > -1;
-    if (win && document.querySelector('#sidenav-scrollbar')) {
-      var options = {
-        damping: '0.5'
-      }
-      Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
-    }
-  </script>
+      <!-- Password and Confirm Password in one line -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="password">Password</label>
+          <div class="password-container input-container">
+            <input
+              type="password"
+              id="password"
+              name="password"
+              placeholder="Enter your password"
+              pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
+              title="Must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters"
+              required
+            />
+            <div class="validation-icon"></div>
+          </div>
+          <div class="password-requirements">
+            <div class="req-item" id="length">At least 8 characters</div>
+            <div class="req-item" id="lowercase">One lowercase letter</div>
+            <div class="req-item" id="uppercase">One uppercase letter</div>
+            <div class="req-item" id="number">One number</div>
+          </div>
+        </div>
 
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script>
-    $(document).ready(function () {
-      $("#username").on("input", function () {
-        var username = $(this).val();
+        <div class="form-group">
+          <label for="confirm_password">Confirm Password</label>
+          <div class="password-container input-container">
+            <input
+              type="password"
+              id="confirm_password"
+              name="confirm_password"
+              placeholder="Confirm your password"
+              required
+            />
+            <div class="validation-icon"></div>
+            <div class="validation-message">Passwords do not match</div>
+          </div>
+        </div>
+      </div>
 
-        if (username.length >= 3) { // Only check when username is at least 3 characters
-          $.ajax({
-            url: "{% url 'check_username_availability' %}",
-            data: {
-              'username': username
-            },
-            dataType: 'json',
-            success: function (data) {
-              if (data.is_available) {
-                $("#username-feedback").html("<span style='color:green;'>Email is available</span>");
-                document.getElementById("signup-button").disabled = false;
-                document.getElementById("signup-button").innerHTML = "Register";
-              } else {
-                $("#username-feedback").html("<span style='color:red;'>Email Already Exists!</span>");
-                document.getElementById("signup-button").disabled = true;
-                document.getElementById("signup-button").innerHTML = "Cannot REGISTER (Email Already Exists)";
-              }
-            }
-          });
-        } else {
-          $("#username-feedback").empty(); // Clear feedback if username is too short
-        }
+      <div class="form-group terms-checkbox">
+        <div class="checkbox-container">
+          <input type="checkbox" id="terms" name="terms" required />
+          <label for="terms"
+            >I agree to the
+            <a href="{% url 'tnc' %}" target="_blank"
+              >Terms and Conditions</a
+            ></label
+          >
+        </div>
+      </div>
+
+      <button type="submit" class="register-button">Register</button>
+      <p class="security-notice">
+        Your security is our priority. All data is encrypted.
+      </p>
+    </form>
+
+    <!-- WhatsApp Support -->
+    <div class="whatsapp-support">
+      <a
+        href="https://wa.me/917078152876?text=Hello%2C%20I%20need%20assistance%20with%20Glance%20registration"
+        target="_blank"
+      >
+        <div class="whatsapp-icon"></div>
+        <span>Need help? Connect with our technical team</span>
+      </a>
+    </div>
+
+    <div class="login-link">
+      Already have an account? <a href="{% url 'login' %}">Login</a>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("registerForm");
+    const inputs = document.querySelectorAll(".input-container input");
+    const password = document.getElementById("password");
+    const confirmPassword = document.getElementById("confirm_password");
+    const emailInput = document.getElementById("email");
+    const mobileInput = document.getElementById("mobile_number");
+    const termsCheckbox = document.getElementById("terms");
+    const passReqs = {
+      length: document.getElementById("length"),
+      lowercase: document.getElementById("lowercase"),
+      uppercase: document.getElementById("uppercase"),
+      number: document.getElementById("number"),
+    };
+    let isSubmitting = false;
+
+    // Real-time validation for all inputs
+    inputs.forEach((input) => {
+      input.addEventListener("input", function () {
+        validateInput(this);
       });
     });
-  </script>
 
-  <script>
-    // Get the input element
-    const cgpaInput = document.getElementById('cgpaInput');
+    // Function to validate input fields
+    function validateInput(input) {
+      const container = input.parentElement;
+      const isValid = input.checkValidity();
 
-    // Add event listener to listen for changes in the input field
-    if (cgpaInput) {
-      cgpaInput.addEventListener('input', function () {
-        // Check if the entered value exceeds the maximum allowed (10)
-        if (parseFloat(this.value) > 10 || parseFloat(this.value) < 0) {
-          this.value = ""; // Reset the value to 0
-          // Show an alert message to the user
-          alert('CGPA should not be more than 10');
+      if (isValid && input.value.trim() !== "") {
+        container.classList.remove("invalid");
+        container.classList.add("valid");
+      } else {
+        container.classList.remove("valid");
+        if (input.value.trim() !== "") {
+          container.classList.add("invalid");
+        } else {
+          container.classList.remove("invalid");
         }
-      });
+      }
     }
 
-    // Password validation
-    document.addEventListener('DOMContentLoaded', function() {
-      const passwordInput = document.getElementById('password-input');
-      const confirmPasswordInput = document.getElementById('confirm-password-input');
-      const passwordMatchMessage = document.getElementById('password-match-message');
-      const signupButton = document.getElementById('signup-button');
-      
-      // Password requirement elements
-      const lengthReq = document.getElementById('length');
-      const lowercaseReq = document.getElementById('lowercase');
-      const uppercaseReq = document.getElementById('uppercase');
-      const numberReq = document.getElementById('number');
-      const noSpaceReq = document.getElementById('no-space');
-      
-      // Function to check password requirements
-      function checkPasswordRequirements() {
-        const password = passwordInput.value;
-        
-        // Check length
-        if (password.length >= 8) {
-          lengthReq.classList.add('valid');
-        } else {
-          lengthReq.classList.remove('valid');
-        }
-        
-        // Check lowercase
-        if (/[a-z]/.test(password)) {
-          lowercaseReq.classList.add('valid');
-        } else {
-          lowercaseReq.classList.remove('valid');
-        }
-        
-        // Check uppercase
-        if (/[A-Z]/.test(password)) {
-          uppercaseReq.classList.add('valid');
-        } else {
-          uppercaseReq.classList.remove('valid');
-        }
-        
-        // Check number
-        if (/[0-9]/.test(password)) {
-          numberReq.classList.add('valid');
-        } else {
-          numberReq.classList.remove('valid');
-        }
-        
-        // Check no spaces
-        if (!/\s/.test(password)) {
-          noSpaceReq.classList.add('valid');
-        } else {
-          noSpaceReq.classList.remove('valid');
-        }
-      }
-      
-      // Function to check if passwords match
-      function checkPasswordsMatch() {
-        if (confirmPasswordInput.value === '') {
-          passwordMatchMessage.innerHTML = '';
-          return;
-        }
-        
-        if (passwordInput.value === confirmPasswordInput.value) {
-          passwordMatchMessage.innerHTML = '<span style="color:green;">Passwords match</span>';
-          confirmPasswordInput.setCustomValidity('');
-        } else {
-          passwordMatchMessage.innerHTML = '<span style="color:red;">Passwords do not match</span>';
-          confirmPasswordInput.setCustomValidity('Passwords do not match');
-        }
-      }
-      
-      // Add event listeners
-      if (passwordInput) {
-        passwordInput.addEventListener('input', function() {
-          checkPasswordRequirements();
-          if (confirmPasswordInput.value !== '') {
-            checkPasswordsMatch();
-          }
-        });
-      }
-      
-      if (confirmPasswordInput) {
-        confirmPasswordInput.addEventListener('input', checkPasswordsMatch);
-      }
-      
-      // Form submission validation
-      const form = document.querySelector('form');
-      if (form) {
-        form.addEventListener('submit', function(e) {
-          if (passwordInput.value !== confirmPasswordInput.value) {
-            e.preventDefault();
-            passwordMatchMessage.innerHTML = '<span style="color:red;">Passwords do not match</span>';
-            return false;
-          }
-          
-          // Disable the button to prevent multiple clicks
-          signupButton.disabled = true;
-          // change the text
-          signupButton.innerHTML = 'Processing...';
-          return true;
-        });
+    // Password requirements validation
+    password.addEventListener("input", function () {
+      const val = this.value;
+
+      // Check each requirement
+      passReqs.length.classList.toggle("valid", val.length >= 8);
+      passReqs.lowercase.classList.toggle("valid", /[a-z]/.test(val));
+      passReqs.uppercase.classList.toggle("valid", /[A-Z]/.test(val));
+      passReqs.number.classList.toggle("valid", /[0-9]/.test(val));
+
+      // Also validate confirm password if it has a value
+      if (confirmPassword.value) {
+        validatePasswordMatch();
       }
     });
-  </script>
 
-  <!-- Form submission handling is now in the password validation script above -->
+    // Password matching validation
+    function validatePasswordMatch() {
+      const container = confirmPassword.parentElement;
 
-  <!-- Github buttons -->
-  <script async defer src="https://buttons.github.io/buttons.js"></script>
-  <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
-  <script src="/js/argon-dashboard.min.js"></script>
-</body>
+      if (confirmPassword.value === "") {
+        confirmPassword.setCustomValidity("");
+        container.classList.remove("valid");
+        container.classList.remove("invalid");
+      } else if (confirmPassword.value !== password.value) {
+        confirmPassword.setCustomValidity("Passwords do not match");
+        container.classList.remove("valid");
+        container.classList.add("invalid");
+      } else {
+        confirmPassword.setCustomValidity("");
+        container.classList.remove("invalid");
+        container.classList.add("valid");
+      }
+    }
 
-</html>
+    confirmPassword.addEventListener("input", validatePasswordMatch);
+
+    // Email uniqueness check
+    emailInput.addEventListener("blur", async function () {
+      const email = this.value;
+      if (email && email.trim() !== "" && this.checkValidity()) {
+        try {
+          const response = await fetch(
+            `/check_username_availability/?username=${email}`
+          );
+          const data = await response.json();
+          const container = this.parentElement;
+
+          if (data.available) {
+            container.classList.remove("invalid");
+            container.classList.add("valid");
+            container.querySelector(".validation-message").style.display =
+              "none";
+          } else {
+            container.classList.remove("valid");
+            container.classList.add("invalid");
+            container.querySelector(".validation-message").style.display =
+              "block";
+          }
+        } catch (error) {
+          console.error("Error checking email availability:", error);
+        }
+      }
+    });
+
+    // Mobile number uniqueness check
+    mobileInput.addEventListener("blur", async function () {
+      const mobile = this.value;
+      if (mobile && mobile.trim() !== "" && this.checkValidity()) {
+        try {
+          const response = await fetch(
+            `/check_mobile_availability/?mobile=${mobile}`
+          );
+          const data = await response.json();
+          const container = this.parentElement;
+
+          if (data.available) {
+            container.classList.remove("invalid");
+            container.classList.add("valid");
+            container.querySelector(".validation-message").style.display =
+              "none";
+          } else {
+            container.classList.remove("valid");
+            container.classList.add("invalid");
+            container.querySelector(".validation-message").style.display =
+              "block";
+          }
+        } catch (error) {
+          console.error("Error checking mobile availability:", error);
+        }
+      }
+    });
+
+    // Form submission handling
+    form.addEventListener("submit", function (e) {
+      if (isSubmitting) {
+        e.preventDefault();
+        return;
+      }
+
+      // Check all inputs
+      let hasError = false;
+      inputs.forEach((input) => {
+        // Manually validate each input
+        if (input.value.trim() === "") {
+          input.parentElement.classList.add("invalid");
+          hasError = true;
+        } else if (!input.checkValidity()) {
+          input.parentElement.classList.add("invalid");
+          hasError = true;
+        }
+      });
+
+      // Final validation
+      if (
+        password.value !== confirmPassword.value &&
+        password.value.trim() !== "" &&
+        confirmPassword.value.trim() !== ""
+      ) {
+        confirmPassword.parentElement.classList.add("invalid");
+        hasError = true;
+      }
+
+      // Terms validation
+      if (!termsCheckbox.checked) {
+        hasError = true;
+        alert("You must agree to the Terms and Conditions to register");
+      }
+
+      if (hasError) {
+        e.preventDefault();
+        return;
+      }
+
+      isSubmitting = true;
+      this.querySelector("button[type='submit']").disabled = true;
+    });
+
+    // Remove password toggle functionality (we're using hover instead)
+    const passwordContainers = document.querySelectorAll(".password-container");
+  });
+</script>
+{% endblock %}

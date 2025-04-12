@@ -72,7 +72,7 @@
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
         <div class="container">
-            <a class="navbar-brand" href="#home">
+            <a class="navbar-brand" href="{% url 'home' %}">
                 <img src="{% static 'img/home/logo.svg' %}" alt="Glance 2.0 Logo">
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -81,25 +81,25 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="#home">Home</a>
+                        <a class="nav-link" href="{% url 'home' %}">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#about">About</a>
+                        <a class="nav-link" href="{% url 'home' %}#about">About</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#companies">Companies</a>
+                        <a class="nav-link" href="{% url 'home' %}#companies">Companies</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#schedule">Schedule</a>
+                        <a class="nav-link" href="{% url 'home' %}#schedule">Schedule</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#gallery">Gallery</a>
+                        <a class="nav-link" href="{% url 'home' %}#gallery">Gallery</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#team">Team</a>
+                        <a class="nav-link" href="{% url 'home' %}#team">Team</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#contact">Contact</a>
+                        <a class="nav-link" href="{% url 'home' %}#contact">Contact</a>
                     </li>
                 </ul>
                 <div class="auth-buttons">

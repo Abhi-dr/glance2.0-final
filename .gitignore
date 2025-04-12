@@ -10,3 +10,4 @@ administration/__pycache__/
 accounts/migrations/__pycache__/
 home/migrations/__pycache__/
 student/migrations/__pycache__/
+.env
