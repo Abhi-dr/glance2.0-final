@@ -42,32 +42,29 @@ def login(request):
     next_url = request.GET.get('next', '')
 
     if request.method == 'POST':
-        username = request.POST.get('email').strip().lower()
+        username = request.POST.get('email').strip()  # Removed .lower() to preserve case
         password = request.POST.get('password')
 
+        # First check if it's a student
         if Student.objects.filter(username=username).exists():
             user = auth.authenticate(username=username, password=password)
-
             if user is not None:
                 auth.login(request, user)
                 return redirect(next_url if next_url else 'student')
-
             messages.error(request, "Invalid Password")
             return redirect("login")
 
-        elif Administrator.objects.filter(username=username).exists():
+        # Then check if it's an administrator
+        if Administrator.objects.filter(username=username).exists():
             user = auth.authenticate(username=username, password=password)
-
             if user is not None:
                 auth.login(request, user)
                 return redirect(next_url if next_url else 'administration')
-
             messages.error(request, "Invalid Password")
             return redirect("login")
 
-        else:
-            messages.error(request, "Invalid Username or Password")
-            return redirect("login")
+        messages.error(request, "Invalid Username or Password")
+        return redirect("login")
 
     return render(request, 'accounts/login.html', {'next': next_url})
 
@@ -94,6 +91,9 @@ def register(request):
         
         password = request.POST.get("password")
 
+        if Student.objects.filter(username=username).exists():
+            messages.error(request, "Email Already Registered")
+            return redirect("login")
         new_user = Student.objects.create(
             username=username,
             first_name=first_name,
