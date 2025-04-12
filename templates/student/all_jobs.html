@@ -162,7 +162,7 @@ Student -> All Jobs
               {{ job.job_type|title }} | {{ job.location_flexibility|title }}</span>
           </div>
           <div class="row-cols-lg-3">
-            <span class="mb-1">{{ batch.description }}</span>
+            <span class="mb-1">{{ job.description|truncatechars:100 }}</span>
           </div>
 
 

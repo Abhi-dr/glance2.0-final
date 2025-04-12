@@ -196,23 +196,43 @@ def upload_resume(request):
 def all_jobs(request):
     
     student = Student.objects.get(id=request.user.id)
-    jobs = Job.objects.all().exclude(applications__student=student)
-    # for application in Application.objects.filter(student=student):
-    #     jobs = jobs.exclude(interview_date=application.job.interview_date)
     
-    if student.backlog > 0:
-        jobs = jobs.exclude(is_backlog_allowed=False)    
-        
+    # Initialize with all jobs
+    jobs = Job.objects.all()
+    
+    # Check if student has applied to any jobs and exclude them
+    applied_jobs = Application.objects.filter(student=student).values_list('job__id', flat=True)
+    jobs = jobs.exclude(id__in=applied_jobs)
+    
+    # Handle backlog filtering with None check
+    if student.backlog is not None and student.backlog > 0:
+        jobs = jobs.exclude(is_backlog_allowed=False)
+    
+    # Apply additional filters only if student has complete profile
+    if all([student.tenth is not None, student.twelfth is not None, student.cgpa is not None]):
+        # Filter jobs by eligibility criteria
+        jobs = jobs.filter(
+            tenth_percentage__lte=student.tenth,
+            twelfth_percentage__lte=student.twelfth,
+            cgpa_criteria__lte=student.cgpa
+        )
+    else:
+        # Inform student that profile completion is needed for filtering
+        messages.info(request, "Complete your profile to see jobs filtered by your qualifications.")
+    
+    # Handle search query
     query = request.POST.get("query")
-    print(query)
     if query:
-        # fetch the companies based on the name of the company, job role and descritiption
-        
+        # Search by company name, job title, or description
         jobs = Job.objects.filter(
             Q(title__icontains=query) |
             Q(description__icontains=query) |
             Q(company__name__icontains=query)
-        ).exclude(applications__student=student)
+        ).exclude(id__in=applied_jobs)
+        
+        # Apply backlog filter to search results too
+        if student.backlog is not None and student.backlog > 0:
+            jobs = jobs.exclude(is_backlog_allowed=False)
     
     parameters = {
         "student": student,
