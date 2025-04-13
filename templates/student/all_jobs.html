@@ -122,9 +122,9 @@ Student -> All Jobs
         <div class="input-group">
           <input type="text" class="form-control" placeholder="Search by Company Name, Job Role, Tags"
             aria-label="Search by Company Name, Job Role, Tags" aria-describedby="button-addon2" name="query">
-          <button class="btn btn-outline-secondary" type="submit" id="button-addon2">Search</button>
+          <button class="btn btn-primary" type="submit" id="button-addon2">Search</button>
           <!-- make a button to clear the search -->
-          <a href="{% url 'all_jobs' %}" class="btn btn-outline-danger">Clear</a>
+          <a href="{% url 'all_jobs' %}" class="btn btn-danger">Clear</a>
         </div>
       </form>
 
@@ -152,18 +152,18 @@ Student -> All Jobs
             </h6>
           </div>
           <div class="mb-2">
-            <span class="badge bg-light text-dark me-1">
+            <span class="badge bg-primary text-white me-1">
               {% if job.salary_range %}
-              {{ job.salary_range }}
+              {{ job.salary_range|truncatechars:15 }}
               {% endif %}
             </span>
-            <span class="badge bg-light text-dark me-1">{{ job.job_type|title }}</span>
-            <span class="badge bg-light text-dark">{{ job.location_flexibility|title }}</span>
+            <span class="badge bg-info text-dark me-1">{{ job.job_type|title|truncatechars:10 }}</span>
+            <span class="badge bg-secondary text-white">{{ job.location_flexibility|title|truncatechars:10 }}</span>
           </div>
           <div>
             <p class="text-muted mb-2">{{ job.description|truncatechars:100 }}</p>
           </div>
-          <a href="{% url 'job' job.slug %}" class="btn btn-sm btn-outline-primary mt-2 w-100">View Details</a>
+          <a href="{% url 'job' job.slug %}" class="btn btn-sm btn-primary mt-2 w-100">View Details</a>
         </div>
       </div>
     </div>
