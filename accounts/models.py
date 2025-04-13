@@ -155,14 +155,16 @@ class Company(models.Model):
 class Job(models.Model):
     
     interview_date_choice = (
-        ("25th April, 2024", "25th April, 2024"),
-        ("24th April, 2024", "24th April, 2024"),
+        ("17th April, 2025", "17th April, 2025"),
+        ("18th April, 2025", "18th April, 2025"),
+        ("19th April, 2025", "19th April, 2025"),
+
     )
     
     company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='jobs')
     title = models.CharField(max_length=100)
     description = models.TextField()
-    interview_date = models.CharField(max_length=100, choices=interview_date_choice, default="25th April, 2024")
+    interview_date = models.CharField(max_length=100, choices=interview_date_choice, default="17th April, 2025")
     deadline = models.DateField()
     interview_mode = models.CharField(max_length=100, blank=True)
     
