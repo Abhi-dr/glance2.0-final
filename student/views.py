@@ -241,6 +241,35 @@ def all_jobs(request):
     }
     
     return render(request, 'student/all_jobs.html', parameters)
+# @login_required(login_url='login')
+# def all_jobs(request):
+    
+#     student = Student.objects.get(id=request.user.id)
+#     jobs = Job.objects.all().exclude(applications__student=student)
+#     # for application in Application.objects.filter(student=student):
+#     #     jobs = jobs.exclude(interview_date=application.job.interview_date)
+    
+#     if student.backlog > 0:
+#         jobs = jobs.exclude(is_backlog_allowed=False)    
+        
+#     query = request.POST.get("query")
+#     print(query)
+#     if query:
+#         # fetch the companies based on the name of the company, job role and descritiption
+        
+#         jobs = Job.objects.filter(
+#             Q(title__icontains=query) |
+#             Q(description__icontains=query) |
+#             Q(company__name__icontains=query)
+#         ).exclude(applications__student=student)
+    
+#     parameters = {
+#         "student": student,
+#         "jobs": jobs,
+#         "query": query
+#     }
+    
+#     return render(request, 'student/all_jobs.html', parameters)
 
 # ================================== CONFIRM APPLICATION ===========================================
 
