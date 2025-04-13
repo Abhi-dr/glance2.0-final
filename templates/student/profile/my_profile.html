@@ -1,18 +1,67 @@
 {% extends "student/base.html" %} {% load static %} {% block title %} Student ->
-Profile {% endblock %} {% block body %}
+Profile {% endblock %}
+
+{% block extra_css %}
+<style>
+  /* Responsive styles for profile page */
+  @media (max-width: 767px) {
+    .profile-header {
+      flex-direction: column;
+      padding-top: 10px;
+    }
+    
+    .profile-score {
+      margin-top: 10px;
+      margin-left: 0 !important;
+      width: 100%;
+      margin-bottom: 5px;
+    }
+    
+    .container-fluid {
+      padding-top: 55px; /* Add space for the fixed navbar */
+    }
+    
+    .social-link-btn {
+      width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 100%;
+    }
+    
+    .profile-label {
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    
+    .profile-section {
+      margin-bottom: 15px;
+    }
+    
+    .profile-value {
+      border-left: 3px solid #0d6efd;
+      padding-left: 10px;
+      margin-bottom: 15px;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block body %}
 
 <div class="container-fluid">
-  <div class="card">
-    <div class="card-body d-inline-flex">
-      <h5 class="card-title fw-semibold">Profile | &nbsp;</h5>
-      <p class="mb-0">Yha Shakal Nahi, Akal Kaam Aati Hai🔥</p>
+  <div class="card mt-md-0 mt-4">
+    <div class="card-body d-inline-flex profile-header">
+      <div>
+        <h5 class="card-title fw-semibold">Profile | &nbsp;</h5>
+        <p class="mb-0">Yha Shakal Nahi, Akal Kaam Aati Hai🔥</p>
+      </div>
 
-      <button class="btn badge text-bg-light-danger w-md-10 px-4 ms-auto">
+      <button class="btn badge text-bg-light-danger w-md-10 px-4 ms-auto profile-score">
         <span class="fw-bold text-black">
           Profile Score: <strong> {{ student.get_profile_score }}%🔥 </strong>
         </span>
       </button>
-
     </div>
   </div>
 
@@ -33,6 +82,11 @@ Profile {% endblock %} {% block body %}
         <div class="card-body text-center">
           <img src="{{ student.profile_pic.url }}" alt="avatar" class="rounded-circle img-fluid"
             style="width: 150px;" />
+          {% if student.profile_pic.url == '/media/student_profile/default.jpg' %}
+          <div class="mt-2 mb-2">
+            <span class="badge bg-danger">Profile Picture Required!</span>
+          </div>
+          {% endif %}
           <h5 class="my-3">
             {{ student.first_name }} {{ student.last_name }}
           </h5>
@@ -60,158 +114,319 @@ Profile {% endblock %} {% block body %}
     <div class="col-lg-8">
       <div class="card mb-4">
         <div class="card-body">
-          <div class="row">
-            <div class="col-sm-3">
-              <p class="mb-0">Name</p>
+          <!-- For desktop view -->
+          <div class="d-none d-md-block">
+            <div class="row">
+              <div class="col-sm-3">
+                <p class="mb-0">Name</p>
+              </div>
+              <div class="col-sm-9">
+                <p class="fw-semibold mb-0">
+                  {{ student.first_name }} {{ student.last_name }}
+                </p>
+              </div>
             </div>
-            <div class="col-sm-9">
-              <p class="fw-semibold mb-0">
-                {{ student.first_name }} {{ student.last_name }}
-              </p>
+            <hr />
+            <div class="row">
+              <div class="col-sm-3">
+                <p class="mb-0">Email</p>
+              </div>
+              <div class="col-sm-9">
+                <p class="fw-semibold mb-0">{{ student.username }}</p>
+              </div>
+            </div>
+            <hr />
+            <div class="row">
+              <div class="col-sm-3">
+                <p class="mb-0">Phone</p>
+              </div>
+              <div class="col-sm-9">
+                <p class="fw-semibold mb-0">+91 {{ student.phone_number }}</p>
+              </div>
+            </div>
+            <hr />
+            <div class="row">
+              <div class="col-sm-3">
+                <p class="mb-0">LinkedIn</p>
+              </div>
+              <div class="col-sm-9">
+                {% if not student.linkedin_id %}
+                <a href="{% url 'edit_profile' %}" class="btn btn-dark mb-0">Not Updated</a>
+                {% else %}
+                <a href="{{ student.linkedin_id }}" target="_blank" class="btn btn-outline-secondary mb-0">
+                  {{ student.linkedin_id }}</a>
+                {% endif %}
+              </div>
+            </div>
+            <hr />
+
+            <!-- GitHub -->
+            <div class="row">
+              <div class="col-sm-3">
+                <p class="mb-0">GitHub</p>
+              </div>
+              <div class="col-sm-9">
+                {% if not student.github_id %}
+                <a href="{% url 'edit_profile' %}" class="btn btn-dark mb-0">Not Available</a>
+                {% else %}
+                <a href="{{ student.github_id }}" target="_blank" class="btn btn-outline-dark mb-0">
+                  {{ student.github_id }}</a>
+                {% endif %}
+              </div>
+            </div>
+            <hr />
+
+            <!-- Instagram -->
+            <div class="row">
+              <div class="col-sm-3">
+                <p class="mb-0">Instagram</p>
+              </div>
+              <div class="col-sm-9">
+                {% if not student.instagram_id %}
+                <a href="{% url 'edit_profile' %}" class="btn btn-dark mb-0">Not Available</a>
+                {% else %}
+                <a href="{{ student.instagram_id }}" target="_blank" class="btn btn-outline-danger mb-0">
+                  {{ student.instagram_id }}</a>
+                {% endif %}
+              </div>
+            </div>
+            <hr />
+
+            <!-- Twitter -->
+            <div class="row">
+              <div class="col-sm-3">
+                <p class="mb-0">Twitter/X</p>
+              </div>
+              <div class="col-sm-9">
+                {% if not student.twitter_id %}
+                <a href="{% url 'edit_profile' %}" class="btn btn-dark mb-0">Not Available</a>
+                {% else %}
+                <a href="{{ student.twitter_id }}" target="_blank" class="btn btn-outline-info mb-0">
+                  {{ student.twitter_id }}</a>
+                {% endif %}
+              </div>
+            </div>
+            <hr />
+
+            <!-- Gender -->
+            <div class="row">
+              <div class="col-sm-3">
+                <p class="mb-0">Gender</p>
+              </div>
+              <div class="col-sm-9">
+                {% if not student.gender %}
+                <a href="{% url 'edit_profile' %}" class="btn btn-dark mb-0">Not Available</a>
+                {% else %}
+                <p class="mb-0">
+                  {{ student.gender }}
+                </p>
+                {% endif %}
+              </div>
+            </div>
+
+            <hr />
+            <div class="row">
+              <div class="col-sm-3">
+                <p class="mb-0 fs-3 fw-bolder">Educational Details</p>
+              </div><span></span>
+
+              <div class="col-sm-3">
+                <p class="mb-0 fw-bold">Highschool</p>
+              </div>
+
+              <div class="col-sm-9">
+                {% if student.tenth %}
+                <p class="fw-semibold mb-0">
+                  {{ student.tenth }}%
+                </p>
+                {% else %}
+                <p class="text-danger fw-semibold mb-0">Not Updated</p>
+                {% endif %}
+              </div>
+
+              <div class="col-sm-3">
+                <p class="mb-0 fw-bold">Intermediate</p>
+              </div>
+              <div class="col-sm-9">
+                {% if student.twelfth %}
+                <p class="fw-semibold mb-0">
+                  {{ student.twelfth }}%
+                </p>
+                {% else %}
+                <p class="text-danger fw-semibold mb-0">Not Updated</p>
+                {% endif %}
+              </div>
+
+              <div class="col-sm-3">
+                <p class="mb-0 fw-bold">Current CGPA</p>
+              </div>
+              <div class="col-sm-9">
+                {% if student.cgpa %}
+                <p class="fw-semibold mb-0">
+                  {{ student.cgpa }}
+                </p>
+                {% else %}
+                <p class="text-danger fw-semibold mb-0">Not Updated</p>
+                {% endif %}
+              </div>
+            </div>
+            <hr />
+
+            <div class="row">
+              <div class="col-sm-3">
+                <p class="mb-0 fw-bolder fs-3">Backlogs</p>
+              </div>
+
+              <div class="col-sm-9">
+                {% if student.backlog == 0 %}
+                <p class="fw-semibold mb-0 text-success">{{ student.backlog }}</p>
+                {% elif student.backlog %}
+                <p class="fw-semibold mb-0 text-danger">{{ student.backlog }}</p>
+                {% else %}
+                <p class="fw-semibold mb-0 text-danger">Not Updated</p>
+                {% endif %}
+              </div>
             </div>
           </div>
-          <hr />
-          <div class="row">
-            <div class="col-sm-3">
-              <p class="mb-0">Email</p>
+          
+          <!-- For mobile view -->
+          <div class="d-block d-md-none">
+            <div class="profile-section">
+              <p class="profile-label">Name</p>
+              <div class="profile-value">
+                <p class="fw-semibold mb-0">{{ student.first_name }} {{ student.last_name }}</p>
+              </div>
             </div>
-            <div class="col-sm-9">
-              <p class="fw-semibold mb-0">{{ student.username }}</p>
+            
+            <div class="profile-section">
+              <p class="profile-label">Email</p>
+              <div class="profile-value">
+                <p class="fw-semibold mb-0">{{ student.username }}</p>
+              </div>
+            </div>
+            
+            <div class="profile-section">
+              <p class="profile-label">Phone</p>
+              <div class="profile-value">
+                <p class="fw-semibold mb-0">+91 {{ student.phone_number }}</p>
+              </div>
+            </div>
+            
+            <div class="profile-section">
+              <p class="profile-label">LinkedIn</p>
+              <div class="profile-value">
+                {% if not student.linkedin_id %}
+                <a href="{% url 'edit_profile' %}" class="btn btn-dark mb-0 w-100">Not Updated</a>
+                {% else %}
+                <a href="{{ student.linkedin_id }}" target="_blank" class="btn btn-outline-secondary mb-0 social-link-btn">
+                  {{ student.linkedin_id }}</a>
+                {% endif %}
+              </div>
+            </div>
+            
+            <div class="profile-section">
+              <p class="profile-label">GitHub</p>
+              <div class="profile-value">
+                {% if not student.github_id %}
+                <a href="{% url 'edit_profile' %}" class="btn btn-dark mb-0 w-100">Not Available</a>
+                {% else %}
+                <a href="{{ student.github_id }}" target="_blank" class="btn btn-outline-dark mb-0 social-link-btn">
+                  {{ student.github_id }}</a>
+                {% endif %}
+              </div>
+            </div>
+            
+            <div class="profile-section">
+              <p class="profile-label">Instagram</p>
+              <div class="profile-value">
+                {% if not student.instagram_id %}
+                <a href="{% url 'edit_profile' %}" class="btn btn-dark mb-0 w-100">Not Available</a>
+                {% else %}
+                <a href="{{ student.instagram_id }}" target="_blank" class="btn btn-outline-danger mb-0 social-link-btn">
+                  {{ student.instagram_id }}</a>
+                {% endif %}
+              </div>
+            </div>
+            
+            <div class="profile-section">
+              <p class="profile-label">Twitter/X</p>
+              <div class="profile-value">
+                {% if not student.twitter_id %}
+                <a href="{% url 'edit_profile' %}" class="btn btn-dark mb-0 w-100">Not Available</a>
+                {% else %}
+                <a href="{{ student.twitter_id }}" target="_blank" class="btn btn-outline-info mb-0 social-link-btn">
+                  {{ student.twitter_id }}</a>
+                {% endif %}
+              </div>
+            </div>
+            
+            <div class="profile-section">
+              <p class="profile-label">Gender</p>
+              <div class="profile-value">
+                {% if not student.gender %}
+                <a href="{% url 'edit_profile' %}" class="btn btn-dark mb-0 w-100">Not Available</a>
+                {% else %}
+                <p class="mb-0">{{ student.gender }}</p>
+                {% endif %}
+              </div>
+            </div>
+            
+            <div class="mt-4 mb-3">
+              <h5 class="fw-bolder">Educational Details</h5>
+            </div>
+            
+            <div class="profile-section">
+              <p class="profile-label">Highschool</p>
+              <div class="profile-value">
+                {% if student.tenth %}
+                <p class="fw-semibold mb-0">{{ student.tenth }}%</p>
+                {% else %}
+                <p class="text-danger fw-semibold mb-0">Not Updated</p>
+                {% endif %}
+              </div>
+            </div>
+            
+            <div class="profile-section">
+              <p class="profile-label">Intermediate</p>
+              <div class="profile-value">
+                {% if student.twelfth %}
+                <p class="fw-semibold mb-0">{{ student.twelfth }}%</p>
+                {% else %}
+                <p class="text-danger fw-semibold mb-0">Not Updated</p>
+                {% endif %}
+              </div>
+            </div>
+            
+            <div class="profile-section">
+              <p class="profile-label">Current CGPA</p>
+              <div class="profile-value">
+                {% if student.cgpa %}
+                <p class="fw-semibold mb-0">{{ student.cgpa }}</p>
+                {% else %}
+                <p class="text-danger fw-semibold mb-0">Not Updated</p>
+                {% endif %}
+              </div>
+            </div>
+            
+            <div class="profile-section">
+              <p class="profile-label">Backlogs</p>
+              <div class="profile-value">
+                {% if student.backlog == 0 %}
+                <p class="fw-semibold mb-0 text-success">{{ student.backlog }}</p>
+                {% elif student.backlog %}
+                <p class="fw-semibold mb-0 text-danger">{{ student.backlog }}</p>
+                {% else %}
+                <p class="fw-semibold mb-0 text-danger">Not Updated</p>
+                {% endif %}
+              </div>
             </div>
           </div>
+          
           <hr />
-          <div class="row">
-            <div class="col-sm-3">
-              <p class="mb-0">Phone</p>
-            </div>
-            <div class="col-sm-9">
-              <p class="fw-semibold mb-0">+91 {{ student.phone_number }}</p>
-            </div>
-          </div>
-          <hr />
-          <div class="row">
-            <div class="col-sm-3">
-              <p class="mb-0">LinkedIn</p>
-            </div>
-            <div class="col-sm-9">
-              {% if not student.linkedin_id %}
-              <a href="{% url 'edit_profile' %}" class="btn btn-dark mb-0">Not Updated</a>
-              {% else %}
-              <a href="{{ student.linkedin_id }}" target="_blank" class="btn btn-outline-secondary mb-0">
-                {{ student.linkedin_id }}</a>
-              {% endif %}
-            </div>
-          </div>
-          <hr />
-
-          <!-- GitHub -->
-          <div class="row">
-            <div class="col-sm-3">
-              <p class="mb-0">GitHub</p>
-            </div>
-            <div class="col-sm-9">
-              {% if not student.github_id %}
-              <a href="{% url 'edit_profile' %}" class="btn btn-dark mb-0">Not Available</a>
-
-              {% else %}
-              <a href="{{ student.github_id }}" target="_blank" class="btn btn-outline-dark mb-0">
-                {{ student.github_id }}</a>
-              {% endif %}
-            </div>
-          </div>
-          <hr />
-
-          <!-- Gender -->
-          <div class="row">
-            <div class="col-sm-3">
-              <p class="mb-0">Gender</p>
-            </div>
-            <div class="col-sm-9">
-              {% if not student.gender %}
-              <a href="{% url 'edit_profile' %}" class="btn btn-dark mb-0">Not Available</a>
-
-              {% else %}
-              <p class="mb-0">
-                {{ student.gender }}
-              </p>
-              {% endif %}
-            </div>
-          </div>
-
-          <hr />
-          <div class="row">
-            <div class="col-sm-3">
-              <p class="mb-0 fs-3 fw-bolder">Educational Details</p>
-            </div><span></span>
-
-            <div class="col-sm-3">
-              <p class="mb-0 fw-bold">Highschool</p>
-            </div>
-
-            <div class="col-sm-9">
-              {% if student.tenth %}
-              <p class="fw-semibold mb-0">
-                {{ student.tenth }}%
-              </p>
-
-              {% else %}
-              <p class="text-danger fw-semibold mb-0">Not Updated</p>
-              {% endif %}
-            </div>
-
-            <div class="col-sm-3">
-              <p class="mb-0 fw-bold">Intermediate</p>
-            </div>
-            <div class="col-sm-9">
-              {% if student.twelfth %}
-              <p class="fw-semibold mb-0">
-                {{ student.twelfth }}%
-              </p>
-              {% else %}
-              <p class="text-danger fw-semibold mb-0">Not Updated</p>
-              {% endif %}
-            </div>
-
-            <div class="col-sm-3">
-              <p class="mb-0 fw-bold">Current CGPA</p>
-            </div>
-            <div class="col-sm-9">
-              {% if student.cgpa %}
-              <p class="fw-semibold mb-0">
-                {{ student.cgpa }}
-              </p>
-              {% else %}
-              <p class="text-danger fw-semibold mb-0">Not Updated</p>
-              {% endif %}
-            </div>
-
-          </div>
-          <hr />
-
-          <div class="row">
-
-            <div class="col-sm-3">
-              <p class="mb-0 fw-bolder fs-3">Backlogs</p>
-            </div>
-
-            <div class="col-sm-9">
-              {% if student.backlog == 0 %}
-              <p class="fw-semibold mb-0 text-success">{{ student.backlog }}</p>
-              {% elif student.backlog %}
-              <p class="fw-semibold mb-0 text-danger">{{ student.backlog }}</p>
-              {% else %}
-              <p class="fw-semibold mb-0 text-danger">Not Updated</p>
-              {% endif %}
-            </div>
-          </div>
-          <hr />
-
           <a href="{% url 'edit_profile' %}" class="btn btn-outline-warning w-100">Edit Profile</a>
         </div>
       </div>
     </div>
   </div>
 </div>
-</div>
-
 {% endblock %}

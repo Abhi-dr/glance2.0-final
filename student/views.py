@@ -291,7 +291,7 @@ def confirm_application(request, slug):
         return render(request, 'student/confirmation.html', parameters)
     
     else:
-        messages.error(request, "You have already applied to 2 companies!")
+        messages.error(request, "You have already applied to 3 companies!")
         return redirect('student')
     
 # ================================== APPLY ===========================================
@@ -386,7 +386,7 @@ GLA University, Mathura
         return redirect('student')
     
     else:
-        messages.error(request, "You have already applied to 2 companies!")
+        messages.error(request, "You have already applied to 3 companies!")
         return redirect('student')
 
 # ================================== WITHDRAW APPLICATION ===========================================

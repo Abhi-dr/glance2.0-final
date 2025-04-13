@@ -2,261 +2,717 @@
 {% load static %}
 
 {% block title %}
-Student -> Edit Profile
+Student - Edit Profile
 {% endblock %}
 
 {% block extra_css %}
-
-
+<style>
+    .custom-file-upload {
+        display: inline-block;
+        padding: 8px 16px;
+        cursor: pointer;
+        background-color: #3a3f44;
+        border: 1px solid #4a5056;
+        border-radius: 4px;
+        transition: all 0.3s;
+        color: #fff;
+    }
+    
+    .custom-file-upload:hover {
+        background-color: #4a5056;
+        border-color: #6c757d;
+    }
+    
+    .img-account-profile {
+        width: 150px;
+        height: 150px;
+        object-fit: cover;
+        border: 4px solid #343a40;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.3);
+    }
+    
+    .form-control:disabled {
+        background-color: rgba(90, 90, 90, 0.2);
+        color: #adb5bd;
+        border-color: #495057;
+    }
+    
+    .form-control, .form-select {
+        background-color: #2c3034;
+        color: #e9ecef;
+        border-color: #495057;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        background-color: #2c3034;
+        color: #e9ecef;
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+    
+    .card {
+        background-color: #222529;
+        border-color: #343a40;
+    }
+    
+    .card-header {
+        background-color: #2c3034;
+        border-color: #343a40;
+        color: #e9ecef;
+        font-weight: 500;
+    }
+    
+    .card-body {
+        color: #e9ecef;
+    }
+    
+    .card-title {
+        color: #fff;
+    }
+    
+    label {
+        color: #e9ecef;
+    }
+    
+    .text-muted {
+        color: #adb5bd !important;
+    }
+    
+    .small {
+        color: #adb5bd;
+    }
+    
+    .input-group-text {
+        background-color: #343a40;
+        border-color: #495057;
+        color: #e9ecef;
+    }
+    
+    .alert-info {
+        background-color: #0d3251;
+        border-color: #0f5b99;
+        color: #9eeaf9;
+    }
+    
+    .is-invalid {
+        border-color: #dc3545 !important;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right calc(0.375em + 0.1875rem) center;
+        background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+    }
+    
+    .is-valid {
+        border-color: #198754 !important;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23198754' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right calc(0.375em + 0.1875rem) center;
+        background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+    }
+    
+    .invalid-feedback {
+        display: none;
+        width: 100%;
+        margin-top: 0.25rem;
+        font-size: 0.875em;
+        color: #dc3545;
+    }
+    
+    .is-invalid ~ .invalid-feedback {
+        display: block;
+    }
+    
+    /* Responsive fixes for mobile */
+    @media (max-width: 767px) {
+        .container-xl {
+            padding-left: 5px;
+            padding-right: 5px;
+        }
+        
+        .card-body {
+            padding: 1rem;
+        }
+        
+        .row.gx-3 {
+            margin-left: -5px;
+            margin-right: -5px;
+        }
+        
+        .input-group {
+            flex-wrap: wrap;
+        }
+        
+        .input-group-text {
+            border-radius: 4px 4px 0 0;
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .input-group > .form-control {
+            border-radius: 0 0 4px 4px;
+        }
+        
+        .social-input-group .form-control {
+            flex: 1 1 auto;
+        }
+        
+        .form-section-header {
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            border-bottom: 1px solid #495057;
+            padding-bottom: 0.5rem;
+            font-weight: bold;
+            color: #e9ecef;
+        }
+        
+        .img-account-profile {
+            width: 120px;
+            height: 120px;
+        }
+    }
+</style>
 {% endblock %}
 
 {% block body %}
-
 <div class="container-fluid">
+    {% for message in messages %}
+
+    <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert">
+        <strong>{{ message.tag }}</strong> {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    {% endfor %}
+    
+    {% if student.profile_pic.url == '/media/student_profile/default.jpg' %}
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <strong><i class="fas fa-exclamation-triangle"></i> Attention!</strong> 
+        Your profile picture is missing. Please upload a profile picture to complete your profile.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
+    
     <div class="card">
         <div class="card-body">
             <h5 class="card-title fw-semibold">Edit Profile</h5>
             <p>For any corrections, contact
-                <a class="text-success" href="{% url 'support' %}">
+                <a class="text-info" href="{% url 'support' %}">
                     Technical Team
                 </a>
             </p>
         </div>
 
         <div class="container-xl px-4">
-
-            <hr class="mt-0">
+            <hr class="mt-0 border-secondary">
             <div class="row">
+                <!-- Profile Picture Column -->
                 <div class="col-xl-4">
-                    <!-- Profile picture card-->
                     <div class="card mb-4 mb-xl-0">
-
-                        <form action="{% url 'upload_profile' %}" method="post" enctype="multipart/form-data">
-
+                        <form action="{% url 'upload_profile' %}" method="post" enctype="multipart/form-data" id="profilePicForm">
                             {% csrf_token %}
-
                             <div class="card-header">Profile Picture</div>
                             <div class="card-body text-center">
-                                <!-- Profile picture image-->
-
-                                <img style="max-width: 100%; width: 90%;"
-                                    class="img-account-profile rounded-circle mb-2" src="{{ student.profile_pic.url }}"
-                                    alt="">
-                                <!-- Profile picture help block-->
-                                <div class="small font-italic text-muted mb-4">JPG or PNG no larger than 5 MB</div>
-
-                                <label for="file-upload" class="custom-file-upload mb-3">
-                                    <i class="fa fa-cloud-upload"></i> Choose Profile Picture
-                                </label>
-                                <input class="form-control" type="file" id="formFile" name="profile_pic"
-                                    accept=".webp, .png, .jpg, .jpeg" required />
-
-                                <br>
-
-                                <!-- Profile picture upload button-->
-                                <button class="btn btn-primary" type="submit">Update</button>
+                                <!-- Profile picture image -->
+                                <img class="img-account-profile rounded-circle mb-3" 
+                                     src="{{ student.profile_pic.url }}"
+                                     alt="Profile Picture">
+                                
+                                <!-- Profile picture help block -->
+                                <div class="small font-italic mb-4">JPG or PNG no larger than 5 MB</div>
+                                
+                                <!-- File input with custom styling -->
+                                <div class="mb-3">
+                                    <label for="formFile" class="custom-file-upload">
+                                        <i class="fa fa-cloud-upload"></i> Choose Profile Picture
+                                    </label>
+                                    <input class="form-control d-none" type="file" id="formFile" name="profile_pic"
+                                        accept=".webp, .png, .jpg, .jpeg" required />
+                                    <div class="invalid-feedback">Please select a valid image file (required).</div>
+                                </div>
+                                
+                                <!-- Profile picture upload button -->
+                                <button class="btn btn-primary px-4" type="submit">Update Photo</button>
+                                
+                                <!-- Mandatory notice -->
+                                <div class="alert alert-info mt-3" role="alert">
+                                    <i class="fas fa-info-circle"></i> Profile picture is mandatory for a complete profile.
+                                </div>
                             </div>
                         </form>
                     </div>
                 </div>
+                
+                <!-- Personal Details Column -->
                 <div class="col-xl-8">
-                    <!-- Account details card-->
                     <div class="card mb-4">
                         <div class="card-header">Your Details</div>
                         <div class="card-body">
-                            <form method="post">
-
+                            <form method="post" id="profileForm" novalidate>
                                 {% csrf_token %}
 
-                                <!-- Form Row-->
-                                <div class="row gx-3 mb-3">
-                                    <!-- Form Group (first name)-->
-                                    <div class="col-md-6">
-                                        <label class="small mb-1" for="inputFirstName">First name</label>
-                                        <input class="form-control" id="inputFirstName" type="text"
-                                            placeholder="Enter your first name" name="first_name"
-                                            value="{{ student.first_name }}">
+                                <!-- Name Fields -->
+                                <div class="form-section-header d-md-none">Basic Information</div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="small mb-1" for="inputFirstName">* First Name</label>
+                                        <input class="form-control" id="inputFirstName" type="text" name="first_name"
+                                            value="{{ student.first_name }}" placeholder="Enter your first name" required>
+                                        <div class="invalid-feedback">Please enter your first name.</div>
                                     </div>
-                                    <!-- Form Group (last name)-->
-                                    <div class="col-md-6">
-                                        <label class="small mb-1" for="inputLastName">Last name</label>
-                                        <input class="form-control" id="inputLastName" type="text"
-                                            placeholder="Enter your last name" name="last_name"
-                                            value="{{ student.last_name }}">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="small mb-1" for="inputLastName">* Last Name</label>
+                                        <input class="form-control" id="inputLastName" type="text" name="last_name"
+                                            value="{{ student.last_name }}" placeholder="Enter your last name" required>
+                                        <div class="invalid-feedback">Please enter your last name.</div>
                                     </div>
                                 </div>
 
-                                
+                                <!-- Contact Information -->
                                 <div class="row mb-3">
                                     <div class="col-md-6">
                                         <label class="small mb-1" for="inputUsername">Email Address</label>
                                         <input class="form-control" id="inputUsername" type="text"
                                             value="{{ student.username }}" disabled>
                                     </div>
-
-                                    <!-- Form Group (phone number)-->
                                     <div class="col-md-6">
                                         <label class="small mb-1" for="inputPhone">Phone number</label>
                                         <input class="form-control" id="inputPhone" type="tel"
                                             placeholder="Enter your phone number" value="{{ student.phone_number }}"
                                             disabled>
                                     </div>
-
                                 </div>
 
+                                <!-- Educational Details Notice -->
                                 <div class="row">
                                     <div class="col-12 mb-3">
                                         <div class="alert alert-info" role="alert">
-                                            <i class="fas fa-info-circle"></i> Educational details can only be set once. After setting a value, it cannot be changed. Please contact support for any changes if needed.
+                                            <i class="fas fa-info-circle"></i> Educational details can only be set once.
+                                            After setting a value, it cannot be changed. Please contact support for any
+                                            changes if needed.
                                         </div>
                                     </div>
+                                </div>
 
+                                <!-- Course and Backlogs -->
+                                <div class="form-section-header d-md-none">Educational Information</div>
+                                <div class="row">
                                     <div class="col-md-6 mb-3">
-                                        <label for="course" class="small mb-1">Course</label>
-                                        <select class="form-select form-control" id="course" name="course" {% if student.course %}disabled{% endif %}>
-                                            <option value="" {% if not student.course %}selected{% endif %}>Select
-                                                Course</option>
-                                            <option value="B.Tech Computer Science" {% if student.course == 'B.Tech Computer Science' %}selected{% endif %}>B.Tech
-                                                Computer Science</option>
-                                            <option value="B.Tech Information Technology" {% if student.course == 'B.Tech Information Technology' %}selected{% endif %}>
-                                                B.Tech Information Technology</option>
-                                            <option value="B.Tech Electronics" {% if student.course == 'B.Tech Electronics' %}selected{% endif %}>B.Tech
-                                                Electronics</option>
+                                        <label for="course" class="small mb-1">* Course</label>
+                                        <select class="form-select" id="course" name="course" 
+                                            {% if student.course %}disabled{% endif %} required>
+                                            <option value="" {% if not student.course %}selected{% endif %}>Select Course</option>
+                                            <option value="B.Tech Computer Science" {% if student.course == 'B.Tech Computer Science' %}selected{% endif %}>B.Tech Computer Science</option>
+                                            <option value="B.Tech Information Technology" {% if student.course == 'B.Tech Information Technology' %}selected{% endif %}>B.Tech Information Technology</option>
+                                            <option value="B.Tech Electronics" {% if student.course == 'B.Tech Electronics' %}selected{% endif %}>B.Tech Electronics</option>
                                             <option value="B.Tech Electrical" {% if student.course == 'B.Tech Electrical' %}selected{% endif %}>B.Tech Electrical</option>
                                             <option value="B.Tech Mechanical" {% if student.course == 'B.Tech Mechanical' %}selected{% endif %}>B.Tech Mechanical</option>
                                             <option value="B.Tech Civil" {% if student.course == 'B.Tech Civil' %}selected{% endif %}>B.Tech Civil</option>
-                                            <option value="BCA" {% if student.course == 'BCA' %}selected{% endif %}>BCA
-                                            </option>
-                                            <option value="MCA" {% if student.course == 'MCA' %}selected{% endif %}>MCA
-                                            </option>
-                                            <option value="M.Tech Computer Science" {% if student.course == 'M.Tech Computer Science' %}selected{% endif %}>M.Tech
-                                                Computer Science</option>
-                                            <option value="M.Tech Information Technology" {% if student.course == 'M.Tech Information Technology' %}selected{% endif %}>
-                                                M.Tech Information Technology</option>
-                                            <option value="MBA" {% if student.course == 'MBA' %}selected{% endif %}>MBA
-                                            </option>
-                                            <option value="B.Com" {% if student.course == 'B.Com' %}selected{% endif %}>
-                                                B.Com</option>
-                                            <option value="M.Com" {% if student.course == 'M.Com' %}selected{% endif %}>
-                                                M.Com</option>
-                                            <option value="BBA" {% if student.course == 'BBA' %}selected{% endif %}>BBA
-                                            </option>
+                                            <option value="BCA" {% if student.course == 'BCA' %}selected{% endif %}>BCA</option>
+                                            <option value="MCA" {% if student.course == 'MCA' %}selected{% endif %}>MCA</option>
+                                            <option value="M.Tech Computer Science" {% if student.course == 'M.Tech Computer Science' %}selected{% endif %}>M.Tech Computer Science</option>
+                                            <option value="M.Tech Information Technology" {% if student.course == 'M.Tech Information Technology' %}selected{% endif %}>M.Tech Information Technology</option>
+                                            <option value="MBA" {% if student.course == 'MBA' %}selected{% endif %}>MBA</option>
+                                            <option value="B.Com" {% if student.course == 'B.Com' %}selected{% endif %}>B.Com</option>
+                                            <option value="M.Com" {% if student.course == 'M.Com' %}selected{% endif %}>M.Com</option>
+                                            <option value="BBA" {% if student.course == 'BBA' %}selected{% endif %}>BBA</option>
                                         </select>
+                                        <div class="invalid-feedback">Please select a course.</div>
                                     </div>
-
-                                    <!-- Backlogs field -->
                                     <div class="col-md-6 mb-3">
-                                        <label class="small mb-1" for="inputBacklogs">Backlogs</label>
+                                        <label class="small mb-1" for="inputBacklogs">* Backlogs</label>
                                         <input class="form-control" id="inputBacklogs" type="number" name="backlog"
-                                            value="{{ student.backlog }}"
-                                            min="0" max="15"
-                                            placeholder="Enter number of backlogs"
-                                            {% if student.backlog >= 0 %} disabled {% endif %}>
+                                            value="{{ student.backlog }}" min="0" max="15"
+                                            placeholder="Enter number of backlogs" 
+                                            {% if student.backlog >= 0 %}disabled{% endif %} required>
+                                        <div class="invalid-feedback">Please enter a number between 0 and 15.</div>
                                     </div>
-
                                 </div>
 
-                                <!-- Form Row        -->
+                                <!-- Gender and Year -->
                                 <div class="row gx-3 mb-3">
-                                    <!-- Form Group (organization name)-->
                                     <div class="col-md-6">
-                                        <label class="small mb-1" for="inputLocation">Gender</label>
-
-                                        <select class="form-select form-control" name="gender" id="gender">
-                                            <option value="Male" {% if student.gender == 'Male' %}selected{% endif %}>Male
-                                            </option>
-                                            <option value="Female" {% if student.gender == 'Female' %}selected{% endif %}>
-                                                Female</option>
-                                            <option value="Other" {% if student.gender == 'Other' %}selected{% endif %}>
-                                                Other</option>
+                                        <label class="small mb-1" for="gender">* Gender</label>
+                                        <select class="form-select" id="gender" name="gender" required>
+                                            <option value="" {% if not student.gender %}selected{% endif %}>Select Gender</option>
+                                            <option value="Male" {% if student.gender == 'Male' %}selected{% endif %}>Male</option>
+                                            <option value="Female" {% if student.gender == 'Female' %}selected{% endif %}>Female</option>
+                                            <option value="Prefer not to say" {% if student.gender == 'Prefer not to say' %}selected{% endif %}>Prefer not to say</option>
                                         </select>
+                                        <div class="invalid-feedback">Please select your gender.</div>
                                     </div>
-                                    
                                     <div class="col-md-6">
-                                        <label class="small mb-1" for="inputLocation">Year</label>
-
-                                        <select class="form-select form-control" name="year" id="year" {% if student.year %}disabled{% endif %}>
-                                            <option value="" {% if not student.year %}selected{% endif %}>Select Year
-                                            </option>
-                                            <option value="1st Year" {% if student.year == '1st Year' %}selected{% endif %}>1st Year
-                                            </option>
-                                            <option value="2nd Year" {% if student.year == '2nd Year' %}selected{% endif %}>
-                                                2nd Year</option>
-                                            <option value="3rd Year" {% if student.year == '3rd Year' %}selected{% endif %}>
-                                                3rd Year</option>
-                                            <option value="4th Year" {% if student.year == '4th Year' %}selected{% endif %}>
-                                                4th Year</option>
+                                        <label class="small mb-1" for="year">* Year</label>
+                                        <select class="form-select" name="year" id="year" 
+                                            {% if student.year %}disabled{% endif %} required>
+                                            <option value="" {% if not student.year %}selected{% endif %}>Select Year</option>
+                                            <option value="1st Year" {% if student.year == '1st Year' %}selected{% endif %}>1st Year</option>
+                                            <option value="2nd Year" {% if student.year == '2nd Year' %}selected{% endif %}>2nd Year</option>
+                                            <option value="3rd Year" {% if student.year == '3rd Year' %}selected{% endif %}>3rd Year</option>
+                                            <option value="4th Year" {% if student.year == '4th Year' %}selected{% endif %}>4th Year</option>
                                         </select>
+                                        <div class="invalid-feedback">Please select your current year.</div>
                                     </div>
-
                                 </div>
 
+                                <!-- Alumni Information -->
+                                <h5 class="text-secondary mb-3 mt-4">Alumni Information</h5>
+                                <div class="form-row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="small mb-1" for="alumni_status">* Alumni Status</label>
+                                        <select class="form-select" name="alumni_status" id="alumni_status" required>
+                                            <option value="Current Student" {% if student.alumni_status == 'Current Student' %}selected{% endif %}>Current Student</option>
+                                            <option value="Alumni" {% if student.alumni_status == 'Alumni' %}selected{% endif %}>Alumni</option>
+                                        </select>
+                                        <div class="invalid-feedback">Please select your alumni status.</div>
+                                    </div>
+                                    <div class="col-md-6 passout-year-container" id="passoutYearContainer">
+                                        <label class="small mb-1" for="passout_year">Passout Year</label>
+                                        <select class="form-select" name="passout_year" id="passout_year">
+                                            <option value="" {% if not student.passout_year %}selected{% endif %}>Select Passout Year</option>
+                                            {% for year in passout_years %}
+                                                <option value="{{ year }}" {% if student.passout_year == year %}selected{% endif %}>{{ year }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <div class="invalid-feedback">
+                                            Please select your passout year.
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Academic Percentages -->
+                                <div class="form-section-header d-md-none">Academic Information</div>
                                 <div class="row">
-                                    <!-- Form Group (location)-->
                                     <div class="col-md-4 mb-3">
-                                        <label class="small mb-1" for="inputHighschool">Highscool</label>
-                                        <input class="form-control" id="inputHighschool" type="text"
-                                            placeholder="Highscool Percentage %" name="tenth"
-                                            value="{% if student.tenth %}{{ student.tenth }}{% endif %}"
-                                            {% if student.tenth %}disabled{% endif %}>
-                                        <small class="text-muted">Enter percentage without % symbol</small>
+                                        <label class="small mb-1" for="inputTenthPercentage">* Class X %</label>
+                                        <input class="form-control" id="inputTenthPercentage" type="number" name="tenth"
+                                            step="0.01" value="{{ student.tenth }}" min="0" max="100"
+                                            placeholder="Enter your 10th percentage" 
+                                            {% if student.tenth %}disabled{% endif %} required>
+                                        <div class="invalid-feedback">Please enter a valid percentage between 0 and 100.</div>
                                     </div>
                                     <div class="col-md-4 mb-3">
-                                        <label class="small mb-1" for="inputIntermediate">Intermediate</label>
-                                        <input class="form-control" id="inputIntermediate" type="text"
-                                            placeholder="Intermediate Percentage %" name="twelfth"
-                                            value="{% if student.twelfth %}{{ student.twelfth }}{% endif %}"
-                                            {% if student.twelfth %}disabled{% endif %}>
-                                        <small class="text-muted">Enter percentage without % symbol</small>
+                                        <label class="small mb-1" for="inputTwelfthPercentage">* Class XII %</label>
+                                        <input class="form-control" id="inputTwelfthPercentage" type="number" name="twelfth"
+                                            step="0.01" value="{{ student.twelfth }}" min="0" max="100"
+                                            placeholder="Enter your 12th percentage" 
+                                            {% if student.twelfth %}disabled{% endif %} required>
+                                        <div class="invalid-feedback">Please enter a valid percentage between 0 and 100.</div>
                                     </div>
                                     <div class="col-md-4 mb-3">
-                                        <label class="small mb-1" for="inputCGPA">Current CGPA</label>
-                                        <input class="form-control" id="inputCGPA" type="text"
-                                            placeholder="Current CGPA (out of 10)" name="cgpa"
-                                            value="{% if student.cgpa %}{{ student.cgpa }}{% endif %}"
-                                            {% if student.cgpa %}disabled{% endif %}>
-                                        <small class="text-muted">Enter CGPA value</small>
+                                        <label class="small mb-1" for="inputCGPA">* CGPA</label>
+                                        <input class="form-control" id="inputCGPA" type="number" name="cgpa" step="0.01"
+                                            value="{{ student.cgpa }}" min="0" max="10.0" placeholder="Enter your CGPA"
+                                            {% if student.cgpa %}disabled{% endif %} required>
+                                        <div class="invalid-feedback">Please enter a valid CGPA between 0 and 10.</div>
                                     </div>
                                 </div>
 
+                                <!-- Social Media Profiles -->
+                                <div class="form-section-header d-md-none">Social Media Profiles</div>
                                 <div class="mb-3">
                                     <label class="small mb-1" for="inputLinkedIn">LinkedIn</label>
-                                    <input class="form-control" id="inputLinkedIn" type="text" name="linkedin_id"
-                                        value="{% if student.linkedin_id %}{{ student.linkedin_id }}{% endif %}"
-                                        placeholder="Enter your LinkedIn profile URL">
+                                    <div class="input-group social-input-group">
+                                        <span class="input-group-text"><i class="fab fa-linkedin"></i></span>
+                                        <input class="form-control" id="inputLinkedIn" type="text" name="linkedin_id"
+                                            value="{% if student.linkedin_id %}{{ student.linkedin_id }}{% elif student.linkedin_id == '' %}N/A{% endif %}"
+                                            placeholder="Enter your LinkedIn profile URL or N/A if not available"
+                                            pattern="https?://(www\.)?linkedin\.com/in/[\w\d-]+/?.*|N/A" required>
+                                        <div class="invalid-feedback">Please enter a valid LinkedIn URL (e.g., https://linkedin.com/in/username) or "N/A".</div>
+                                    </div>
                                 </div>
-
 
                                 <div class="mb-3">
                                     <label class="small mb-1" for="inputGitHub">GitHub</label>
-                                    <input class="form-control" id="inputGitHub" type="text" name="github_id"
-                                        value="{% if student.github_id %}{{ student.github_id }}{% endif %}"
-                                        placeholder="Enter your GitHub profile URL">
+                                    <div class="input-group social-input-group">
+                                        <span class="input-group-text"><i class="fab fa-github"></i></span>
+                                        <input class="form-control" id="inputGitHub" type="text" name="github_id"
+                                            value="{% if student.github_id %}{{ student.github_id }}{% elif student.github_id == '' %}N/A{% endif %}"
+                                            placeholder="Enter your GitHub profile URL or N/A if not available"
+                                            pattern="https?://(www\.)?github\.com/[\w\d-]+/?.*|N/A" required>
+                                        <div class="invalid-feedback">Please enter a valid GitHub URL (e.g., https://github.com/username) or "N/A".</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="small mb-1" for="inputInstagram">Instagram</label>
+                                    <div class="input-group social-input-group">
+                                        <span class="input-group-text"><i class="fab fa-instagram"></i></span>
+                                        <input class="form-control" id="inputInstagram" type="text" name="instagram_id"
+                                            value="{% if student.instagram_id %}{{ student.instagram_id }}{% elif student.instagram_id == '' %}N/A{% endif %}"
+                                            placeholder="Enter your Instagram profile URL or N/A if not available"
+                                            pattern="https?://(www\.)?instagram\.com/[a-zA-Z0-9_\.]+/?.*|N/A" required>
+                                        <div class="invalid-feedback">Please enter a valid Instagram URL (e.g., https://instagram.com/username) or "N/A".</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="small mb-1" for="inputTwitter">Twitter/X</label>
+                                    <div class="input-group social-input-group">
+                                        <span class="input-group-text"><i class="fab fa-twitter"></i></span>
+                                        <input class="form-control" id="inputTwitter" type="text" name="twitter_id"
+                                            value="{% if student.twitter_id %}{{ student.twitter_id }}{% elif student.twitter_id == '' %}N/A{% endif %}"
+                                            placeholder="Enter your Twitter/X profile URL or N/A if not available"
+                                            pattern="https?://(www\.)?(twitter|x)\.com/[a-zA-Z0-9_]+/?.*|N/A" required>
+                                        <div class="invalid-feedback">Please enter a valid Twitter/X URL (e.g., https://twitter.com/username) or "N/A".</div>
+                                    </div>
                                 </div>
 
-                                <!-- Form Row-->
-                                <div class="row gx-3 mb-3">
-                                    
-
-                                    <!-- Form Group (birthday)-->
+                                <!-- Date Info -->
+                                <div class="row gx-3 mb-4">
                                     <div class="col-md-6">
                                         <label class="small mb-1" for="inputBirthday">Date of joining</label>
                                         <input class="form-control" id="inputBirthday" type="text"
                                             value="{{ student.date_joined }}" disabled>
                                     </div>
                                 </div>
-                                
 
-                                <!-- Save changes button-->
-                                <button class="btn btn-success w-100" type="submit">Save changes</button>
+                                <!-- Save Button -->
+                                <button class="btn btn-success w-100 py-2" type="submit">
+                                    <i class="fas fa-save me-2"></i>Save Changes
+                                </button>
                             </form>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
     </div>
 </div>
 
+<script>
+    // Show filename when file is selected
+    document.getElementById('formFile').addEventListener('change', function(e) {
+        const fileName = e.target.files[0].name;
+        const label = document.querySelector('.custom-file-upload');
+        label.innerHTML = '<i class="fa fa-file"></i> ' + fileName;
+        
+        // Validate file type
+        const fileInput = this;
+        const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
+        const fileType = fileInput.files[0].type;
+        
+        if (!validTypes.includes(fileType)) {
+            fileInput.classList.add('is-invalid');
+        } else if (fileInput.files[0].size > 5 * 1024 * 1024) { // 5MB
+            fileInput.classList.add('is-invalid');
+        } else {
+            fileInput.classList.remove('is-invalid');
+            fileInput.classList.add('is-valid');
+        }
+    });
+    
+    // Profile picture form validation
+    document.getElementById('profilePicForm').addEventListener('submit', function(e) {
+        const fileInput = document.getElementById('formFile');
+        
+        if (!fileInput.files.length) {
+            e.preventDefault();
+            fileInput.classList.add('is-invalid');
+            alert('Please select a profile picture. This is a mandatory requirement.');
+            return false;
+        }
+        
+        const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
+        
+        if (!validTypes.includes(fileInput.files[0].type) || fileInput.files[0].size > 5 * 1024 * 1024) {
+            e.preventDefault();
+            fileInput.classList.add('is-invalid');
+            return false;
+        }
+    });
+    
+    // Profile form validation
+    document.getElementById('profileForm').addEventListener('submit', function(e) {
+        const form = this;
+        let hasError = false;
+        
+        if (!form.checkValidity()) {
+            e.preventDefault();
+            e.stopPropagation();
+            hasError = true;
+        }
+        
+        // Validate fields
+        const inputs = form.querySelectorAll('input:not([disabled]), select:not([disabled])');
+        inputs.forEach(input => {
+            if (!input.checkValidity()) {
+                input.classList.add('is-invalid');
+                hasError = true;
+                
+                // Scroll to first invalid field on mobile
+                if (window.innerWidth < 768 && !window.scrolledToError) {
+                    input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    window.scrolledToError = true;
+                }
+            } else {
+                input.classList.remove('is-invalid');
+                input.classList.add('is-valid');
+            }
+        });
+        
+        // Validate social media fields (allow N/A)
+        const socialInputs = [
+            document.getElementById('inputLinkedIn'),
+            document.getElementById('inputGitHub'),
+            document.getElementById('inputInstagram'),
+            document.getElementById('inputTwitter')
+        ];
+        
+        socialInputs.forEach(input => {
+            if (input.value.trim() === '') {
+                input.value = 'N/A';
+                input.classList.remove('is-invalid');
+                input.classList.add('is-valid');
+            } else if (input.value !== 'N/A' && !input.checkValidity()) {
+                input.classList.add('is-invalid');
+                hasError = true;
+                
+                // Scroll to first invalid social field on mobile
+                if (window.innerWidth < 768 && !window.scrolledToError) {
+                    input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    window.scrolledToError = true;
+                }
+            }
+        });
+        
+        // Special validation for percentages and CGPA to ensure they're in the correct range
+        const percentageInputs = [document.getElementById('inputTenthPercentage'), document.getElementById('inputTwelfthPercentage')];
+        percentageInputs.forEach(input => {
+            if (!input.disabled && input.value) {
+                const value = parseFloat(input.value);
+                if (isNaN(value) || value < 0 || value > 100) {
+                    input.classList.add('is-invalid');
+                    hasError = true;
+                    
+                    // Scroll to first invalid percentage field on mobile
+                    if (window.innerWidth < 768 && !window.scrolledToError) {
+                        input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        window.scrolledToError = true;
+                    }
+                }
+            }
+        });
+        
+        const cgpaInput = document.getElementById('inputCGPA');
+        if (!cgpaInput.disabled && cgpaInput.value) {
+            const value = parseFloat(cgpaInput.value);
+            if (isNaN(value) || value < 0 || value > 10) {
+                cgpaInput.classList.add('is-invalid');
+                hasError = true;
+                
+                // Scroll to CGPA field on mobile if invalid
+                if (window.innerWidth < 768 && !window.scrolledToError) {
+                    cgpaInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    window.scrolledToError = true;
+                }
+            }
+        }
+        
+        if (hasError) {
+            e.preventDefault();
+            window.scrolledToError = false; // Reset for next validation
+        }
+    });
+    
+    // Initialize validation on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        const inputs = document.querySelectorAll('input:not([disabled]), select:not([disabled])');
+        
+        // Set default "N/A" for empty social media fields
+        const socialInputs = [
+            document.getElementById('inputLinkedIn'),
+            document.getElementById('inputGitHub'),
+            document.getElementById('inputInstagram'),
+            document.getElementById('inputTwitter')
+        ];
+        
+        socialInputs.forEach(input => {
+            if (input.value.trim() === '') {
+                input.value = 'N/A';
+            }
+        });
+        
+        // Add input event listeners for all form fields
+        inputs.forEach(input => {
+            input.addEventListener('input', function() {
+                if (this.checkValidity()) {
+                    this.classList.remove('is-invalid');
+                    this.classList.add('is-valid');
+                } else {
+                    this.classList.remove('is-valid');
+                    if (this.value) {
+                        this.classList.add('is-invalid');
+                    } else {
+                        this.classList.remove('is-invalid');
+                    }
+                }
+            });
+        });
+        
+        // Adjust mobile view
+        function adjustForMobile() {
+            if (window.innerWidth < 768) {
+                // Any additional mobile adjustments
+                document.querySelectorAll('.input-group-text').forEach(el => {
+                    el.style.display = 'flex';
+                });
+            }
+        }
+        
+        // Run initially
+        adjustForMobile();
+        
+        // Run on resize
+        window.addEventListener('resize', adjustForMobile);
+    });
+
+    // Enable form validation
+    (function() {
+        'use strict';
+        window.addEventListener('load', function() {
+            var forms = document.getElementsByClassName('needs-validation');
+            var validation = Array.prototype.filter.call(forms, function(form) {
+                form.addEventListener('submit', function(event) {
+                    if (form.checkValidity() === false) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        }, false);
+    })();
+
+    // Handle file input change to show filename
+    document.querySelector('.custom-file-input').addEventListener('change', function(e) {
+        var fileName = e.target.files[0].name;
+        var nextSibling = e.target.nextElementSibling;
+        nextSibling.innerText = fileName;
+    });
+
+    // Show/hide passout year field based on alumni status
+    document.addEventListener('DOMContentLoaded', function() {
+        const alumniStatusSelect = document.getElementById('alumni_status');
+        const passoutYearContainer = document.getElementById('passoutYearContainer');
+        const passoutYearField = document.getElementById('passout_year');
+        
+        // Function to toggle passout year visibility
+        function togglePassoutYear() {
+            if (alumniStatusSelect.value === 'Alumni') {
+                passoutYearContainer.style.display = 'block';
+                passoutYearField.setAttribute('required', 'required');
+            } else {
+                passoutYearContainer.style.display = 'none';
+                passoutYearField.removeAttribute('required');
+                passoutYearField.value = '';
+            }
+        }
+        
+        // Initial toggle based on current value
+        togglePassoutYear();
+        
+        // Add event listener for changes
+        alumniStatusSelect.addEventListener('change', togglePassoutYear);
+    });
+</script>
 {% endblock %}

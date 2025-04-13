@@ -42,6 +42,17 @@ def edit_profile(request):
         backlog = request.POST.get('backlog', '')
         year = request.POST.get('year', '')
         
+        # Alumni details
+        alumni_status = request.POST.get('alumni_status', 'Current Student')
+        passout_year = request.POST.get('passout_year', '')
+        
+        # Update student object with alumni details
+        student.alumni_status = alumni_status
+        if alumni_status == 'Alumni' and passout_year:
+            student.passout_year = passout_year
+        elif alumni_status == 'Current Student':
+            student.passout_year = None
+        
         # Update educational details - only if they haven't been set before
         if course and not student.course:
             student.course = course
@@ -70,34 +81,47 @@ def edit_profile(request):
         # Social profiles (can always be updated)
         linkedin_id = request.POST.get('linkedin_id', '')
         github_id = request.POST.get('github_id', '')
-        student.linkedin_id = linkedin_id
-        student.github_id = github_id
+        instagram_id = request.POST.get('instagram_id', '')
+        twitter_id = request.POST.get('twitter_id', '')
+        
+        # Handle N/A values for social profiles
+        student.linkedin_id = None if linkedin_id == 'N/A' else linkedin_id
+        student.github_id = None if github_id == 'N/A' else github_id
+        student.instagram_id = None if instagram_id == 'N/A' else instagram_id
+        student.twitter_id = None if twitter_id == 'N/A' else twitter_id
         
         student.save()
         
         messages.success(request, "Profile updated successfully")
         return redirect('my_profile')
     
+    # Generate passout years (current year + 10 years)
+    import datetime
+    current_year = datetime.datetime.now().year
+    passout_years = [str(year) for year in range(current_year-5, current_year+6)]
+    
     parameters = {
-        "student": student
+        "student": student,
+        "passout_years": passout_years
     }
     
-    return render(request, 'student/profile/edit_profile.html', parameters) 
+    return render(request, 'student/profile/edit_profile.html', parameters)
 
 
 # ================================== UPLOAD PROFILE ===========================================
 
 @login_required(login_url='login')
 def upload_profile(request):
-
     if request.method == 'POST':
-
+        if 'profile_pic' not in request.FILES:
+            messages.error(request, 'Profile picture is required. Please select a valid image file.')
+            return redirect('edit_profile')
+            
         student = Student.objects.get(id=request.user.id)
-
         student.profile_pic = request.FILES['profile_pic']
         student.save()
 
         messages.success(request, 'Profile Picture Updated Successfully')
-
         return redirect('my_profile')
-    
+        
+    return redirect('edit_profile') 

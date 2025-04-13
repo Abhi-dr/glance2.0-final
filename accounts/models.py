@@ -16,6 +16,16 @@ class Student(User):
     
     gender = models.CharField(
         max_length=17, choices=gender_choices, blank=True, null=True)
+    
+    alumni_status_choices = (
+        ("Current Student", "Current Student"),
+        ("Alumni", "Alumni")
+    )
+    
+    alumni_status = models.CharField(
+        max_length=20, choices=alumni_status_choices, default="Current Student")
+        
+    passout_year = models.CharField(max_length=4, blank=True, null=True)
 
     
     course = models.CharField(max_length=100, blank=True, null=True)
@@ -34,13 +44,15 @@ class Student(User):
     
     linkedin_id = models.URLField(blank=True, null=True)
     github_id = models.URLField(blank=True, null=True)
+    instagram_id = models.URLField(blank=True, null=True)
+    twitter_id = models.URLField(blank=True, null=True)
     
-    no_of_companies_left = models.IntegerField(default=2, validators=[
+    no_of_companies_left = models.IntegerField(default=3, validators=[
             MinValueValidator(0)
         ])
     
     profile_pic = models.ImageField(
-        upload_to="student_profile/", blank=True, null=True, default="/student_profile/default.jpg")
+        upload_to="student_profile/", default="/student_profile/default.jpg")
     
     class Meta:
         verbose_name_plural = "Students"
@@ -62,8 +74,14 @@ class Student(User):
             score += 5
         if self.github_id:
             score += 5
-        if self.profile_pic:
-            score += 10
+        if self.instagram_id:
+            score += 5
+        if self.twitter_id:
+            score += 5
+            
+        # Check if profile picture is not the default one
+        if self.profile_pic and not str(self.profile_pic).endswith('default.jpg'):
+            score += 15  # Increased from 10 to emphasize importance
         
         if self.phone_number:
             score += 5
@@ -83,6 +101,10 @@ class Student(User):
         if self.twelfth:
             score += 5
         
+        # Alumni information
+        if self.alumni_status == "Alumni" and self.passout_year:
+            score += 10
+        
         # return score in percentage
         return score
 
@@ -101,7 +123,7 @@ class Administrator(User):
 
     
     profile_pic = models.ImageField(
-        upload_to="student_profile/", blank=True, null=True, default="/student_profile/default.jpg")
+        upload_to="student_profile/", default="/student_profile/default.jpg")
     
     class Meta:
         verbose_name_plural = "Administrators"
