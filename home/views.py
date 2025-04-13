@@ -32,3 +32,8 @@ def home(request):
 
 def alumni_registration(request):
     return render(request, 'home/alumni_registration.html')
+
+# ========================================== TERMS AND CONDITIONS PAGE =========================================
+
+def terms(request):
+    return render(request, 'home/terms.html')
