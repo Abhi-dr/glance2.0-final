@@ -118,7 +118,7 @@ def job(request, slug):
   
     if not (student.tenth and student.twelfth and student.cgpa):
         messages.error(request,"Complete your Profile to see eligible jobs for you ")
-        return redirect('myProfile')
+        return redirect('my_profile')
 
     eligible_jobs = Job.objects.filter(
         tenth_percentage__lte=student.tenth,
