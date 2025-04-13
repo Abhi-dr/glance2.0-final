@@ -525,101 +525,153 @@ Fair 2.0 - GLA University{% endblock %} {% block css %}
               </div>
             </div>
           </div>
-          <!--special thanks -->
-          <section id="special-thanks" class="section">
-            <div class="container">
-              <h2 class="section-title">Special Thanks</h2>
-              <p class="section-subtitle"></p>
-
-              <div class="row justify-content-center">
-                <div class="col-lg-6">
-                  <div class="special-thanks-card">
-                    <div class="special-thanks-img text-center">
-                      <img src="{% static 'img/home/team/as.jpg' %}" alt="Anshy Sir"
-                        class="img-fluid rounded-circle mx-auto d-block" style="max-width: 200px" />
-                    </div>
-                    <div class="special-thanks-info text-center mt-4">
-                      <h3>Dr. Anshy Singh</h3>
-                      <p class="special-thanks-position">Associate Professor</p>
-                      <p class="special-thanks-desc">
-                        We extend our deepest gratitude to Dr. Anshy Singh and his team for their unwavering support.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-          <!-- Contact Section -->
-          <section id="contact" class="section">
-            <div class="container">
-              <h2 class="section-title">Contact Us</h2>
-              <p class="section-subtitle">Get in touch with our team</p>
-
-              <div class="row">
-                <div class="col-lg-5">
-                  <div class="contact-info">
-                    <div class="contact-item">
-                      <div class="contact-icon">
-                        <i class="fas fa-map-marker-alt"></i>
-                      </div>
-                      <div class="contact-details">
-                        <h4>Location</h4>
-                        <p>GLA University, Mathura</p>
-                        <p>NH-2, Mathura-Delhi Highway</p>
-                        <p>P.O. Chaumuhan, Mathura, Uttar Pradesh - 281406</p>
-                      </div>
-                    </div>
-                    <div class="contact-item">
-                      <div class="contact-icon">
-                        <i class="fas fa-phone"></i>
-                      </div>
-                      <div class="contact-details">
-                        <h4>Phone</h4>
-                        <p>+91 9068405049</p>
-                      </div>
-                    </div>
-                    <div class="contact-item">
-                      <div class="contact-icon">
-                        <i class="fas fa-envelope"></i>
-                      </div>
-                      <div class="contact-details">
-                        <h4>Email</h4>
-                        <p>alumniassociation@gla.ac.in</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-lg-7">
-                  <form class="contact-form">
-                    <div class="row">
-                      <div class="col-md-6">
-                        <input type="text" class="form-control" placeholder="Your Name" required />
-                      </div>
-                      <div class="col-md-6">
-                        <input type="email" class="form-control" placeholder="Your Email" required />
-                      </div>
-                      <div class="col-12">
-                        <input type="text" class="form-control" placeholder="Subject" required />
-                      </div>
-                      <div class="col-12">
-                        <textarea class="form-control" rows="5" placeholder="Your Message" required></textarea>
-                      </div>
-                      <div class="col-12">
-                        <button type="submit" class="btn btn-primary">
-                          Send Message
-                        </button>
-                      </div>
-                    </div>
-                  </form>
-                </div>
-              </div>
-            </div>
-          </section>
         </div>
       </div>
     </section>
 
-    {% endblock %}
+    <!-- Technical Team Section -->
+    <section id="technical-team" class="section section-bg">
+      <div class="container">
+        <h2 class="section-title">Meet Our Technical Team</h2>
+        <p class="section-subtitle">The dedicated individuals behind Glance 2.0</p>
+
+        <div class="row g-4 justify-content-center">
+            <!-- Team Member 1 -->      
+            <div class="col-lg-3 col-md-6">
+                <div class="team-card">
+                    <div class="team-img">
+                        <img src="{% static 'img/home/team/dk.jpeg' %}" alt="Divyanshu Khandelwal" class="img-fluid">
+                    </div>
+                    <div class="team-info">
+                        <h4>Divyanshu Khandelwal</h4>
+                        <p class="team-position">Technical Team Advisor </p>
+                        <p class="team-desc">Co-Founder and Educator @The Angaar Batch🔥</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Team Member 2 -->
+            <div class="col-lg-3 col-md-6">
+                <div class="team-card">
+                    <div class="team-img">
+                        <img src="{% static 'img/home/team/paras.jpg' %}" alt="Paras Mittal" class="img-fluid">
+                    </div>
+                    <div class="team-info">
+                        <h4>Paras Mittal</h4>
+                        <p class="team-position">President, Alumni Affairs & Technical Head</p>
+                        <p class="team-desc"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Team Member 3 -->
+            <div class="col-lg-3 col-md-6">
+                <div class="team-card">
+                    <div class="team-img">
+                        <img src="{% static 'img/home/team/amit.jpeg' %}" alt="Amit Kumar" class="img-fluid">
+                    </div>
+                    <div class="team-info">
+                        <h4>Amit Kumar</h4>
+                        <p class="team-position">Technical Team Member</p>
+                        <p class="team-desc"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+      </div>
+    </section>
+
+    <!--special thanks -->
+    <section id="special-thanks" class="section">
+      <div class="container">
+        <h2 class="section-title">Special Thanks</h2>
+        <p class="section-subtitle"></p>
+
+        <div class="row justify-content-center">
+          <div class="col-lg-6">
+            <div class="special-thanks-card">
+              <div class="special-thanks-img text-center">
+                <img src="{% static 'img/home/team/as.jpg' %}" alt="Anshy Sir"
+                  class="img-fluid rounded-circle mx-auto d-block" style="max-width: 200px" />
+              </div>
+              <div class="special-thanks-info text-center mt-4">
+                <h3>Dr. Anshy Singh</h3>
+                <p class="special-thanks-position">Associate Professor</p>
+                <p class="special-thanks-desc">
+                  We extend our deepest gratitude to Dr. Anshy Singh and his team for their unwavering support.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- Contact Section -->
+    <section id="contact" class="section">
+      <div class="container">
+        <h2 class="section-title">Contact Us</h2>
+        <p class="section-subtitle">Get in touch with our team</p>
+
+        <div class="row">
+          <div class="col-lg-5">
+            <div class="contact-info">
+              <div class="contact-item">
+                <div class="contact-icon">
+                  <i class="fas fa-map-marker-alt"></i>
+                </div>
+                <div class="contact-details">
+                  <h4>Location</h4>
+                  <p>GLA University, Mathura</p>
+                  <p>NH-2, Mathura-Delhi Highway</p>
+                  <p>P.O. Chaumuhan, Mathura, Uttar Pradesh - 281406</p>
+                </div>
+              </div>
+              <div class="contact-item">
+                <div class="contact-icon">
+                  <i class="fas fa-phone"></i>
+                </div>
+                <div class="contact-details">
+                  <h4>Phone</h4>
+                  <p>+91 9068405049</p>
+                </div>
+              </div>
+              <div class="contact-item">
+                <div class="contact-icon">
+                  <i class="fas fa-envelope"></i>
+                </div>
+                <div class="contact-details">
+                  <h4>Email</h4>
+                  <p>alumniassociation@gla.ac.in</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-7">
+            <form class="contact-form">
+              <div class="row">
+                <div class="col-md-6">
+                  <input type="text" class="form-control" placeholder="Your Name" required />
+                </div>
+                <div class="col-md-6">
+                  <input type="email" class="form-control" placeholder="Your Email" required />
+                </div>
+                <div class="col-12">
+                  <input type="text" class="form-control" placeholder="Subject" required />
+                </div>
+                <div class="col-12">
+                  <textarea class="form-control" rows="5" placeholder="Your Message" required></textarea>
+                </div>
+                <div class="col-12">
+                  <button type="submit" class="btn btn-primary">
+                    Send Message
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
   </div>
 </section>
+{% endblock %}

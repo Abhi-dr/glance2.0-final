@@ -7,6 +7,7 @@ from accounts.models import Student, Administrator
 from django.core.mail import send_mail
 from django_ratelimit.decorators import ratelimit
 import requests
+from django.http import HttpResponse
 
 # Comment out external API email function
 """
@@ -85,6 +86,8 @@ def login(request):
             return redirect("login")
 
     return render(request, 'accounts/login.html', {'next': next_url})
+
+
 
 
 # ===================================== REGISTER ==============================

@@ -28,6 +28,7 @@ def home(request):
     
     return render(request, 'home/index.html', parameters)
 
+
 # ========================================== ALUMNI REGISTRATIONS =========================================
 
 def alumni_registration(request):
