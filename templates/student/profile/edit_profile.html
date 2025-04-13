@@ -304,9 +304,11 @@ Student - Edit Profile
                                             <option value="B.Tech Computer Science" {% if student.course == 'B.Tech Computer Science' %}selected{% endif %}>B.Tech Computer Science</option>
                                             <option value="B.Tech Information Technology" {% if student.course == 'B.Tech Information Technology' %}selected{% endif %}>B.Tech Information Technology</option>
                                             <option value="B.Tech Electronics" {% if student.course == 'B.Tech Electronics' %}selected{% endif %}>B.Tech Electronics</option>
+                                            <option value="B.Tech Biotech" {% if student.course == 'B.Tech Biotech' %}selected{% endif %}>B.Tech Biotech</option>
+                                            <option value="B.Tech Civil" {% if student.course == 'B.Tech Civil' %}selected{% endif %}>B.Tech Civil</option>
                                             <option value="B.Tech Electrical" {% if student.course == 'B.Tech Electrical' %}selected{% endif %}>B.Tech Electrical</option>
                                             <option value="B.Tech Mechanical" {% if student.course == 'B.Tech Mechanical' %}selected{% endif %}>B.Tech Mechanical</option>
-                                            <option value="B.Tech Civil" {% if student.course == 'B.Tech Civil' %}selected{% endif %}>B.Tech Civil</option>
+                                            <option value="LLB" {% if student.course == 'LLB' %}selected{% endif %}>LLB</option>
                                             <option value="BCA" {% if student.course == 'BCA' %}selected{% endif %}>BCA</option>
                                             <option value="MCA" {% if student.course == 'MCA' %}selected{% endif %}>MCA</option>
                                             <option value="M.Tech Computer Science" {% if student.course == 'M.Tech Computer Science' %}selected{% endif %}>M.Tech Computer Science</option>
@@ -383,27 +385,34 @@ Student - Edit Profile
                                 <div class="form-section-header d-md-none">Academic Information</div>
                                 <div class="row">
                                     <div class="col-md-4 mb-3">
-                                        <label class="small mb-1" for="inputTenthPercentage">* Class X %</label>
-                                        <input class="form-control" id="inputTenthPercentage" type="number" name="tenth"
-                                            step="0.01" value="{{ student.tenth }}" min="0" max="100"
-                                            placeholder="Enter your 10th percentage" 
-                                            {% if student.tenth %}disabled{% endif %} required>
-                                        <div class="invalid-feedback">Please enter a valid percentage between 0 and 100.</div>
+                                        <label class="small mb-1" for="inputHighschool">Highschool</label>
+                                        <input class="form-control" id="inputHighschool" type="text"
+                                            placeholder="Highschool Percentage %" name="tenth"
+                                            value="{% if student.tenth %}{{ student.tenth }}{% endif %}" 
+                                            {% if student.tenth %}disabled{% endif %}
+                                            pattern="^([0-9]{1,2}(\.[0-9]{1,2})?|100(\.0{1,2})?)$" required>
+                                        <small class="text-muted">Enter percentage without % symbol</small>
+                                        <div class="invalid-feedback">Please enter a valid percentage (0-100).</div>
                                     </div>
                                     <div class="col-md-4 mb-3">
-                                        <label class="small mb-1" for="inputTwelfthPercentage">* Class XII %</label>
-                                        <input class="form-control" id="inputTwelfthPercentage" type="number" name="twelfth"
-                                            step="0.01" value="{{ student.twelfth }}" min="0" max="100"
-                                            placeholder="Enter your 12th percentage" 
-                                            {% if student.twelfth %}disabled{% endif %} required>
-                                        <div class="invalid-feedback">Please enter a valid percentage between 0 and 100.</div>
+                                        <label class="small mb-1" for="inputIntermediate">Intermediate</label>
+                                        <input class="form-control" id="inputIntermediate" type="text"
+                                            placeholder="Intermediate Percentage %" name="twelfth"
+                                            value="{% if student.twelfth %}{{ student.twelfth }}{% endif %}" 
+                                            {% if student.twelfth %}disabled{% endif %}
+                                            pattern="^([0-9]{1,2}(\.[0-9]{1,2})?|100(\.0{1,2})?)$" required>
+                                        <small class="text-muted">Enter percentage without % symbol</small>
+                                        <div class="invalid-feedback">Please enter a valid percentage (0-100).</div>
                                     </div>
                                     <div class="col-md-4 mb-3">
-                                        <label class="small mb-1" for="inputCGPA">* CGPA</label>
-                                        <input class="form-control" id="inputCGPA" type="number" name="cgpa" step="0.01"
-                                            value="{{ student.cgpa }}" min="0" max="10.0" placeholder="Enter your CGPA"
-                                            {% if student.cgpa %}disabled{% endif %} required>
-                                        <div class="invalid-feedback">Please enter a valid CGPA between 0 and 10.</div>
+                                        <label class="small mb-1" for="inputCGPA">Current CGPA</label>
+                                        <input class="form-control" id="inputCGPA" type="text"
+                                            placeholder="Current CGPA (out of 10)" name="cgpa"
+                                            value="{% if student.cgpa %}{{ student.cgpa }}{% endif %}" 
+                                            {% if student.cgpa %}disabled{% endif %}
+                                            pattern="^([0-9](\.[0-9]{1,2})?|10(\.0{1,2})?)$" required>
+                                        <small class="text-muted">Enter CGPA value</small>
+                                        <div class="invalid-feedback">Please enter a valid CGPA (0-10).</div>
                                     </div>
                                 </div>
 
@@ -576,7 +585,7 @@ Student - Edit Profile
         });
         
         // Special validation for percentages and CGPA to ensure they're in the correct range
-        const percentageInputs = [document.getElementById('inputTenthPercentage'), document.getElementById('inputTwelfthPercentage')];
+        const percentageInputs = [document.getElementById('inputHighschool'), document.getElementById('inputIntermediate')];
         percentageInputs.forEach(input => {
             if (!input.disabled && input.value) {
                 const value = parseFloat(input.value);
