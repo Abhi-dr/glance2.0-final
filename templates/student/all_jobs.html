@@ -107,20 +107,18 @@ Student -> All Jobs
 </div> -->
 
 <div class="container-fluid">
-  <div class="card">
+  <div class="card mb-4">
     <div class="card-body">
       <h5 class="card-title fw-semibold mb-3">Lots of Opportunities!</h5>
       <p class="mb-0">The Place Where You Unlock Your Potential🔥!</p>
     </div>
   </div>
 
-  <div class="card w-100">
+  <div class="card w-100 mb-4">
     <div class="card-body p-4">
       <!-- <h5 class="card-title fw-semibold mb-4">Search Applicants 🔍</h5> -->
-      <form method="post">
-
+      <form method="post" class="mb-0">
         {% csrf_token %}
-
         <div class="input-group">
           <input type="text" class="form-control" placeholder="Search by Company Name, Job Role, Tags"
             aria-label="Search by Company Name, Job Role, Tags" aria-describedby="button-addon2" name="query">
@@ -136,47 +134,47 @@ Student -> All Jobs
     </div>
   </div>
 
-
-  <div class="row">
-
+  <div class="row g-4">
     {% for job in jobs %}
-
-    <div class="col-sm-6 col-xl-3">
-      <div class="card overflow-hidden rounded-2">
-        <div class="position-relative">
-          <a href="{% url 'job' job.slug %}"><img src="{{ job.company.logo.url }}" class="card-img-top rounded-0"
-              alt="..." /></a>
+    <div class="col-sm-6 col-md-4 col-xl-3">
+      <div class="card h-100 overflow-hidden rounded-2">
+        <div class="position-relative text-center p-3 bg-light">
+          <a href="{% url 'job' job.slug %}">
+            <img src="{{ job.company.logo.url }}" class="card-img-top rounded-0 img-fluid" 
+              style="max-height: 120px; width: auto; max-width: 100%;" alt="{{ job.company.name }} logo" />
+          </a>
         </div>
         <div class="card-body pt-3 p-4">
-          <h6 class="fw-semibold fs-4">{{ job.company.name|title|truncatechars:25 }}</h6>
-          <div class="d-flex align-items-center justify-content-between">
-            <h6 class="fw-semibold fs-4 mb-1">
-              Openings: {{ job.no_of_openings }}<span class="ms-2 fw-normal text-muted fs-3"></span>
+          <h6 class="fw-semibold fs-4 mb-3">{{ job.company.name|title|truncatechars:25 }}</h6>
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <h6 class="fw-semibold fs-4 mb-0">
+              Openings: <span class="badge bg-success">{{ job.no_of_openings }}</span>
             </h6>
           </div>
-          <div class="row-cols-lg-3">
-            <span class="mb-1">
+          <div class="mb-2">
+            <span class="badge bg-light text-dark me-1">
               {% if job.salary_range %}
-              {{ job.salary_range }} |
+              {{ job.salary_range }}
               {% endif %}
-              {{ job.job_type|title }} | {{ job.location_flexibility|title }}</span>
+            </span>
+            <span class="badge bg-light text-dark me-1">{{ job.job_type|title }}</span>
+            <span class="badge bg-light text-dark">{{ job.location_flexibility|title }}</span>
           </div>
-          <div class="row-cols-lg-3">
-            <span class="mb-1">{{ job.description|truncatechars:100 }}</span>
+          <div>
+            <p class="text-muted mb-2">{{ job.description|truncatechars:100 }}</p>
           </div>
-
-
-
+          <a href="{% url 'job' job.slug %}" class="btn btn-sm btn-outline-primary mt-2 w-100">View Details</a>
         </div>
       </div>
     </div>
-
+    {% empty %}
+    <div class="col-12">
+      <div class="alert alert-info">
+        No jobs found {% if query %}matching "{{ query }}"{% endif %}. Please try a different search term.
+      </div>
+    </div>
     {% endfor %}
-
   </div>
-
 </div>
-
-
 
 {% endblock %}

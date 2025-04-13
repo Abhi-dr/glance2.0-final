@@ -28,9 +28,11 @@ Student -> {{ job.company.name }}
 <div class="container-fluid">
     <div class="card">
         <div class="card-body mb-n9">
-            <div class="col-md-5">
-            <h5 class="card-title d-block mb-2 fw-semibold">{{ job.title|title }} @{{ job.company.name|title }}</h5>
-        </div>
+            <div class="row">
+                <div class="col-md-8">
+                    <h5 class="card-title d-block mb-2 fw-semibold">{{ job.title|title }} @{{ job.company.name|title }}</h5>
+                </div>
+            </div>
 
             <!-- <div class="col-md-5">
                 {% if student.resume and student.no_of_companies_left != 0 %}
@@ -47,24 +49,14 @@ Student -> {{ job.company.name }}
 
             <div class="card-body">
                 <h5 class="card-title fw-semibold mb-0">Offer Details</h5>
-                <div class="d-md-flex">
+                <div class="row">
+                    <div class="col-md-4 text-center mb-4">
+                        <img src="{{ job.company.logo.url }}" class="img-fluid rounded mt-2" 
+                            style="max-width: 100%; height: auto; max-height: 200px;" alt="{{ job.company.name }} logo">
+                    </div>
 
-                    <!-- <div class="d-flex ms-4 my-4">
-                        <div class="border-right border-2 px-5 d-flex flex-column align-items-center">
-                            <span class="fw-semibold fs-6">300+</span>
-                            <span class="fw-semibold fs-6">Lecture Hours</span>
-                        </div>
-                        <div class="border-right border-2 px-5 d-flex flex-column align-items-center">
-                            <span class="fw-semibold fs-6">30+</span>
-                            <span class="fw-semibold fs-6">PDFs And DPPs</span>
-                        </div>
-                    </div> -->
-
-                    <img src="{{ job.company.logo.url }}" class="card-img-top mt-2 mb-2 float-end"
-                        style="border-radius: 5px; width: 50%; height: 100vh;" alt="...">
-
-                    <div class="position-relative">
-                        <div class="card-body">
+                    <div class="col-md-8">
+                        <div class="card-body p-0">
                             <p class="mb-0 text-wrap">{{ job.description|linebreaks }}</p>
 
                             <p class="mb-1 fw-semibold fs-5">Date of Arrival:
@@ -102,25 +94,26 @@ Student -> {{ job.company.name }}
                             </p>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
 
-        {% if job in applications %}
-        <a href="#" class="btn btn-danger mx-9 mb-4">Withdraw Application</a>
-
-        {% else %}
-
-        {% if student.resume and student.tenth_marksheet and student.twelfth_marksheet and student.college_profile_print and student.no_of_companies_left != 0 %}
-        <a href="{% url 'confirm_application' job.slug %}" class="btn btn-success mx-9 mb-4">Apply now</a>
-        {% elif student.no_of_companies_left == 0 %}
-        <a href="#" class="btn btn-dark mx-9 mb-4">Max. Applications Reached!</a>
-        {% else %}
-        <a href="{% url 'upload_resume' %}" class="btn btn-danger button">Upload Documents First</a>
-        {% endif %}
-
-        {% endif %}
+        <div class="card-body text-center">
+            {% if job in applications %}
+            <a href="#" class="btn btn-danger btn-lg px-5 mb-3">Withdraw Application</a>
+    
+            {% else %}
+    
+            {% if student.resume and student.tenth_marksheet and student.twelfth_marksheet and student.college_profile_print and student.no_of_companies_left != 0 %}
+            <a href="{% url 'confirm_application' job.slug %}" class="btn btn-success btn-lg px-5 mb-3">Apply now</a>
+            {% elif student.no_of_companies_left == 0 %}
+            <a href="#" class="btn btn-dark btn-lg px-5 mb-3">Max. Applications Reached!</a>
+            {% else %}
+            <a href="{% url 'upload_resume' %}" class="btn btn-danger btn-lg px-5 mb-3">Upload Documents First</a>
+            {% endif %}
+    
+            {% endif %}
+        </div>
 
         <!-- <div class="card-body">
             <div class="card-body">

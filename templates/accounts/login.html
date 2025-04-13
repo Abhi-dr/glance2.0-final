@@ -1,15 +1,5 @@
 {% extends 'home/base.html' %} {% load static %} {% block titl%}Login{% endblock %} {% block css %}
 <style>
-  /* Hide the video background from the base template */
-  .video-background {
-    display: none !important;
-  }
-  
-  body {
-    background: linear-gradient(135deg, #1a237e, #283593, #3949ab);
-    background-attachment: fixed;
-  }
-  
   /* Reset and base styles */
   * {
     margin: 0;
@@ -306,24 +296,16 @@
     text-align: center;
   }
 
-  /* Mobile-specific styles */
+  /* Responsive styles */
   @media (max-width: 768px) {
     .login-container {
-      margin: 10% 5%;
-      padding: 1.5rem;
+      padding: 2rem;
+      margin: 1rem;
       max-width: 90%;
     }
-    
+
     .login-header h1 {
       font-size: 1.8rem;
-    }
-    
-    .form-group input {
-      padding: 0.7rem 0.8rem;
-    }
-    
-    .login-button {
-      padding: 0.8rem;
     }
   }
 

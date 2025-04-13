@@ -244,7 +244,33 @@
             
             /* Adjust profile display on mobile */
             .row-cols-lg-3 {
-                display: none; /* Hide on mobile to save space */
+                display: block; /* Show on mobile but with better spacing */
+                margin-top: 10px;
+            }
+            
+            /* Improve job detail page responsiveness */
+            .d-md-flex {
+                flex-direction: column;
+            }
+            
+            .card-img-top {
+                width: 100% !important;
+                max-width: 250px !important;
+                height: auto !important;
+                margin: 0 auto 15px !important;
+                float: none !important;
+                display: block;
+            }
+            
+            /* Make buttons full width on mobile */
+            .mx-9 {
+                margin-left: 1rem !important;
+                margin-right: 1rem !important;
+            }
+            
+            /* Better spacing in general */
+            .card-body {
+                padding: 1rem;
             }
             
             /* Backdrop for sidebar */
@@ -261,6 +287,19 @@
             
             .sidebar-backdrop.show {
                 display: block;
+            }
+        }
+        
+        /* Ensure proper display on screens between mobile and desktop */
+        @media (min-width: 768px) and (max-width: 991px) {
+            .d-md-flex {
+                display: flex;
+                flex-direction: row;
+            }
+            
+            .card-img-top {
+                max-width: 200px !important;
+                margin-right: 20px !important;
             }
         }
     </style>
@@ -520,14 +559,33 @@
     <script>
         // Mobile nav improvements
         document.addEventListener('DOMContentLoaded', function() {
-            if (window.innerWidth < 768) {
+            // Theme toggle functionality
+            const themeToggle = document.getElementById('themeToggle');
+            if (themeToggle) {
+                // Set initial state
+                const currentTheme = localStorage.getItem('theme') || 'dark';
+                themeToggle.checked = currentTheme === 'dark';
+                
+                // Handle change
+                themeToggle.addEventListener('change', function() {
+                    const newTheme = this.checked ? 'dark' : 'light';
+                    document.documentElement.setAttribute('data-bs-theme', newTheme);
+                    localStorage.setItem('theme', newTheme);
+                });
+            }
+            
+            // Mobile navigation
+            if (window.innerWidth < 992) {
                 // Add classes for better mobile display
                 document.querySelector('.navbar-collapse').classList.add('p-2');
                 
-                // Create backdrop for sidebar
-                const backdrop = document.createElement('div');
-                backdrop.classList.add('sidebar-backdrop');
-                document.body.appendChild(backdrop);
+                // Create backdrop for sidebar if it doesn't exist
+                let backdrop = document.querySelector('.sidebar-backdrop');
+                if (!backdrop) {
+                    backdrop = document.createElement('div');
+                    backdrop.classList.add('sidebar-backdrop');
+                    document.body.appendChild(backdrop);
+                }
                 
                 // Handle navbar toggler on mobile
                 const headerCollapse = document.getElementById('headerCollapse');
@@ -538,6 +596,12 @@
                         if (sidebar) {
                             sidebar.classList.toggle('show-menu');
                             backdrop.classList.toggle('show');
+                            // Prevent body scrolling when sidebar is open
+                            if (sidebar.classList.contains('show-menu')) {
+                                document.body.style.overflow = 'hidden';
+                            } else {
+                                document.body.style.overflow = '';
+                            }
                         }
                     });
                 }
@@ -548,18 +612,23 @@
                     if (sidebar) {
                         sidebar.classList.remove('show-menu');
                         backdrop.classList.remove('show');
+                        document.body.style.overflow = '';
                     }
                 });
                 
-                // Close sidebar when clicking outside
-                document.addEventListener('click', function(e) {
-                    const sidebar = document.querySelector('.left-sidebar');
-                    const toggler = document.getElementById('headerCollapse');
-                    if (sidebar && sidebar.classList.contains('show-menu') && 
-                        !sidebar.contains(e.target) && e.target !== toggler) {
-                        sidebar.classList.remove('show-menu');
-                        backdrop.classList.remove('show');
-                    }
+                // Handle all links in sidebar to ensure it closes after navigation
+                const sidebarLinks = document.querySelectorAll('.sidebar-link');
+                sidebarLinks.forEach(link => {
+                    link.addEventListener('click', function() {
+                        const sidebar = document.querySelector('.left-sidebar');
+                        if (sidebar && window.innerWidth < 992) {
+                            setTimeout(() => {
+                                sidebar.classList.remove('show-menu');
+                                backdrop.classList.remove('show');
+                                document.body.style.overflow = '';
+                            }, 100);
+                        }
+                    });
                 });
             }
         });
