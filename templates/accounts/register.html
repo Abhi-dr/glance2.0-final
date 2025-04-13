@@ -455,9 +455,14 @@
       <p>Join us to get started</p>
     </div>
 
+    {% if messages %}
     {% for message in messages %}
-    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+    <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}">
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
     {% endfor %}
+    {% endif %}
 
     <form role="form" method="post" id="registerForm">
       {% csrf_token %}
@@ -618,6 +623,8 @@
     const confirmPassword = document.getElementById("confirm_password");
     const termsCheckbox = document.getElementById("terms");
     const registerButton = document.querySelector(".register-button");
+    const emailInput = document.getElementById("email");
+    const mobileInput = document.getElementById("mobile_number");
     const passReqs = {
       length: document.getElementById("length"),
       lowercase: document.getElementById("lowercase"),
@@ -630,6 +637,58 @@
       input.addEventListener("input", function() {
         validateInput(this);
       });
+    });
+    
+    // Email availability check
+    let emailTimeout;
+    emailInput.addEventListener('input', function() {
+      clearTimeout(emailTimeout);
+      const container = this.parentElement;
+      const validationMessage = container.querySelector('.validation-message');
+      
+      if (this.value && this.checkValidity()) {
+        emailTimeout = setTimeout(function() {
+          fetch(`/accounts/check_username_availability/?username=${encodeURIComponent(emailInput.value)}`)
+            .then(response => response.json())
+            .then(data => {
+              if (!data.is_available) {
+                container.classList.add('invalid');
+                container.classList.remove('valid');
+                validationMessage.style.display = 'block';
+              } else {
+                container.classList.add('valid');
+                container.classList.remove('invalid');
+                validationMessage.style.display = 'none';
+              }
+            });
+        }, 500);
+      }
+    });
+    
+    // Mobile availability check
+    let mobileTimeout;
+    mobileInput.addEventListener('input', function() {
+      clearTimeout(mobileTimeout);
+      const container = this.parentElement;
+      const validationMessage = container.querySelector('.validation-message');
+      
+      if (this.value && this.checkValidity()) {
+        mobileTimeout = setTimeout(function() {
+          fetch(`/accounts/check_mobile_availability/?mobile=${encodeURIComponent(mobileInput.value)}`)
+            .then(response => response.json())
+            .then(data => {
+              if (!data.is_available) {
+                container.classList.add('invalid');
+                container.classList.remove('valid');
+                validationMessage.style.display = 'block';
+              } else {
+                container.classList.add('valid');
+                container.classList.remove('invalid');
+                validationMessage.style.display = 'none';
+              }
+            });
+        }, 500);
+      }
     });
     
     // Simple validation function
@@ -695,6 +754,18 @@
           hasError = true;
         }
       });
+      
+      // Check if email is already registered
+      const emailContainer = emailInput.parentElement;
+      if (emailContainer.classList.contains('invalid')) {
+        hasError = true;
+      }
+      
+      // Check if mobile is already registered
+      const mobileContainer = mobileInput.parentElement;
+      if (mobileContainer.classList.contains('invalid')) {
+        hasError = true;
+      }
       
       // Validate password match
       if (password.value !== confirmPassword.value) {

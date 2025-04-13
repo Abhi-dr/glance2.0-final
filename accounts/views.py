@@ -6,8 +6,6 @@ from django.http import JsonResponse
 from accounts.models import Student, Administrator
 from django.core.mail import send_mail
 from django_ratelimit.decorators import ratelimit
-
-
 import requests
 
 # Comment out external API email function
@@ -31,7 +29,13 @@ def login(request):
     if request.user.is_authenticated:
         # Redirect based on user type
         if hasattr(request.user, 'student'):
-            return redirect('student')
+            student = Student.objects.get(id=request.user.id)
+            profile_score = student.get_profile_score()
+            if profile_score >= 80: 
+                return redirect('student')
+            else:
+                messages.warning(request, f"Your profile is only {profile_score}% complete. Please complete your profile to continue using the system.")
+                return redirect('edit_profile')
         elif hasattr(request.user, 'administrator'):
             return redirect('administration')
         else:
@@ -52,6 +56,15 @@ def login(request):
 
             if user is not None:
                 auth.login(request, user)
+                
+                # Check profile completion after login
+                student = Student.objects.get(id=user.id)
+                profile_score = student.get_profile_score()
+                
+                if profile_score < 80:
+                    messages.warning(request, f"Your profile is only {profile_score}% complete. Please complete your profile to continue using the system.")
+                    return redirect('edit_profile')
+                
                 return redirect(next_url if next_url else 'student')
 
             messages.error(request, "Invalid Password")
