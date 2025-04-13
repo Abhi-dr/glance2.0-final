@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'home.apps.HomeConfig',
     'student.apps.StudentConfig',
     "administration.apps.AdministrationConfig",
+    'volunteer.apps.VolunteerConfig',
     
     'import_export',
     "user_visit"
@@ -174,8 +175,8 @@ EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
-SESSION_COOKIE_AGE = 60 * 60
-SESSION_COOKIE_SECURE = True
-SESSION_COOKIE_HTTPONLY = os.getenv("SESSION_COOKIE_HTTPONLY")
-CSRF_COOKIE_SECURE = os.getenv("CSRF_COOKIE_SECURE")
+SESSION_COOKIE_AGE = 60 * 60 * 24  # Extended to 24 hours for development
+SESSION_COOKIE_SECURE = False  # Changed to False for development without HTTPS
+SESSION_COOKIE_HTTPONLY = os.getenv("SESSION_COOKIE_HTTPONLY", True)
+CSRF_COOKIE_SECURE = os.getenv("CSRF_COOKIE_SECURE", False)  # Changed to False for development
 

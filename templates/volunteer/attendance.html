@@ -1,0 +1,199 @@
+{% extends 'volunteer/base.html' %} {% load static %} {% block content %}
+<div class="row mb-4">
+  <div class="col-12">
+    <h2 class="mb-4">Attendance Records</h2>
+    <p class="text-muted">Track and manage attendance for all student interviews.</p>
+  </div>
+</div>
+
+<!-- Filters Section -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title mb-3">Filter Attendance Records</h5>
+        <form method="GET" class="row g-3">
+          <!-- Date Filter -->
+          <div class="col-md-3">
+            <label for="date" class="form-label">Interview Date</label>
+            <select class="form-select" id="date" name="date">
+              <option value="">All Dates</option>
+              {% for date in interview_dates %}
+              <option value="{{ date }}" {% if selected_date == date %}selected{% endif %}>{{ date }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          
+          <!-- Company Filter -->
+          <div class="col-md-3">
+            <label for="company" class="form-label">Company</label>
+            <select class="form-select" id="company" name="company">
+              <option value="">All Companies</option>
+              {% for company in companies %}
+              <option value="{{ company.id }}" {% if selected_company == company.id %}selected{% endif %}>{{ company.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          
+          <!-- Status Filter -->
+          <div class="col-md-3">
+            <label for="status" class="form-label">Attendance Status</label>
+            <select class="form-select" id="status" name="status">
+              <option value="">All Status</option>
+              <option value="present" {% if status_filter == 'present' %}selected{% endif %}>Present</option>
+              <option value="absent" {% if status_filter == 'absent' %}selected{% endif %}>Absent</option>
+            </select>
+          </div>
+          
+          <!-- Search Input -->
+          <div class="col-md-3">
+            <label for="search" class="form-label">Search Student</label>
+            <input type="text" class="form-control" id="search" name="search" placeholder="Name or Roll No" value="{{ search_query }}">
+          </div>
+          
+          <!-- Filter Buttons -->
+          <div class="col-12 mt-3">
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-filter me-1"></i> Apply Filters
+            </button>
+            <a href="{% url 'volunteer_attendance' %}" class="btn btn-outline-secondary ms-2">
+              <i class="fas fa-redo me-1"></i> Reset
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Attendance Statistics -->
+<div class="row mb-4">
+  <!-- Present Count -->
+  <div class="col-md-4 mb-3">
+    <div class="card h-100 border-success">
+      <div class="card-body">
+        <div class="d-flex align-items-center">
+          <div class="rounded-circle bg-success-subtle p-3 me-3">
+            <i class="fas fa-check text-success fa-2x"></i>
+          </div>
+          <div>
+            <h6 class="card-title mb-1">Present</h6>
+            <h3 class="mb-0">{{ present_count }}</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Absent Count -->
+  <div class="col-md-4 mb-3">
+    <div class="card h-100 border-danger">
+      <div class="card-body">
+        <div class="d-flex align-items-center">
+          <div class="rounded-circle bg-danger-subtle p-3 me-3">
+            <i class="fas fa-times text-danger fa-2x"></i>
+          </div>
+          <div>
+            <h6 class="card-title mb-1">Absent</h6>
+            <h3 class="mb-0">{{ absent_count }}</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Attendance Rate -->
+  <div class="col-md-4 mb-3">
+    <div class="card h-100 border-info">
+      <div class="card-body">
+        <div class="d-flex align-items-center">
+          <div class="rounded-circle bg-info-subtle p-3 me-3">
+            <i class="fas fa-chart-pie text-info fa-2x"></i>
+          </div>
+          <div>
+            <h6 class="card-title mb-1">Attendance Rate</h6>
+            <h3 class="mb-0">{{ attendance_rate }}%</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Attendance List -->
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Attendance Records</h5>
+        <div>
+          <a href="{% url 'export_attendance_csv' %}" class="btn btn-sm btn-success me-2">
+            <i class="fas fa-file-excel me-1"></i> Export CSV
+          </a>
+          <span class="badge bg-primary">{{ attendance_records|length }} records</span>
+        </div>
+      </div>
+      <div class="card-body">
+        {% if attendance_records %}
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Student</th>
+                <th>University Roll No</th>
+                <th>Company</th>
+                <th>Job Role</th>
+                <th>Interview Date</th>
+                <th>Status</th>
+                <th>Marked By</th>
+                <th>Marked On</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for record in attendance_records %}
+              <tr>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <img src="{{ record.application.student.profile_pic.url }}" alt="Profile" class="rounded-circle me-2" width="32" height="32">
+                    <div>
+                      <div>{{ record.application.student.first_name }} {{ record.application.student.last_name }}</div>
+                      <small class="text-muted">{{ record.application.student.course }} - {{ record.application.student.year }}</small>
+                    </div>
+                  </div>
+                </td>
+                <td>{{ record.application.student.university_roll_no }}</td>
+                <td>{{ record.application.job.company.name }}</td>
+                <td>{{ record.application.job.role }}</td>
+                <td>{{ record.application.job.interview_date }}</td>
+                <td>
+                  {% if record.is_present %}
+                    <span class="badge bg-success">Present</span>
+                  {% else %}
+                    <span class="badge bg-danger">Absent</span>
+                  {% endif %}
+                </td>
+                <td>{{ record.marked_by.first_name }} {{ record.marked_by.last_name }}</td>
+                <td>{{ record.marked_at|date:"M d, Y H:i" }}</td>
+                <td>
+                  <a href="{% url 'change_attendance' attendance_id=record.id %}" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-edit"></i>
+                  </a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="text-center py-4">
+          <img src="{% static 'img/no-data.svg' %}" alt="No Data" class="img-fluid mb-3" style="max-width: 150px;">
+          <h5>No Attendance Records Found</h5>
+          <p class="text-muted">Try changing your search criteria or filters.</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} 

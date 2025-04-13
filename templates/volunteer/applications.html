@@ -1,0 +1,153 @@
+{% extends 'volunteer/base.html' %} {% load static %} {% block content %}
+<div class="row mb-4">
+  <div class="col-12">
+    <h2 class="mb-4">Student Applications</h2>
+    <p class="text-muted">View and mark attendance for all student applications.</p>
+  </div>
+</div>
+
+<!-- Filters Section -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title mb-3">Filter Applications</h5>
+        <form method="GET" class="row g-3">
+          <!-- Date Filter -->
+          <div class="col-md-3">
+            <label for="date" class="form-label">Interview Date</label>
+            <select class="form-select" id="date" name="date">
+              <option value="">All Dates</option>
+              {% for date in interview_dates %}
+              <option value="{{ date }}" {% if selected_date == date %}selected{% endif %}>{{ date }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          
+          <!-- Company Filter -->
+          <div class="col-md-3">
+            <label for="company" class="form-label">Company</label>
+            <select class="form-select" id="company" name="company">
+              <option value="">All Companies</option>
+              {% for company in companies %}
+              <option value="{{ company.id }}" {% if selected_company == company.id %}selected{% endif %}>{{ company.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          
+          <!-- Status Filter -->
+          <div class="col-md-3">
+            <label for="attendance" class="form-label">Attendance Status</label>
+            <select class="form-select" id="attendance" name="attendance">
+              <option value="">All Status</option>
+              <option value="marked" {% if attendance_filter == 'marked' %}selected{% endif %}>Attendance Marked</option>
+              <option value="present" {% if attendance_filter == 'present' %}selected{% endif %}>Present</option>
+              <option value="absent" {% if attendance_filter == 'absent' %}selected{% endif %}>Absent</option>
+              <option value="pending" {% if attendance_filter == 'pending' %}selected{% endif %}>Pending</option>
+            </select>
+          </div>
+          
+          <!-- Search Input -->
+          <div class="col-md-3">
+            <label for="search" class="form-label">Search Student</label>
+            <input type="text" class="form-control" id="search" name="search" placeholder="Name or Roll No" value="{{ search_query }}">
+          </div>
+          
+          <!-- Filter Buttons -->
+          <div class="col-12 mt-3">
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-filter me-1"></i> Apply Filters
+            </button>
+            <a href="{% url 'volunteer_applications' %}" class="btn btn-outline-secondary ms-2">
+              <i class="fas fa-redo me-1"></i> Reset
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Applications List -->
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Applications</h5>
+        <span class="badge bg-primary">{{ applications|length }} results</span>
+      </div>
+      <div class="card-body">
+        {% if applications %}
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Student</th>
+                <th>University Roll No</th>
+                <th>Company</th>
+                <th>Job Role</th>
+                <th>Interview Date</th>
+                <th>Attendance</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for application in applications %}
+              <tr>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <img src="{{ application.student.profile_pic.url }}" alt="Profile" class="rounded-circle me-2" width="32" height="32">
+                    <div>
+                      <div>{{ application.student.first_name }} {{ application.student.last_name }}</div>
+                      <small class="text-muted">{{ application.student.course }} - {{ application.student.year }}</small>
+                    </div>
+                  </div>
+                </td>
+                <td>{{ application.student.university_roll_no }}</td>
+                <td>{{ application.job.company.name }}</td>
+                <td>{{ application.job.role }}</td>
+                <td>{{ application.job.interview_date }}</td>
+                <td>
+                  {% if application.attendance %}
+                    {% if application.attendance.is_present %}
+                      <span class="badge bg-success">Present</span>
+                    {% else %}
+                      <span class="badge bg-danger">Absent</span>
+                    {% endif %}
+                  {% else %}
+                    <span class="badge bg-warning">Pending</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if not application.attendance %}
+                    <div class="btn-group" role="group">
+                      <a href="{% url 'mark_attendance' application_id=application.id status='present' %}" class="btn btn-sm btn-success">
+                        <i class="fas fa-check me-1"></i> Present
+                      </a>
+                      <a href="{% url 'mark_attendance' application_id=application.id status='absent' %}" class="btn btn-sm btn-danger">
+                        <i class="fas fa-times me-1"></i> Absent
+                      </a>
+                    </div>
+                  {% else %}
+                    <a href="{% url 'change_attendance' attendance_id=application.attendance.id %}" class="btn btn-sm btn-outline-primary">
+                      <i class="fas fa-edit me-1"></i> Change
+                    </a>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="text-center py-4">
+          <img src="{% static 'img/no-data.svg' %}" alt="No Data" class="img-fluid mb-3" style="max-width: 150px;">
+          <h5>No Applications Found</h5>
+          <p class="text-muted">Try changing your search criteria or filters.</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} 

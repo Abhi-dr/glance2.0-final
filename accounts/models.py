@@ -271,3 +271,39 @@ class Notification(models.Model):
     def __str__(self):
         return self.title
 
+# ================================================ VOLUNTEER ==========================================
+
+class Volunteer(User):
+    gender_choices = (
+        ("Male", "Male"),
+        ("Female", "Female"),
+        ("Prefer not to say", "Prefer not to say")
+    )
+    phone_number = models.CharField(max_length=12)
+    
+    gender = models.CharField(
+        max_length=17, choices=gender_choices, blank=True, null=True)
+    
+    profile_pic = models.ImageField(
+        upload_to="volunteer_profile/", default="/student_profile/default.jpg")
+    
+    class Meta:
+        verbose_name_plural = "Volunteers"
+        verbose_name = "Volunteer"
+
+# ========================================== ATTENDANCE =========================================
+
+class Attendance(models.Model):
+    application = models.OneToOneField(Application, on_delete=models.CASCADE, related_name="attendance")
+    is_present = models.BooleanField(default=False)
+    marked_by = models.ForeignKey(Volunteer, on_delete=models.SET_NULL, null=True, blank=True)
+    marked_at = models.DateTimeField(auto_now_add=True)
+    notes = models.TextField(blank=True, null=True)
+    
+    def __str__(self):
+        return f"{self.application.student.first_name} - {self.application.job.title} - {'Present' if self.is_present else 'Absent'}"
+    
+    class Meta:
+        verbose_name_plural = "Attendances"
+        verbose_name = "Attendance"
+

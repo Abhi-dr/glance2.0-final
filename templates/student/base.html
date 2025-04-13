@@ -35,7 +35,7 @@
             --btn-danger-bg: #ef4444;
             --btn-danger-text: #ffffff;
         }
-        
+
         [data-bs-theme="dark"] {
             --sidebar-bg: #0f172a;
             --sidebar-text: #e2e8f0;
@@ -831,8 +831,8 @@
         const toggleTheme = () => {
             const currentTheme = document.documentElement.getAttribute('data-bs-theme');
             const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-bs-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
+                    document.documentElement.setAttribute('data-bs-theme', newTheme);
+                    localStorage.setItem('theme', newTheme);
         };
 
         // Add event listener for the theme toggle button
@@ -908,30 +908,30 @@
                     });
                 });
             }
-            
-            // Get references to the sidebar and the toggle button
-            const sidebar = document.getElementById('sidebar');
-            const sidebarCollapse = document.getElementById('sidebarCollapse');
+        
+        // Get references to the sidebar and the toggle button
+        const sidebar = document.getElementById('sidebar');
+        const sidebarCollapse = document.getElementById('sidebarCollapse');
 
-            // Function to close the sidebar
-            function closeSidebar() {
-                sidebar.classList.remove('show');
-            }
+        // Function to close the sidebar
+        function closeSidebar() {
+            sidebar.classList.remove('show');
+        }
 
-            // Event listener for clicks on the toggle button
+        // Event listener for clicks on the toggle button
             if (sidebarCollapse) {
-                sidebarCollapse.addEventListener('click', function () {
-                    sidebar.classList.toggle('show');
-                });
+        sidebarCollapse.addEventListener('click', function () {
+            sidebar.classList.toggle('show');
+        });
             }
 
-            // Event listener for clicks outside the sidebar
-            document.addEventListener('click', function (event) {
-                const target = event.target;
+        // Event listener for clicks outside the sidebar
+        document.addEventListener('click', function (event) {
+            const target = event.target;
                 if (sidebar && !sidebar.contains(target) && target !== sidebarCollapse) {
-                    closeSidebar();
-                }
-            });
+                closeSidebar();
+            }
+        });
         });
         
         // Function to highlight the active menu item based on current URL

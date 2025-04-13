@@ -3,7 +3,7 @@ from django.contrib import auth
 from django.contrib import messages
 from django.http import JsonResponse
 
-from accounts.models import Student, Administrator
+from accounts.models import Student, Administrator, Volunteer, Attendance
 from django.core.mail import send_mail
 from django_ratelimit.decorators import ratelimit
 import requests
@@ -39,6 +39,8 @@ def login(request):
                 return redirect('edit_profile')
         elif hasattr(request.user, 'administrator'):
             return redirect('administration')
+        elif hasattr(request.user, 'volunteer'):
+            return redirect('volunteer_dashboard')
         else:
             return redirect('home')  # Default fallback
 
@@ -77,6 +79,16 @@ def login(request):
             if user is not None:
                 auth.login(request, user)
                 return redirect(next_url if next_url else 'administration')
+
+            messages.error(request, "Invalid Password")
+            return redirect("login")
+            
+        elif Volunteer.objects.filter(username=username).exists():
+            user = auth.authenticate(username=username, password=password)
+
+            if user is not None:
+                auth.login(request, user)
+                return redirect(next_url if next_url else 'volunteer_dashboard')
 
             messages.error(request, "Invalid Password")
             return redirect("login")
