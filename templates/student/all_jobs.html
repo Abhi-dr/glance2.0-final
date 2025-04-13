@@ -140,8 +140,13 @@ Student -> All Jobs
       <div class="card h-100 overflow-hidden rounded-2">
         <div class="position-relative text-center p-3 bg-dark">
           <a href="{% url 'job' job.slug %}">
+            {% if job.company.logo %}
             <img src="{{ job.company.logo.url }}" class="card-img-top rounded-0 img-fluid" 
               style="max-height: 120px; width: auto; max-width: 100%;" alt="{{ job.company.name }} logo" />
+            {% else %}
+            <img src="{% static 'img/user.jpg' %}" class="card-img-top rounded-0 img-fluid" 
+              style="max-height: 120px; width: auto; max-width: 100%;" alt="{{ job.company.name }} logo" />
+            {% endif %}
           </a>
         </div>
         <div class="card-body pt-3 p-4">

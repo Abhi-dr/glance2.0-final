@@ -87,8 +87,7 @@ Administration -> {{ job.company.name }}
 
 
 
-                    <img src="{{ job.company.logo.url }}" class="card-img-top mt-2 mb-2 float-end"
-                        style="border-radius: 5px; width: 50%; height: 100vh;" alt="...">
+                    <img src="{% if job.company.logo %}{{ job.company.logo.url }}{% else %}{% static 'img/user.jpg' %}{% endif %}" class="card-img-top mt-2 mb-2 float-end" style="max-width: 100px; max-height: 100px;">
 
                 </div>
             </div>

@@ -417,7 +417,7 @@ Administration -> Home
 
             <div class="col-md-3">
                 <div class="card">
-                    <img src="{{ job.company.logo.url }}" class="card-img-top" alt="...">
+                    <img src="{% if job.company.logo %}{{ job.company.logo.url }}{% else %}{% static 'img/user.jpg' %}{% endif %}" class="card-img-top" alt="...">
                     <div class="card-body">
                         <h5 class="card-title">{{ job.company.name|title }} ({{ job.title }})</h5>
                         <p class="card-text">

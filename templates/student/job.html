@@ -51,8 +51,13 @@ Student -> {{ job.company.name }}
                 <h5 class="card-title fw-semibold mb-0">Offer Details</h5>
                 <div class="row">
                     <div class="col-md-4 text-center mb-4">
+                        {% if job.company.logo %}
                         <img src="{{ job.company.logo.url }}" class="img-fluid rounded mt-2" 
                             style="max-width: 100%; height: auto; max-height: 200px;" alt="{{ job.company.name }} logo">
+                        {% else %}
+                        <img src="{% static 'img/user.jpg' %}" class="img-fluid rounded mt-2" 
+                            style="max-width: 100%; height: auto; max-height: 200px;" alt="{{ job.company.name }} logo">
+                        {% endif %}
                     </div>
 
                     <div class="col-md-8">

@@ -110,6 +110,7 @@ def register(request):
         first_name = request.POST.get("first_name").strip().title()
         last_name = request.POST.get("last_name").strip().title()
         phone_number = request.POST.get("mobile_number")
+        profile_pic = request.FILES.get("profile_pic")
         
         # Check if email already exists
         if Student.objects.filter(username=username).exists():
@@ -121,13 +122,19 @@ def register(request):
             messages.error(request, "Mobile Number Already Registered")
             return redirect("register")
         
+        # Validate profile picture
+        if not profile_pic:
+            messages.error(request, "Profile Photo is Required")
+            return redirect("register")
+        
         password = request.POST.get("password")
 
         new_user = Student.objects.create(
             username=username,
             first_name=first_name,
-            last_name = last_name,
-            phone_number = phone_number
+            last_name=last_name,
+            phone_number=phone_number,
+            profile_pic=profile_pic
         )
 
         new_user.set_password(password)

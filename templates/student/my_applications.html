@@ -38,7 +38,7 @@ Student -> My Applications
       <a href="{% url 'applied_job' application.job.slug %}">
 
         <div class="card">
-          <img src="{{ application.job.company.logo.url }}" class="card-img-top" alt="...">
+          <img src="{% if application.job.company.logo %}{{ application.job.company.logo.url }}{% else %}{% static 'img/user.jpg' %}{% endif %}" class="card-img-top" alt="...">
           <div class="card-body">
             <h5 class="card-title">{{ application.job.title|title|truncatechars:10 }} @{{ application.job.company.name|title|truncatechars:10 }}</h5>
             <!-- <p class="card-text">
