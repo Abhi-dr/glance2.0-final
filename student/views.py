@@ -348,7 +348,7 @@ If you wish to withdraw your application,
 - Select the Application you wish to withdraw
 - Click on the 'Withdraw' button
 
-Should you have any inquiries or require further assistance, please do not hesitate to contact us at alumniassociation@gla.ac.in.
+Should you have any inquiries or require further assistance, please do not hesitate to contact us at alumniassociation01@gla.ac.in.
 
 Best Regards,
 Technical Team
@@ -358,7 +358,7 @@ GLA University, Mathura
 
         email_subject = f"Application Confirmation: {job.title.title()} at GLANCE"
         email_body = myfile
-        email_from = 'GLANCE JOB FAIR 2k24'
+        email_from = 'GLANCE JOB FAIR 2k24 <alumniassociation01@gla.ac.in>'
         email_to = [student.username]
 
         try:
@@ -371,8 +371,9 @@ GLA University, Mathura
                 fail_silently=False
                 )
         
-        except:
-            messages.warning(request, "You will get the mail soon!")
+        except Exception as e:
+            print(f"Error sending email: {e}")
+            messages.warning(request, "You will get the confirmation mail soon!")
         
         student.save()
         application.save()
@@ -411,7 +412,7 @@ Should you feel that this was a mistake or wish to reapply,
 - Find the company you wish to apply to
 - Click on the 'Apply' button
 
-For any further inquiries or if you require assistance, please do not hesitate to contact us at alumniassociation@gla.ac.in.
+For any further inquiries or if you require assistance, please do not hesitate to contact us at alumniassociation01@gla.ac.in.
 
 Best regards,
 
@@ -421,7 +422,7 @@ GLA University, Mathura"""
 
     email_subject = f"Application Withdrawn: {job.title.title()} at GLANCE"
     email_body = myfile
-    email_from = 'GLANCE JOB FAIR 2k24'
+    email_from = 'GLANCE JOB FAIR 2k24 <alumniassociation01@gla.ac.in>'
     email_to = [student.username]
 
     try:
@@ -433,7 +434,8 @@ GLA University, Mathura"""
             email_to,
             fail_silently=False
             )
-    except:
+    except Exception as e:
+        print(f"Error sending email: {e}")
         messages.error(request, "You'll get the confirmation mail soon!")
         
     messages.success(request, "Application withdrawn successfully")

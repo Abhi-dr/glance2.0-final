@@ -12,6 +12,8 @@ from django.core.mail import send_mail
 
 import requests
 
+# Comment out the external API email functions
+"""
 def send_email_async(to, subject, text):
     url = 'https://send-mail-api-express.onrender.com/send-email'
     # url = "http://localhost:3000/send-email"
@@ -38,6 +40,7 @@ def send_emails_threaded(recipients, subject, text):
         thread.join()
 
     print("All emails sent successfully.")
+"""
 
 @login_required(login_url='login')
 @staff_member_required(login_url='login')
@@ -244,11 +247,32 @@ def add_notification(request):
         all_mails = Student.objects.all().values_list('username', flat=True)
         all_mails = list(all_mails)
         
-        all_mails += [f"khandelwalprinci1+{i}@gmail.com" for i in range(100, 200)]
+        # all_mails += [f"khandelwalprinci1+{i}@gmail.com" for i in range(100, 200)]
         # print(all_mails)
 
+        # Comment out the external API email functions
+        """
         thread = threading.Thread(target=send_emails_threaded, args=(all_mails, title, description))
         thread.start()
+        """
+        
+        # Use Django's send_mail instead
+        email_from = 'GLANCE JOB FAIR 2k24 <alumniassociation01@gla.ac.in>'
+        
+        # Send emails in batches to avoid timeout
+        batch_size = 50
+        for i in range(0, len(all_mails), batch_size):
+            batch = all_mails[i:i+batch_size]
+            try:
+                send_mail(
+                    title,
+                    description,
+                    email_from,
+                    bcc=batch,  # Use BCC for privacy
+                    fail_silently=False
+                )
+            except Exception as e:
+                print(f"Error sending email batch {i//batch_size + 1}: {e}")
         
         # send_email_async(
         #             to=all_mails,
@@ -329,7 +353,7 @@ Interview Mode: {application.job.interview_mode}
 Job role: {application.job.role}
 Job type: {application.job.job_type}
 
-We have every confidence that you will represent yourself and GLA University admirably throughout this process. If you have any questions or need further assistance, please don't hesitate to reach out to us at alumniassociation@gla.ac.in.
+We have every confidence that you will represent yourself and GLA University admirably throughout this process. If you have any questions or need further assistance, please don't hesitate to reach out to us at alumniassociation01@gla.ac.in.
 
 Once again, congratulations on your one step towards a fantastic accomplishment! We wish you the best of luck in your upcoming interview with {application.job.company.name.title()}.
 
@@ -342,17 +366,21 @@ GLA University, Mathura
 
     email_subject = f"Subject: Congratulations! You've Been Selected by {application.job.company.name.title()} at GLANCE JOB FAIR 2k24"
     email_body = myfile
-    email_from = 'GLANCE JOB FAIR 2k24'
+    email_from = 'GLANCE JOB FAIR 2k24 <alumniassociation01@gla.ac.in>'
     email_to = [student.username]
 
     # Send the email
-    send_mail(
-        email_subject, 
-        email_body, 
-        email_from, 
-        email_to,
-        fail_silently=False
-        )
+    try:
+        send_mail(
+            email_subject, 
+            email_body, 
+            email_from, 
+            email_to,
+            fail_silently=False
+            )
+    except Exception as e:
+        print(f"Error sending email: {e}")
+        messages.warning(request, "Selection email will be sent to the student soon.")
     
     application.save()
     
@@ -383,7 +411,7 @@ We regret to inform you that your application for {job.company.name.title()} at 
 
 While we understand that this news may be disappointing, don't loose hope. Please know that your participation and interest in GLANCE is highly valued. We encourage you to remain proactive in your job search and explore other opportunities available at the fair.
 
-If you have any questions or require further assistance, please do not hesitate to reach out to us at alumniassociation@gla.ac.in.
+If you have any questions or require further assistance, please do not hesitate to reach out to us at alumniassociation01@gla.ac.in.
 
 Thank you for your understanding, and we wish you the best of luck in your future endeavors.
 
@@ -395,17 +423,21 @@ GLA University, Mathura"""
 
     email_subject = f"Update on Your Application for GLANCE - Mega Student Job Fair"
     email_body = myfile
-    email_from = 'GLANCE JOB FAIR 2k24'
+    email_from = 'GLANCE JOB FAIR 2k24 <alumniassociation01@gla.ac.in>'
     email_to = [student.username]
 
     # Send the email
-    send_mail(
-        email_subject, 
-        email_body, 
-        email_from, 
-        email_to,
-        fail_silently=False
-        )
+    try:
+        send_mail(
+            email_subject, 
+            email_body, 
+            email_from, 
+            email_to,
+            fail_silently=False
+            )
+    except Exception as e:
+        print(f"Error sending email: {e}")
+        messages.warning(request, "Rejection email will be sent to the student soon.")
     
     
     messages.error(request, "Application rejected successfully.")

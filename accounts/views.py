@@ -10,6 +10,8 @@ from django_ratelimit.decorators import ratelimit
 
 import requests
 
+# Comment out external API email function
+"""
 def send_email_async(to, subject, text):
     url = 'https://send-mail-api-express.vercel.app/send-email'
     data = {
@@ -20,7 +22,7 @@ def send_email_async(to, subject, text):
     response = requests.post(url, json=data)
     print(response)
     return True
-
+"""
 
 # =============================== LOGIN =========================
 
@@ -110,11 +112,11 @@ Congratulations on successfully registering for GLANCE - the Mega Job Fair!
 
 Your commitment to your professional journey is commendable. Here are some key details:
 
-- Date: April 24th & 25th April, 2024
+- Date: 17,18,19 April, 2025
 - Opportunity: Connect with recruiters, explore job and internship prospects, and expand your network.
-- *Reminder: You can apply to a maximum of two (2) companies.*
+- *Reminder: You can apply to a maximum of two (3) companies. with 1 each day* 
 
-Best of luck! For any queries or assistance, reach out to us at alumniassociation@gla.ac.in.
+Best of luck! For any queries or assistance, reach out to us at alumniassociation01@gla.ac.in.
 
 Looking forward to seeing you at GLANCE!
 
@@ -125,11 +127,21 @@ GLA University"""
         
         email_subject = ' GLANCE Registration Confirmation - Your Path to Success!'
         email_body = myfile
-        email_from = 'GLANCE Job Fair'
+        email_from = 'GLANCE Job Fair <alumniassociation01@gla.ac.in>'
         email_to = [username]
 
         # Send the email
-        # send_mail(email_subject, email_body, email_from, email_to)  
+        try:
+            send_mail(
+                email_subject, 
+                email_body, 
+                email_from, 
+                email_to,
+                fail_silently=False
+            )
+        except Exception as e:
+            print(f"Error sending email: {e}")
+            messages.warning(request, "You will receive a confirmation email soon.")
         
         messages.success(request, "Account created successfully")
 
