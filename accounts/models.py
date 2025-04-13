@@ -38,9 +38,9 @@ class Student(User):
 
     resume = models.FileField(upload_to='student_resumes/', blank=True, null=True)
     
-    tenth_marksheet = models.ImageField(upload_to='student_marksheets/', blank=True, null=True)
-    twelfth_marksheet = models.ImageField(upload_to='student_marksheets/', blank=True, null=True)
-    college_profile_print = models.ImageField(upload_to='student_marksheets/', blank=True, null=True)
+    tenth_marksheet = models.FileField(upload_to='student_marksheets/', blank=True, null=True)
+    twelfth_marksheet = models.FileField(upload_to='student_marksheets/', blank=True, null=True)
+    college_profile_print = models.FileField(upload_to='student_marksheets/', blank=True, null=True)
     
     linkedin_id = models.URLField(blank=True, null=True)
     github_id = models.URLField(blank=True, null=True)

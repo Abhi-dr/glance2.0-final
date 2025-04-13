@@ -2,6 +2,80 @@
 
 {% block title %} Student -> Upload Documents {% endblock %} 
 
+{% block extra_css %}
+<style>
+    /* Mobile-specific styles */
+    @media (max-width: 768px) {
+        .input-group {
+            flex-wrap: nowrap;
+        }
+        
+        input[type="file"] {
+            font-size: 14px;
+            padding: 8px;
+        }
+        
+        .alert {
+            padding: 0.75rem;
+        }
+        
+        .card {
+            margin-bottom: 1rem;
+        }
+        
+        .form-text {
+            font-size: 12px; 
+            line-height: 1.3;
+        }
+        
+        /* Make file inputs more touch-friendly */
+        .input-group-text {
+            padding: 10px 15px;
+        }
+        
+        /* Make buttons larger for touch */
+        #uploadBtn {
+            padding: 12px;
+            font-size: 16px;
+        }
+        
+        /* Improve PDF viewer on mobile */
+        embed[type="application/pdf"] {
+            height: 300px !important;
+        }
+    }
+    
+    /* Success feedback styling */
+    .valid-feedback {
+        display: none;
+        color: #198754;
+        margin-top: 0.25rem;
+    }
+    
+    /* Improve form elements */
+    .form-control:focus {
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+    
+    /* Highlight the file inputs */
+    input[type="file"] {
+        border: 1px dashed #ccc;
+        transition: all 0.3s ease;
+    }
+    
+    input[type="file"]:hover,
+    input[type="file"]:focus {
+        border-color: var(--bs-primary);
+    }
+    
+    /* Make badges more visible */
+    .badge.bg-info {
+        background-color: #0dcaf0 !important;
+        color: #000 !important;
+    }
+</style>
+{% endblock %}
+
 {% block body %}
 
 <div class="container-fluid">
@@ -209,29 +283,65 @@
 
             {% endif %}
 
-            <form method="post" enctype="multipart/form-data">
+            <form method="post" enctype="multipart/form-data" id="uploadForm">
                 {% csrf_token %}
 
                 <div class="mb-4">
-                    <label for="formFile" class="form-label">Upload Resume</label>
-                    <input class="form-control" type="file" id="formFile" name="resume" accept=".pdf"/>
+                    <label for="resumeFile" class="form-label">Upload Resume <small class="text-muted">(PDF only, max 5MB)</small></label>
+                    <div class="input-group">
+                        <input class="form-control" type="file" id="resumeFile" name="resume" accept="application/pdf,.pdf"/>
+                        <span class="input-group-text">
+                            <i class="ti ti-file-upload"></i>
+                        </span>
+                    </div>
+                    <div class="form-text">
+                        <span class="badge bg-info me-1"><i class="ti ti-device-mobile me-1"></i>Mobile users</span>
+                        Take a clear photo or use a document scanning app (like Adobe Scan or CamScanner)
+                    </div>
+                    <div class="invalid-feedback">
+                        Please select a valid PDF file less than 5MB in size.
+                    </div>
                 </div>
 
                 <div class="mb-4">
-                    <label for="formFile" class="form-label">HighSchool Marksheet</label>
-                    <input class="form-control" type="file" id="formFile" name="tenth_marksheet" accept=".pdf"/>
+                    <label for="tenthFile" class="form-label">HighSchool Marksheet <small class="text-muted">(PDF only, max 5MB)</small></label>
+                    <div class="input-group">
+                        <input class="form-control" type="file" id="tenthFile" name="tenth_marksheet" accept="application/pdf,.pdf"/>
+                        <span class="input-group-text">
+                            <i class="ti ti-file-upload"></i>
+                        </span>
+                    </div>
+                    <div class="form-text">
+                        <span class="badge bg-info me-1"><i class="ti ti-device-mobile me-1"></i>Mobile users</span>
+                        Place document on a flat surface with good lighting for best results
+                    </div>
+                    <div class="invalid-feedback">
+                        Please select a valid PDF file less than 5MB in size.
+                    </div>
                 </div>
 
                 <div class="mb-4">
-                    <label for="formFile" class="form-label">Intermediate Marksheet</label>
-                    <input class="form-control" type="file" id="formFile" name="twelfth_marksheet" accept=".pdf"/>
+                    <label for="twelfthFile" class="form-label">Intermediate Marksheet <small class="text-muted">(PDF only, max 5MB)</small></label>
+                    <div class="input-group">
+                        <input class="form-control" type="file" id="twelfthFile" name="twelfth_marksheet" accept="application/pdf,.pdf"/>
+                        <span class="input-group-text">
+                            <i class="ti ti-file-upload"></i>
+                        </span>
+                    </div>
+                    <div class="form-text">
+                        <span class="badge bg-info me-1"><i class="ti ti-device-mobile me-1"></i>Mobile users</span>
+                        Use PDF converter apps if you have image files
+                    </div>
+                    <div class="invalid-feedback">
+                        Please select a valid PDF file less than 5MB in size.
+                    </div>
                 </div>
 
                 <div class="mb-4">
-                    <label for="formFile" class="form-label">College Profile Print</label>
+                    <label for="profileFile" class="form-label">College Profile Print <small class="text-muted">(PDF only, max 5MB)</small></label>
                     <ul>
                         <li>
-                            <small>1. Go to <a href="glauniversity.in/8085">glauniversity.in/8085</a></small>                            
+                            <small>1. Go to <a href="https://glauniversity.in:8085" target="_blank">glauniversity.in:8085</a></small>                            
                         </li>
                         <li>
                             <small>2. Click on 'Main Account' section</small>
@@ -240,15 +350,51 @@
                             <small>3. Click on <b>'Profile Print'</b></small>
                         </li>
                         <li>
-                            <small>4. Click on <b>'Print'</b> button to download</small>
+                            <small>4. Click on <b>'Print'</b> button and save as PDF</small>
+                        </li>
+                        <li>
+                            <small>5. <b>On mobile:</b> Use "Save as PDF" option in the share menu or take screenshots and convert to PDF</small>
                         </li>
                     </ul>
-                    <input class="form-control" type="file" id="formFile" name="college_profile_print"/>
+                    <div class="input-group">
+                        <input class="form-control" type="file" id="profileFile" name="college_profile_print" accept="application/pdf,.pdf"/>
+                        <span class="input-group-text">
+                            <i class="ti ti-file-upload"></i>
+                        </span>
+                    </div>
+                    <div class="form-text">
+                        <span class="badge bg-info me-1"><i class="ti ti-device-mobile me-1"></i>Mobile users</span>
+                        If saving as PDF doesn't work, use screenshot and convert to PDF
+                    </div>
+                    <div class="invalid-feedback">
+                        Please select a valid PDF file less than 5MB in size.
+                    </div>
                 </div>
 
-                <button type="submit" class="btn btn-primary w-100">
-                    Upload Documents
+                <div class="alert alert-info" role="alert">
+                    <h5><i class="ti ti-device-mobile me-2"></i>Mobile Upload Tips</h5>
+                    <ol class="mb-0">
+                        <li>Use a document scanning app like Adobe Scan, Microsoft Lens, or CamScanner to convert photos to PDF</li>
+                        <li>Ensure good lighting when taking photos of documents</li>
+                        <li>If you're having trouble, try using a different browser or the latest Chrome version</li>
+                        <li>Make sure your PDF files are less than 5MB in size</li>
+                    </ol>
+                </div>
+
+                <div id="uploadStatus" class="alert alert-info d-none">
+                    <div class="d-flex align-items-center">
+                        <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                        <span>Uploading files, please wait...</span>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-lg w-100 mb-3" id="uploadBtn">
+                    <i class="ti ti-upload me-2"></i>Upload Documents
                 </button>
+                
+                <div class="text-center mb-3">
+                    <small class="text-muted">Having trouble uploading from mobile? Try using a PDF converter app or contact support.</small>
+                </div>
             </form>
 
         </div>
@@ -256,63 +402,227 @@
 </div>
 
 <script>
+    // File size validation - maximum 5MB
+    function validateFileSize(inputElement) {
+        const maxSizeInBytes = 5 * 1024 * 1024; // 5MB
+        const file = inputElement.files[0];
+        
+        if (file) {
+            // Check file size
+            if (file.size > maxSizeInBytes) {
+                showError(inputElement, `File "${file.name}" is too large (${(file.size/1024/1024).toFixed(1)}MB). Maximum size is 5MB.`);
+                return false;
+            } 
+            
+            // Check if file is a PDF
+            const fileType = file.type;
+            const fileName = file.name.toLowerCase();
+            
+            if (!(fileType === 'application/pdf' || fileName.endsWith('.pdf'))) {
+                showError(inputElement, `File "${file.name}" is not a PDF. Only PDF files are allowed.`);
+                return false;
+            } 
+            
+            // All checks passed
+            clearError(inputElement);
+            showSuccess(inputElement, `File "${file.name}" ready to upload.`);
+            return true;
+        } else {
+            clearError(inputElement);
+            return true;
+        }
+    }
+    
+    function showError(element, message) {
+        element.setCustomValidity(message);
+        element.classList.add('is-invalid');
+        element.classList.remove('is-valid');
+        
+        // Find the invalid feedback element and update its text
+        const feedbackElement = element.closest('.mb-4').querySelector('.invalid-feedback');
+        if (feedbackElement) {
+            feedbackElement.textContent = message;
+            feedbackElement.style.display = 'block';
+        }
+    }
+    
+    function showSuccess(element, message) {
+        element.setCustomValidity("");
+        element.classList.add('is-valid');
+        element.classList.remove('is-invalid');
+        
+        // Add success message
+        let successDiv = element.closest('.mb-4').querySelector('.valid-feedback');
+        if (!successDiv) {
+            successDiv = document.createElement('div');
+            successDiv.className = 'valid-feedback';
+            element.closest('.input-group').insertAdjacentElement('afterend', successDiv);
+        }
+        successDiv.textContent = message;
+        successDiv.style.display = 'block';
+    }
+    
+    function clearError(element) {
+        element.setCustomValidity("");
+        element.classList.remove('is-invalid');
+    }
+    
+    // Fix for iOS Safari file input issues
+    function fixIOSFileInput() {
+        // Check if we're on iOS
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        
+        if (isIOS) {
+            const fileInputs = document.querySelectorAll('input[type="file"]');
+            fileInputs.forEach(input => {
+                // Add click event to parent input-group to trigger file input
+                const inputGroup = input.closest('.input-group');
+                if (inputGroup) {
+                    inputGroup.style.cursor = 'pointer';
+                    inputGroup.addEventListener('click', function(e) {
+                        // Only trigger if the click wasn't directly on the input
+                        if (e.target !== input) {
+                            input.click();
+                        }
+                    });
+                }
+            });
+        }
+    }
+    
+    // Add event listeners to all file inputs
+    document.addEventListener('DOMContentLoaded', function() {
+        // Fix iOS file input issues
+        fixIOSFileInput();
+        
+        const fileInputs = [
+            document.getElementById('resumeFile'),
+            document.getElementById('tenthFile'),
+            document.getElementById('twelfthFile'),
+            document.getElementById('profileFile')
+        ];
+        
+        fileInputs.forEach(input => {
+            if (input) {
+                input.addEventListener('change', function() {
+                    validateFileSize(this);
+                });
+            }
+        });
+        
+        // Form submission handling
+        const form = document.getElementById('uploadForm');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                let hasValidFiles = false;
+                let allFilesValid = true;
+                let errorMessages = [];
+                
+                // Check if at least one file is selected and all selected files are valid
+                fileInputs.forEach(input => {
+                    if (input && input.files.length > 0) {
+                        hasValidFiles = true;
+                        if (!validateFileSize(input)) {
+                            allFilesValid = false;
+                            errorMessages.push(`Issue with ${input.name}: ${input.validationMessage}`);
+                        }
+                    }
+                });
+                
+                // Check if there are no files selected
+                if (!hasValidFiles) {
+                    alert("Please select at least one document to upload");
+                    e.preventDefault();
+                    return false;
+                }
+                
+                // Check if all files are valid
+                if (!allFilesValid) {
+                    alert("Please fix the following issues:\n" + errorMessages.join("\n"));
+                    e.preventDefault();
+                    return false;
+                }
+                
+                // Show the loading status and disable the button
+                const uploadStatus = document.getElementById('uploadStatus');
+                const uploadBtn = document.getElementById('uploadBtn');
+                
+                if (uploadStatus) {
+                    uploadStatus.classList.remove('d-none');
+                }
+                
+                if (uploadBtn) {
+                    uploadBtn.disabled = true;
+                    uploadBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading...';
+                }
+                
+                return true;
+            });
+        }
+    });
+    
+    // PDF viewer functions
     function myf(pdfId) {
         var x = document.getElementById("pdfContainer");
         var btn = document.getElementById("viewbtn");
+        var card = btn.closest('.card');
 
         if (x.style.display === "none") {
             btn.innerHTML = "Close";
             x.style.display = "block";
-            card.style.height = "600px";
+            if (card) card.style.height = "600px";
         } else {
             btn.innerHTML = "View";
             x.style.display = "none";
-            card.style.height = "auto";
+            if (card) card.style.height = "auto";
         }
     }
 
     function myf2(pdfId) {
         var x = document.getElementById("pdfContainer2");
         var btn = document.getElementById("viewbtn2");
+        var card = btn.closest('.card');
 
         if (x.style.display === "none") {
             btn.innerHTML = "Close";
             x.style.display = "block";
-            card.style.height = "600px";
+            if (card) card.style.height = "600px";
         } else {
             btn.innerHTML = "View";
             x.style.display = "none";
-            card.style.height = "auto";
+            if (card) card.style.height = "auto";
         }
     }
 
     function myf3(pdfId) {
         var x = document.getElementById("pdfContainer3");
         var btn = document.getElementById("viewbtn3");
+        var card = btn.closest('.card');
 
         if (x.style.display === "none") {
             btn.innerHTML = "Close";
             x.style.display = "block";
-            card.style.height = "600px";
+            if (card) card.style.height = "600px";
         } else {
             btn.innerHTML = "View";
             x.style.display = "none";
-            card.style.height = "auto";
+            if (card) card.style.height = "auto";
         }
     }
 
     function myf4(pdfId) {
         var x = document.getElementById("pdfContainer4");
         var btn = document.getElementById("viewbtn4");
+        var card = btn.closest('.card');
 
         if (x.style.display === "none") {
             btn.innerHTML = "Close";
             x.style.display = "block";
-            card.style.height = "600px";
+            if (card) card.style.height = "600px";
         } else {
             btn.innerHTML = "View";
             x.style.display = "none";
-            card.style.height = "auto";
+            if (card) card.style.height = "auto";
         }
     }
 </script>

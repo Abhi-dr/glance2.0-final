@@ -166,27 +166,73 @@ def upload_resume(request):
     student = Student.objects.get(id=request.user.id)
     
     if request.method == "POST":
-        resume = request.FILES.get('resume')
-        tenth_marksheet = request.FILES.get('tenth_marksheet')
-        twelfth_marksheet = request.FILES.get('twelfth_marksheet')
-        college_profile_print = request.FILES.get('college_profile_print')
-        
-        
-        student = Student.objects.get(id=request.user.id)            
-        
-        if resume:
-            student.resume = resume
-        if tenth_marksheet:
-            student.tenth_marksheet = tenth_marksheet
-        if twelfth_marksheet:
-            student.twelfth_marksheet = twelfth_marksheet
-        if college_profile_print:
-            student.college_profile_print = college_profile_print
+        try:
+            resume = request.FILES.get('resume')
+            tenth_marksheet = request.FILES.get('tenth_marksheet')
+            twelfth_marksheet = request.FILES.get('twelfth_marksheet')
+            college_profile_print = request.FILES.get('college_profile_print')
             
-        student.save()
-        
-        messages.success(request, "Documents Uploaded successfully")
-        return redirect('upload_resume')
+            # Check if at least one file was uploaded
+            if not any([resume, tenth_marksheet, twelfth_marksheet, college_profile_print]):
+                messages.error(request, "Please select at least one file to upload.")
+                return redirect('upload_resume')
+            
+            # Check file sizes (max 5MB) and file types
+            max_size = 5 * 1024 * 1024  # 5MB in bytes
+            for file_obj in [f for f in [resume, tenth_marksheet, twelfth_marksheet, college_profile_print] if f]:
+                if file_obj.size > max_size:
+                    messages.error(request, f"File '{file_obj.name}' is too large. Maximum size is 5MB.")
+                    return redirect('upload_resume')
+                
+                # Check if file is PDF
+                if not file_obj.name.lower().endswith('.pdf') and not file_obj.content_type == 'application/pdf':
+                    messages.error(request, f"File '{file_obj.name}' is not a PDF. Only PDF files are allowed.")
+                    return redirect('upload_resume')
+            
+            # Get the student and update fields
+            student = Student.objects.get(id=request.user.id)            
+            
+            upload_success = False
+            
+            if resume:
+                student.resume = resume
+                upload_success = True
+                
+            if tenth_marksheet:
+                student.tenth_marksheet = tenth_marksheet
+                upload_success = True
+                
+            if twelfth_marksheet:
+                student.twelfth_marksheet = twelfth_marksheet
+                upload_success = True
+                
+            if college_profile_print:
+                student.college_profile_print = college_profile_print
+                upload_success = True
+                
+            student.save()
+            
+            # List of successfully uploaded files for the success message
+            uploaded_files = []
+            if resume:
+                uploaded_files.append("Resume")
+            if tenth_marksheet:
+                uploaded_files.append("10th Marksheet")
+            if twelfth_marksheet:
+                uploaded_files.append("12th Marksheet")
+            if college_profile_print:
+                uploaded_files.append("College Profile")
+            
+            if uploaded_files:
+                messages.success(request, f"Successfully uploaded: {', '.join(uploaded_files)}")
+            else:
+                messages.info(request, "No new documents were uploaded.")
+                
+            return redirect('upload_resume')
+            
+        except Exception as e:
+            messages.error(request, f"Error uploading files: {str(e)}")
+            return redirect('upload_resume')
     
     parameters = {
         "student": student
