@@ -1278,6 +1278,7 @@ section {
 .special-thanks-img {
   text-align: center;
   margin-bottom: 1.5rem;
+  margin-left: 1.5rem;
 }
 
 .special-thanks-img img {
@@ -1303,6 +1304,7 @@ section {
 #special-thanks {
   background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
 }
+
 /*--------------------------------------------------------------
 # Footer
 --------------------------------------------------------------*/
