@@ -138,7 +138,7 @@ Student -> All Jobs
     {% for job in jobs %}
     <div class="col-sm-6 col-md-4 col-xl-3">
       <div class="card h-100 overflow-hidden rounded-2">
-        <div class="position-relative text-center p-3 bg-light">
+        <div class="position-relative text-center p-3 bg-dark">
           <a href="{% url 'job' job.slug %}">
             <img src="{{ job.company.logo.url }}" class="card-img-top rounded-0 img-fluid" 
               style="max-height: 120px; width: auto; max-width: 100%;" alt="{{ job.company.name }} logo" />
@@ -152,13 +152,13 @@ Student -> All Jobs
             </h6>
           </div>
           <div class="mb-2">
-            <span class="badge bg-primary text-white me-1">
+            <span class="badge bg-dark text-white me-1">
               {% if job.salary_range %}
               {{ job.salary_range|truncatechars:15 }}
               {% endif %}
             </span>
-            <span class="badge bg-info text-dark me-1">{{ job.job_type|title|truncatechars:10 }}</span>
-            <span class="badge bg-secondary text-white">{{ job.location_flexibility|title|truncatechars:10 }}</span>
+            <span class="badge bg-danger text-white me-1">{{ job.job_type|title|truncatechars:10 }}</span>
+            <span class="badge bg-primary text-white">{{ job.location_flexibility|title|truncatechars:10 }}</span>
           </div>
           <div>
             <p class="text-muted mb-2">{{ job.description|truncatechars:100 }}</p>
