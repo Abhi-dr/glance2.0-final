@@ -580,8 +580,8 @@ Student -> Home
                 <div class="card">
                     <img src="{{ job.company.logo.url }}" class="card-img-top" alt="...">
                     <div class="card-body">
-                        <h5 class="card-title">{{ job.company.name|title|truncatechars:10 }} For ({{
-                            job.title|truncatechars:5 }})</h5>
+                        <h5 class="card-title">{{ job.company.name|title|truncatechars:10 }} For 
+                            ({{job.title|truncatechars:5 }})</h5>
                         <p class="card-text">
                             {{ job.description|truncatechars:25 }}...
                         </p>
