@@ -38,3 +38,8 @@ def alumni_registration(request):
 
 def terms(request):
     return render(request, 'home/terms.html')
+
+def companies(request):
+    day = request.GET.get('day', 1)  # Default to day 1 if not specified
+    companies = Company_Carousel.objects.filter(day=day)
+    return render(request, 'home/companies.html', {'companies': companies, 'day': day})

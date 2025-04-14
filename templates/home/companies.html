@@ -1,0 +1,71 @@
+{% extends 'home/base.html' %}
+{% load static %}
+
+{% block body %}
+<div class="container mt-5 pt-5">
+    <h2 class="text-center mb-4">Companies</h2>
+    
+    <!-- Day Selection -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="btn-group" role="group">
+                <a href="?day=1" class="btn btn-outline-primary {% if day == 1 %}active{% endif %}">Day 1</a>
+                <a href="?day=2" class="btn btn-outline-primary {% if day == 2 %}active{% endif %}">Day 2</a>
+                <a href="?day=3" class="btn btn-outline-primary {% if day == 3 %}active{% endif %}">Day 3</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Companies Carousel -->
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div id="companiesCarousel" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    {% for company in companies %}
+                    <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                        <img src="{{ company.image.url }}" class="d-block w-100 rounded" alt="{{ company.name }}" style="max-height: 500px; object-fit: contain;">
+                    </div>
+                    {% empty %}
+                    <div class="carousel-item active">
+                        <div class="text-center py-5">
+                            <h3>No companies scheduled for Day {{ day }}</h3>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% if companies|length > 1 %}
+                <button class="carousel-control-prev" type="button" data-bs-target="#companiesCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#companiesCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .carousel {
+        background: rgba(255, 255, 255, 0.9);
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .carousel-item img {
+        max-height: 500px;
+        object-fit: contain;
+    }
+    
+    .btn-group {
+        background: rgba(255, 255, 255, 0.9);
+        padding: 10px;
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    }
+</style>
+{% endblock %} 

@@ -11,4 +11,4 @@ urlpatterns = [
     path('check_mobile_availability/', views.check_mobile_availability, name='check_mobile_availability'),
 
     # path('reset_password', views.reset_password, name="reset_password"),
-]
+] 

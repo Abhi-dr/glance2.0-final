@@ -16,7 +16,8 @@
     min-height: 100vh;
     position: relative;
     overflow: hidden;
-    padding-top: 70px; /* Add padding for the navbar */
+    padding-top: 70px;
+    /* Add padding for the navbar */
   }
 
   /* Register container */
@@ -43,6 +44,7 @@
       transform: scale(0.8);
       opacity: 0;
     }
+
     100% {
       transform: scale(1);
       opacity: 1;
@@ -134,12 +136,10 @@
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(
-      90deg,
-      transparent,
-      rgba(255, 255, 255, 0.2),
-      transparent
-    );
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(255, 255, 255, 0.2),
+        transparent);
     transition: 0.5s;
   }
 
@@ -187,6 +187,7 @@
       transform: translateY(-10px);
       opacity: 0;
     }
+
     to {
       transform: translateY(0);
       opacity: 1;
@@ -210,6 +211,7 @@
     from {
       opacity: 0;
     }
+
     to {
       opacity: 1;
     }
@@ -228,56 +230,6 @@
     transition: opacity 0.3s ease;
   }
 
-  /* File upload styling */
-  input[type="file"] {
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
-    padding: 0.6rem;
-    border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    width: 100%;
-    cursor: pointer;
-  }
-  
-  input[type="file"]::-webkit-file-upload-button {
-    background: rgba(33, 150, 243, 0.8);
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    margin-right: 1rem;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background 0.3s;
-  }
-  
-  input[type="file"]::-webkit-file-upload-button:hover {
-    background: rgba(33, 150, 243, 1);
-  }
-  
-  .file-requirements {
-    font-size: 0.75rem;
-    color: rgba(255, 255, 255, 0.7);
-    margin-top: 0.3rem;
-  }
-
-  /* Mobile file upload styling */
-  @media (max-width: 480px) {
-    input[type="file"] {
-      padding: 0.5rem;
-      font-size: 0.9rem;
-    }
-    
-    input[type="file"]::-webkit-file-upload-button {
-      padding: 0.4rem 0.8rem;
-      margin-right: 0.5rem;
-      font-size: 0.8rem;
-    }
-    
-    .file-requirements {
-      font-size: 0.7rem;
-    }
-  }
-
   .input-container.valid .validation-icon {
     opacity: 1;
     background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%2340C057"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>');
@@ -290,6 +242,56 @@
 
   .input-container.invalid .validation-message {
     display: block;
+  }
+
+  /* File upload styling */
+  input[type="file"] {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    padding: 0.6rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    width: 100%;
+    cursor: pointer;
+  }
+
+  input[type="file"]::-webkit-file-upload-button {
+    background: rgba(33, 150, 243, 0.8);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    margin-right: 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+
+  input[type="file"]::-webkit-file-upload-button:hover {
+    background: rgba(33, 150, 243, 1);
+  }
+
+  .file-requirements {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-top: 0.3rem;
+  }
+
+  /* Mobile file upload styling */
+  @media (max-width: 480px) {
+    input[type="file"] {
+      padding: 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    input[type="file"]::-webkit-file-upload-button {
+      padding: 0.4rem 0.8rem;
+      margin-right: 0.5rem;
+      font-size: 0.8rem;
+    }
+
+    .file-requirements {
+      font-size: 0.7rem;
+    }
   }
 
   /* Password visibility styles */
@@ -358,20 +360,31 @@
     display: flex;
     align-items: center;
     margin-bottom: 0.2rem;
+    color: rgba(255, 255, 255, 0.7);
+    transition: color 0.3s;
   }
 
   .req-item:before {
     content: "";
+    display: inline-block;
     width: 12px;
     height: 12px;
     margin-right: 8px;
     border-radius: 50%;
     background-color: rgba(255, 255, 255, 0.3);
-    transition: background-color 0.3s;
+    transition: all 0.3s;
+  }
+
+  .req-item.valid {
+    color: #40c057;
   }
 
   .req-item.valid:before {
     background-color: #40c057;
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>');
+    background-size: 8px;
+    background-position: center;
+    background-repeat: no-repeat;
   }
 
   /* Security notice */
@@ -495,19 +508,19 @@
     .whatsapp-support a span {
       font-size: 0.8rem;
     }
-    
+
     /* Smaller file input for very small screens */
     input[type="file"] {
       font-size: 0.8rem;
       padding: 0.4rem;
     }
-    
+
     input[type="file"]::-webkit-file-upload-button {
       padding: 0.3rem 0.6rem;
       font-size: 0.75rem;
       margin-right: 0.4rem;
     }
-    
+
     .file-requirements {
       font-size: 0.65rem;
     }
@@ -538,15 +551,8 @@
         <div class="form-group">
           <label for="first_name">First Name</label>
           <div class="input-container">
-            <input
-              type="text"
-              id="first_name"
-              name="first_name"
-              placeholder="Enter your first name"
-              pattern="[A-Za-z]+"
-              title="Please enter alphabets only"
-              required
-            />
+            <input type="text" id="first_name" name="first_name" placeholder="Enter your first name" pattern="[A-Za-z]+"
+              title="Please enter alphabets only" required />
             <div class="validation-icon"></div>
             <div class="validation-message">
               First name should contain only alphabets
@@ -557,15 +563,8 @@
         <div class="form-group">
           <label for="last_name">Last Name</label>
           <div class="input-container">
-            <input
-              type="text"
-              id="last_name"
-              name="last_name"
-              placeholder="Enter your last name"
-              pattern="[A-Za-z]+"
-              title="Please enter alphabets only"
-              required
-            />
+            <input type="text" id="last_name" name="last_name" placeholder="Enter your last name" pattern="[A-Za-z]+"
+              title="Please enter alphabets only" required />
             <div class="validation-icon"></div>
             <div class="validation-message">
               Last name should contain only alphabets
@@ -579,15 +578,9 @@
         <div class="form-group">
           <label for="email">Email</label>
           <div class="input-container">
-            <input
-              type="email"
-              id="email"
-              name="email"
-              placeholder="Enter your email"
+            <input type="email" id="email" name="email" placeholder="Enter your email"
               pattern="[a-zA-Z0-9._%+-]+@(gmail\.com|gla\.ac\.in)$"
-              title="Please enter an email ending with @gmail.com or @gla.ac.in"
-              required
-            />
+              title="Please enter an email ending with @gmail.com or @gla.ac.in" required />
             <div class="validation-icon"></div>
             <div class="validation-message">
               Only @gmail.com or @gla.ac.in emails are allowed
@@ -598,19 +591,11 @@
         <div class="form-group">
           <label for="mobile_number">Mobile Number</label>
           <div class="input-container">
-            <input
-              type="tel"
-              id="mobile_number"
-              name="mobile_number"
-              placeholder="10-digit mobile number"
-              pattern="[0-9]{10}"
-              title="Please enter a valid 10-digit mobile number"
-              required
-            />
+            <input type="tel" id="mobile_number" name="mobile_number" placeholder="10-digit mobile number"
+              pattern="[0-9]{10}" title="Please enter a valid 10-digit mobile number" required />
             <div class="validation-icon"></div>
             <div class="validation-message">
-              This mobile number is already registered. Please use a different
-              number.
+              Please enter a valid 10-digit mobile number
             </div>
           </div>
         </div>
@@ -621,15 +606,10 @@
         <div class="form-group">
           <label for="password">Password</label>
           <div class="password-container input-container">
-            <input
-              type="password"
-              id="password"
-              name="password"
-              placeholder="Enter your password"
-              pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
-              title="Must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters"
-              required
-            />
+            <input type="password" id="password" name="password" placeholder="Enter your password"
+              pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
+              title="Password must contain at least 8 characters, one uppercase letter, one lowercase letter, one number and one special character"
+              required />
             <div class="validation-icon"></div>
           </div>
           <div class="password-requirements">
@@ -637,19 +617,15 @@
             <div class="req-item" id="lowercase">One lowercase letter</div>
             <div class="req-item" id="uppercase">One uppercase letter</div>
             <div class="req-item" id="number">One number</div>
+            <div class="req-item" id="special">One special character</div>
           </div>
         </div>
 
         <div class="form-group">
           <label for="confirm_password">Confirm Password</label>
           <div class="password-container input-container">
-            <input
-              type="password"
-              id="confirm_password"
-              name="confirm_password"
-              placeholder="Confirm your password"
-              required
-            />
+            <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm your password"
+              required />
             <div class="validation-icon"></div>
             <div class="validation-message">Passwords do not match</div>
           </div>
@@ -657,31 +633,20 @@
       </div>
 
       <!-- Profile Photo Upload Field -->
-      <div class="form-group">
+      <!-- <div class="form-group">
         <label for="profile_pic">Profile Photo</label>
         <div class="input-container">
-          <input
-            type="file"
-            id="profile_pic"
-            name="profile_pic"
-            accept="image/*"
-            required
-          />
+          <input type="file" id="profile_pic" name="profile_pic" accept="image/*" required />
           <div class="validation-icon"></div>
           <div class="validation-message">Please upload a profile photo</div>
         </div>
         <p class="file-requirements">Upload a clear photo of yourself (JPEG, PNG, up to 2MB)</p>
-      </div>
-
+      </div> -->
       <div class="form-group terms-checkbox">
         <div class="checkbox-container">
           <input type="checkbox" id="terms" name="terms" required />
-          <label for="terms"
-            >I agree to the
-            <a href="{% url 'terms' %}" target="_blank"
-              >Terms and Conditions</a
-            ></label
-          >
+          <label for="terms">I agree to the
+            <a href="{% url 'terms' %}" target="_blank">Terms and Conditions</a></label>
         </div>
       </div>
 
@@ -693,10 +658,8 @@
 
     <!-- WhatsApp Support -->
     <div class="whatsapp-support">
-      <a
-        href="https://wa.me/917078152876?text=Hello%2C%20I%20need%20assistance%20with%20Glance%20registration"
-        target="_blank"
-      >
+      <a href="https://wa.me/917078152876?text=Hello%2C%20I%20need%20assistance%20with%20Glance%20registration"
+        target="_blank">
         <div class="whatsapp-icon"></div>
         <span>Need help? Connect with our technical team</span>
       </a>
@@ -709,7 +672,7 @@
 </div>
 
 <script>
-  document.addEventListener("DOMContentLoaded", function() {
+  document.addEventListener("DOMContentLoaded", function () {
     // Get form elements
     const form = document.getElementById("registerForm");
     const password = document.getElementById("password");
@@ -717,22 +680,23 @@
     const termsCheckbox = document.getElementById("terms");
     const emailInput = document.getElementById("email");
     const mobileInput = document.getElementById("mobile_number");
-    const profilePicInput = document.getElementById("profile_pic");
     const firstNameInput = document.getElementById("first_name");
     const lastNameInput = document.getElementById("last_name");
     const registerButton = document.querySelector(".register-button");
-    
+
     // Timeout variables for debouncing
     let emailTimeout;
     let mobileTimeout;
-    
+
+    // Get password requirement elements
     const passReqs = {
       length: document.getElementById("length"),
       lowercase: document.getElementById("lowercase"),
       uppercase: document.getElementById("uppercase"),
-      number: document.getElementById("number")
+      number: document.getElementById("number"),
+      special: document.getElementById("special")
     };
-    
+
     // Get all text/email/password inputs for validation
     const inputs = [
       firstNameInput,
@@ -740,63 +704,54 @@
       emailInput,
       mobileInput,
       password,
-      confirmPassword,
-      profilePicInput
+      confirmPassword
     ];
-    
+
     // Basic real-time validation
     inputs.forEach((input) => {
-      input.addEventListener("input", function() {
+      input.addEventListener("input", function () {
         validateInput(this);
       });
     });
-    
+
+    // Simple validation function
+    function validateInput(input) {
+      const container = input.parentElement;
+      const validationMessage = container.querySelector('.validation-message');
+      const isValid = input.checkValidity() && input.value.trim() !== "";
+
+      if (isValid) {
+        container.classList.add("valid");
+        container.classList.remove("invalid");
+        validationMessage.style.display = 'none';
+      } else {
+        container.classList.remove("valid");
+        if (input.value.trim() !== "") {
+          container.classList.add("invalid");
+          validationMessage.style.display = 'block';
+        } else {
+          container.classList.remove("invalid");
+          validationMessage.style.display = 'none';
+        }
+      }
+    }
+
     // First name validation - letters only
-    firstNameInput.addEventListener('input', function() {
-      const container = this.parentElement;
-      const validationMessage = container.querySelector('.validation-message');
-      
-      if (this.value && !this.checkValidity()) {
-        container.classList.add('invalid');
-        container.classList.remove('valid');
-        validationMessage.style.display = 'block';
-      } else if (this.value) {
-        container.classList.add('valid');
-        container.classList.remove('invalid');
-        validationMessage.style.display = 'none';
-      } else {
-        container.classList.remove('valid');
-        container.classList.remove('invalid');
-        validationMessage.style.display = 'none';
-      }
+    firstNameInput.addEventListener('input', function () {
+      validateInput(this);
     });
-    
+
     // Last name validation - letters only
-    lastNameInput.addEventListener('input', function() {
-      const container = this.parentElement;
-      const validationMessage = container.querySelector('.validation-message');
-      
-      if (this.value && !this.checkValidity()) {
-        container.classList.add('invalid');
-        container.classList.remove('valid');
-        validationMessage.style.display = 'block';
-      } else if (this.value) {
-        container.classList.add('valid');
-        container.classList.remove('invalid');
-        validationMessage.style.display = 'none';
-      } else {
-        container.classList.remove('valid');
-        container.classList.remove('invalid');
-        validationMessage.style.display = 'none';
-      }
+    lastNameInput.addEventListener('input', function () {
+      validateInput(this);
     });
-    
-    // Email validation - domain check
-    emailInput.addEventListener('input', function() {
+
+    // Email validation
+    emailInput.addEventListener('input', function () {
       clearTimeout(emailTimeout);
       const container = this.parentElement;
       const validationMessage = container.querySelector('.validation-message');
-      
+
       if (this.value) {
         // Check for valid domain (@gmail.com or @gla.ac.in)
         if (!this.checkValidity()) {
@@ -806,9 +761,9 @@
           validationMessage.style.display = 'block';
           return;
         }
-        
+
         // Check email availability
-        emailTimeout = setTimeout(function() {
+        emailTimeout = setTimeout(function () {
           fetch(`/accounts/check_username_availability/?username=${encodeURIComponent(emailInput.value)}`)
             .then(response => response.json())
             .then(data => {
@@ -822,68 +777,73 @@
                 container.classList.remove('invalid');
                 validationMessage.style.display = 'none';
               }
+            })
+            .catch(error => {
+              console.error('Error checking email availability:', error);
+              container.classList.remove('valid', 'invalid');
+              validationMessage.style.display = 'none';
             });
         }, 500);
       } else {
-        container.classList.remove('valid');
-        container.classList.remove('invalid');
+        container.classList.remove('valid', 'invalid');
         validationMessage.style.display = 'none';
       }
     });
-    
-    // Mobile availability check
-    mobileInput.addEventListener('input', function() {
+
+    // Mobile validation
+    mobileInput.addEventListener('input', function () {
       clearTimeout(mobileTimeout);
       const container = this.parentElement;
       const validationMessage = container.querySelector('.validation-message');
-      
-      if (this.value && this.checkValidity()) {
-        mobileTimeout = setTimeout(function() {
+
+      if (this.value) {
+        // Check for valid mobile number format
+        if (!this.checkValidity()) {
+          container.classList.add('invalid');
+          container.classList.remove('valid');
+          validationMessage.textContent = "Please enter a valid 10-digit mobile number";
+          validationMessage.style.display = 'block';
+          return;
+        }
+
+        // Check mobile availability
+        mobileTimeout = setTimeout(function () {
           fetch(`/accounts/check_mobile_availability/?mobile=${encodeURIComponent(mobileInput.value)}`)
             .then(response => response.json())
             .then(data => {
               if (!data.is_available) {
                 container.classList.add('invalid');
                 container.classList.remove('valid');
+                validationMessage.textContent = "This mobile number is already registered";
                 validationMessage.style.display = 'block';
               } else {
                 container.classList.add('valid');
                 container.classList.remove('invalid');
                 validationMessage.style.display = 'none';
               }
+            })
+            .catch(error => {
+              console.error('Error checking mobile availability:', error);
+              container.classList.remove('valid', 'invalid');
+              validationMessage.style.display = 'none';
             });
         }, 500);
+      } else {
+        container.classList.remove('valid', 'invalid');
+        validationMessage.style.display = 'none';
       }
     });
-    
-    // Simple validation function
-    function validateInput(input) {
-      const container = input.parentElement;
-      const isValid = input.checkValidity();
-      
-      if (isValid && input.value.trim() !== "") {
-        container.classList.remove("invalid");
-        container.classList.add("valid");
-      } else {
-        container.classList.remove("valid");
-        if (input.value.trim() !== "") {
-          container.classList.add("invalid");
-        } else {
-          container.classList.remove("invalid");
-        }
-      }
-    }
-    
+
     // Profile photo validation on change
-    profilePicInput.addEventListener('change', function() {
+    /* profilePicInput.addEventListener('change', function () {
       const container = this.parentElement;
       const validationMessage = container.querySelector('.validation-message');
-      
+
       if (this.files && this.files.length > 0) {
         const file = this.files[0];
         const fileSize = file.size / 1024 / 1024; // in MB
         const fileType = file.type;
-        
+
         if (fileType.startsWith('image/') && fileSize <= 2) {
           container.classList.add('valid');
           container.classList.remove('invalid');
@@ -891,11 +851,11 @@
         } else {
           container.classList.add('invalid');
           container.classList.remove('valid');
-          
+
           if (!fileType.startsWith('image/')) {
             validationMessage.textContent = "Please upload a valid image file (JPEG, PNG, etc.)";
             validationMessage.style.display = 'block';
-            
+
             // For desktop, also show alert for better visibility
             if (window.innerWidth > 480) {
               alert("Please upload a valid image file (JPEG, PNG, etc.)");
@@ -903,13 +863,13 @@
           } else if (fileSize > 2) {
             validationMessage.textContent = "Profile photo must be less than 2MB in size";
             validationMessage.style.display = 'block';
-            
+
             // For desktop, also show alert for better visibility
             if (window.innerWidth > 480) {
               alert("Profile photo must be less than 2MB in size");
             }
           }
-          
+
           // Reset the input
           this.value = '';
         }
@@ -918,68 +878,112 @@
         container.classList.remove('invalid');
         validationMessage.style.display = 'none';
       }
-    });
-    
+    }); */
+
     // Password requirements validation
-    password.addEventListener("input", function() {
+    password.addEventListener("input", function () {
       const val = this.value;
+      const container = this.parentElement;
+
+      // Check each requirement and apply the valid class
+      if (val.length >= 8) {
+        passReqs.length.classList.add("valid");
+      } else {
+        passReqs.length.classList.remove("valid");
+      }
       
-      // Check each requirement
-      passReqs.length.classList.toggle("valid", val.length >= 8);
-      passReqs.lowercase.classList.toggle("valid", /[a-z]/.test(val));
-      passReqs.uppercase.classList.toggle("valid", /[A-Z]/.test(val));
-      passReqs.number.classList.toggle("valid", /[0-9]/.test(val));
+      if (/[a-z]/.test(val)) {
+        passReqs.lowercase.classList.add("valid");
+      } else {
+        passReqs.lowercase.classList.remove("valid");
+      }
       
+      if (/[A-Z]/.test(val)) {
+        passReqs.uppercase.classList.add("valid");
+      } else {
+        passReqs.uppercase.classList.remove("valid");
+      }
+      
+      if (/[0-9]/.test(val)) {
+        passReqs.number.classList.add("valid");
+      } else {
+        passReqs.number.classList.remove("valid");
+      }
+      
+      if (/[@$!%*?&]/.test(val)) {
+        passReqs.special.classList.add("valid");
+      } else {
+        passReqs.special.classList.remove("valid");
+      }
+
+      // Validate password input
+      if (val.length >= 8 && /[a-z]/.test(val) && /[A-Z]/.test(val) && /[0-9]/.test(val) && /[@$!%*?&]/.test(val)) {
+        container.classList.add("valid");
+        container.classList.remove("invalid");
+      } else {
+        container.classList.remove("valid");
+        if (val.length > 0) {
+          container.classList.add("invalid");
+        } else {
+          container.classList.remove("invalid");
+        }
+      }
+
       // Also validate confirm password if it has a value
       if (confirmPassword.value) {
         validatePasswordMatch();
       }
     });
-    
+
     // Password matching validation
     function validatePasswordMatch() {
       const container = confirmPassword.parentElement;
-      
+      const validationMessage = container.querySelector('.validation-message');
+
       if (confirmPassword.value === "") {
         container.classList.remove("valid", "invalid");
+        validationMessage.style.display = 'none';
       } else if (confirmPassword.value !== password.value) {
         container.classList.add("invalid");
         container.classList.remove("valid");
+        validationMessage.style.display = 'block';
       } else {
         container.classList.add("valid");
         container.classList.remove("invalid");
+        validationMessage.style.display = 'none';
       }
     }
-    
+
     confirmPassword.addEventListener("input", validatePasswordMatch);
-    
+
     // Handle form submission
-    form.addEventListener("submit", function(e) {
-      // Basic client-side validation before submission
+    form.addEventListener("submit", function (e) {
       let hasError = false;
-      
+      let errorMessages = [];
+
       // Validate all inputs
       inputs.forEach((input) => {
         if (!input.checkValidity() || input.value.trim() === "") {
           input.parentElement.classList.add("invalid");
           hasError = true;
+          errorMessages.push(`${input.name} is required`);
         }
       });
-      
+
       // Additional validation for first name
       if (!/^[A-Za-z]+$/.test(firstNameInput.value)) {
         firstNameInput.parentElement.classList.add("invalid");
         firstNameInput.parentElement.querySelector('.validation-message').style.display = 'block';
         hasError = true;
       }
-      
+
       // Additional validation for last name
       if (!/^[A-Za-z]+$/.test(lastNameInput.value)) {
         lastNameInput.parentElement.classList.add("invalid");
         lastNameInput.parentElement.querySelector('.validation-message').style.display = 'block';
         hasError = true;
       }
-      
+
       // Additional validation for email domain
       if (emailInput.value) {
         const emailValue = emailInput.value.toLowerCase();
@@ -990,72 +994,25 @@
           hasError = true;
         }
       }
-      
+
       // Check if email is already registered
       const emailContainer = emailInput.parentElement;
       if (emailContainer.classList.contains('invalid')) {
         hasError = true;
       }
-      
+
       // Check if mobile is already registered
       const mobileContainer = mobileInput.parentElement;
       if (mobileContainer.classList.contains('invalid')) {
         hasError = true;
       }
-      
-      // Validate profile photo
-      const profilePic = document.getElementById('profile_pic');
-      const profilePicContainer = profilePic.parentElement;
-      const profilePicValidationMsg = profilePicContainer.querySelector('.validation-message');
-      
-      if (!profilePic.files || profilePic.files.length === 0) {
-        profilePicContainer.classList.add("invalid");
-        profilePicValidationMsg.textContent = "Please upload a profile photo";
-        profilePicValidationMsg.style.display = 'block';
-        
-        // Only show alert on desktop
-        if (window.innerWidth > 480) {
-          alert("Please upload a profile photo");
-        }
-        hasError = true;
-      } else {
-        const file = profilePic.files[0];
-        const fileSize = file.size / 1024 / 1024; // in MB
-        const fileType = file.type;
-        
-        // Check file type
-        if (!fileType.startsWith('image/')) {
-          profilePicContainer.classList.add("invalid");
-          profilePicValidationMsg.textContent = "Please upload a valid image file (JPEG, PNG, etc.)";
-          profilePicValidationMsg.style.display = 'block';
-          
-          // Only show alert on desktop
-          if (window.innerWidth > 480) {
-            alert("Please upload a valid image file (JPEG, PNG, etc.)");
-          }
-          hasError = true;
-        }
-        
-        // Check file size (2MB max)
-        if (fileSize > 2) {
-          profilePicContainer.classList.add("invalid");
-          profilePicValidationMsg.textContent = "Profile photo must be less than 2MB in size";
-          profilePicValidationMsg.style.display = 'block';
-          
-          // Only show alert on desktop
-          if (window.innerWidth > 480) {
-            alert("Profile photo must be less than 2MB in size");
-          }
-          hasError = true;
-        }
-      }
-      
+
       // Validate password match
       if (password.value !== confirmPassword.value) {
         confirmPassword.parentElement.classList.add("invalid");
         hasError = true;
       }
-      
+
       // Check terms
       if (!termsCheckbox.checked) {
         // Create a custom validation message for terms
@@ -1065,26 +1022,29 @@
         termsMessage.textContent = 'You must agree to the Terms and Conditions';
         termsMessage.style.display = 'block';
         termsMessage.style.marginTop = '0.5rem';
-        
+
         // Remove any existing message
         const existingMessage = termsContainer.querySelector('.validation-message');
         if (existingMessage) {
           existingMessage.remove();
         }
-        
+
         termsContainer.appendChild(termsMessage);
-        
+
         // Only show alert on desktop
         if (window.innerWidth > 480) {
           alert("You must agree to the Terms and Conditions");
         }
-        
         hasError = true;
       }
-      
+
       // Prevent submission if there are errors
       if (hasError) {
         e.preventDefault();
+        // Show all error messages
+        if (errorMessages.length > 0) {
+          alert(errorMessages.join('\n'));
+        }
       } else {
         registerButton.textContent = "Registering...";
         registerButton.disabled = true;
@@ -1093,4 +1053,3 @@
   });
 </script>
 {% endblock %}
-

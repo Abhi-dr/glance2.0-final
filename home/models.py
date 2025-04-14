@@ -12,4 +12,8 @@ class Contact(models.Model):
     
 class Company_Carousel(models.Model):
     image = models.ImageField(upload_to='corousel/')
+    day = models.IntegerField(choices=[(1, 'Day 1'), (2, 'Day 2'), (3, 'Day 3')], default=1)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Company Carousel - Day {self.day}"
