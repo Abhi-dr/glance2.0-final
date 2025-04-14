@@ -26,16 +26,18 @@ def volunteer_dashboard(request):
     Dashboard view for volunteers showing key metrics and recent activity
     """
     # Get statistics
-    total_applications = Application.objects.filter(status="accepted").count()
+    total_applications = Application.objects.count()
     total_attendance_marked = Attendance.objects.count()
     students_present = Attendance.objects.filter(is_present=True).count()
     attendance_pending = total_applications - total_attendance_marked
+    
+    # Check if there's any data
+    has_data = total_applications > 0
     
     # Get interviews by date
     interview_dates = {}
     for date_choice in Job._meta.get_field('interview_date').choices:
         count = Application.objects.filter(
-            status="accepted", 
             job__interview_date=date_choice[0]
         ).count()
         if count > 0:
@@ -54,6 +56,7 @@ def volunteer_dashboard(request):
         'attendance_pending': attendance_pending,
         'interview_dates': interview_dates,
         'recent_attendance': recent_attendance,
+        'has_data': has_data,
     }
     
     return render(request, 'volunteer/dashboard.html', context)
@@ -63,16 +66,17 @@ def volunteer_dashboard(request):
 @volunteer_required
 def volunteer_applications(request):
     """
-    View to display and filter student applications for attendance marking
+    View to display and filter all student applications for attendance marking
     """
     # Get filter parameters
     search_query = request.GET.get('search', '')
     selected_date = request.GET.get('date', '')
     selected_company = request.GET.get('company', '')
     attendance_filter = request.GET.get('attendance', '')
+    status_filter = request.GET.get('status', '')
     
-    # Base queryset - only get accepted applications
-    applications = Application.objects.filter(status="accepted").select_related(
+    # Base queryset - get all applications instead of just accepted ones
+    applications = Application.objects.all().select_related(
         'student', 
         'job__company'
     ).prefetch_related('attendance')
@@ -91,6 +95,9 @@ def volunteer_applications(request):
     if selected_company:
         applications = applications.filter(job__company__id=selected_company)
     
+    if status_filter:
+        applications = applications.filter(status=status_filter)
+        
     if attendance_filter:
         if attendance_filter == 'marked':
             applications = applications.filter(attendance__isnull=False)
@@ -115,6 +122,7 @@ def volunteer_applications(request):
         'selected_date': selected_date,
         'selected_company': selected_company,
         'attendance_filter': attendance_filter,
+        'status_filter': status_filter,
         'search_query': search_query,
     }
     
@@ -207,6 +215,11 @@ def mark_attendance(request, application_id, status):
     View to mark a student's attendance
     """
     application = get_object_or_404(Application, id=application_id)
+    
+    # Check if the application is accepted
+    if application.status != "accepted":
+        messages.warning(request, f"You can only mark attendance for accepted applications. This application is {application.status}.")
+        return redirect('volunteer_applications')
     
     # Check if attendance already exists
     if hasattr(application, 'attendance'):

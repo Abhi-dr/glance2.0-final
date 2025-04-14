@@ -1,64 +1,93 @@
 {% extends 'volunteer/base.html' %} {% load static %} {% block content %}
 <div class="row mb-4">
   <div class="col-12">
-    <h2 class="mb-4">Student Applications</h2>
-    <p class="text-muted">View and mark attendance for all student applications.</p>
+    <div class="d-sm-flex justify-content-between align-items-center">
+      <div>
+        <h2 class="mb-1">Applications</h2>
+        <p class="text-muted">Manage and track student applications</p>
+      </div>
+      <div class="d-flex gap-2 mt-3 mt-sm-0">
+        <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#filtersCollapse" aria-expanded="false" aria-controls="filtersCollapse">
+          <i class="fas fa-filter me-1"></i> Filters
+        </button>
+        <a href="{% url 'volunteer_applications' %}" class="btn btn-sm btn-outline-primary">
+          <i class="fas fa-sync me-1"></i> Reset
+        </a>
+      </div>
+    </div>
   </div>
 </div>
 
 <!-- Filters Section -->
 <div class="row mb-4">
   <div class="col-12">
-    <div class="card">
+    <div class="card border-0 shadow-sm collapse {% if selected_date or selected_company or attendance_filter or status_filter or search_query %}show{% endif %}" id="filtersCollapse">
       <div class="card-body">
-        <h5 class="card-title mb-3">Filter Applications</h5>
+        <h5 class="card-title mb-3">
+          <i class="fas fa-filter me-2 text-primary"></i>Filter Applications
+        </h5>
         <form method="GET" class="row g-3">
-          <!-- Date Filter -->
-          <div class="col-md-3">
-            <label for="date" class="form-label">Interview Date</label>
-            <select class="form-select" id="date" name="date">
-              <option value="">All Dates</option>
-              {% for date in interview_dates %}
-              <option value="{{ date }}" {% if selected_date == date %}selected{% endif %}>{{ date }}</option>
-              {% endfor %}
-            </select>
+          <div class="col-md-6 col-lg-3">
+            <div class="form-floating">
+              <select class="form-select" id="date" name="date">
+                <option value="">All Dates</option>
+                {% for date in interview_dates %}
+                <option value="{{ date }}" {% if selected_date == date %}selected{% endif %}>{{ date }}</option>
+                {% endfor %}
+              </select>
+              <label for="date">Interview Date</label>
+            </div>
           </div>
           
-          <!-- Company Filter -->
-          <div class="col-md-3">
-            <label for="company" class="form-label">Company</label>
-            <select class="form-select" id="company" name="company">
-              <option value="">All Companies</option>
-              {% for company in companies %}
-              <option value="{{ company.id }}" {% if selected_company == company.id %}selected{% endif %}>{{ company.name }}</option>
-              {% endfor %}
-            </select>
+          <div class="col-md-6 col-lg-3">
+            <div class="form-floating">
+              <select class="form-select" id="company" name="company">
+                <option value="">All Companies</option>
+                {% for company in companies %}
+                <option value="{{ company.id }}" {% if selected_company == company.id %}selected{% endif %}>{{ company.name }}</option>
+                {% endfor %}
+              </select>
+              <label for="company">Company</label>
+            </div>
           </div>
           
-          <!-- Status Filter -->
-          <div class="col-md-3">
-            <label for="attendance" class="form-label">Attendance Status</label>
-            <select class="form-select" id="attendance" name="attendance">
-              <option value="">All Status</option>
-              <option value="marked" {% if attendance_filter == 'marked' %}selected{% endif %}>Attendance Marked</option>
-              <option value="present" {% if attendance_filter == 'present' %}selected{% endif %}>Present</option>
-              <option value="absent" {% if attendance_filter == 'absent' %}selected{% endif %}>Absent</option>
-              <option value="pending" {% if attendance_filter == 'pending' %}selected{% endif %}>Pending</option>
-            </select>
+          <div class="col-md-6 col-lg-3">
+            <div class="form-floating">
+              <select class="form-select" id="attendance" name="attendance">
+                <option value="">All Attendance</option>
+                <option value="marked" {% if attendance_filter == 'marked' %}selected{% endif %}>Attendance Marked</option>
+                <option value="present" {% if attendance_filter == 'present' %}selected{% endif %}>Present</option>
+                <option value="absent" {% if attendance_filter == 'absent' %}selected{% endif %}>Absent</option>
+                <option value="pending" {% if attendance_filter == 'pending' %}selected{% endif %}>Pending</option>
+              </select>
+              <label for="attendance">Attendance Status</label>
+            </div>
           </div>
           
-          <!-- Search Input -->
-          <div class="col-md-3">
-            <label for="search" class="form-label">Search Student</label>
-            <input type="text" class="form-control" id="search" name="search" placeholder="Name or Roll No" value="{{ search_query }}">
+          <div class="col-md-6 col-lg-3">
+            <div class="form-floating">
+              <select class="form-select" id="status" name="status">
+                <option value="">All Applications</option>
+                <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
+                <option value="accepted" {% if status_filter == 'accepted' %}selected{% endif %}>Accepted</option>
+                <option value="rejected" {% if status_filter == 'rejected' %}selected{% endif %}>Rejected</option>
+              </select>
+              <label for="status">Application Status</label>
+            </div>
           </div>
           
-          <!-- Filter Buttons -->
-          <div class="col-12 mt-3">
-            <button type="submit" class="btn btn-primary">
-              <i class="fas fa-filter me-1"></i> Apply Filters
+          <div class="col-md-6">
+            <div class="form-floating">
+              <input type="text" class="form-control" id="search" name="search" placeholder="Name or Roll No" value="{{ search_query }}">
+              <label for="search">Search Student</label>
+            </div>
+          </div>
+          
+          <div class="col-md-6 d-flex align-items-center">
+            <button type="submit" class="btn btn-primary me-2">
+              <i class="fas fa-search me-1"></i> Apply Filters
             </button>
-            <a href="{% url 'volunteer_applications' %}" class="btn btn-outline-secondary ms-2">
+            <a href="{% url 'volunteer_applications' %}" class="btn btn-outline-secondary">
               <i class="fas fa-redo me-1"></i> Reset
             </a>
           </div>
@@ -68,27 +97,96 @@
   </div>
 </div>
 
+<!-- Active Filters -->
+{% if selected_date or selected_company or attendance_filter or status_filter or search_query %}
+<div class="row mb-3">
+  <div class="col-12">
+    <div class="d-flex flex-wrap gap-2 align-items-center">
+      <span class="text-muted me-2">Active filters:</span>
+      
+      {% if selected_date %}
+      <span class="badge bg-info rounded-pill">
+        <i class="fas fa-calendar-day me-1"></i> {{ selected_date }}
+        <a href="{% url 'volunteer_applications' %}?{% if selected_company %}company={{ selected_company }}{% endif %}{% if attendance_filter %}&attendance={{ attendance_filter }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="text-white ms-1"><i class="fas fa-times-circle"></i></a>
+      </span>
+      {% endif %}
+      
+      {% if selected_company %}
+      <span class="badge bg-info rounded-pill">
+        <i class="fas fa-building me-1"></i> 
+        {% for company in companies %}
+          {% if company.id == selected_company %}{{ company.name }}{% endif %}
+        {% endfor %}
+        <a href="{% url 'volunteer_applications' %}?{% if selected_date %}date={{ selected_date }}{% endif %}{% if attendance_filter %}&attendance={{ attendance_filter }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="text-white ms-1"><i class="fas fa-times-circle"></i></a>
+      </span>
+      {% endif %}
+      
+      {% if attendance_filter %}
+      <span class="badge bg-info rounded-pill">
+        <i class="fas fa-user-check me-1"></i> 
+        {% if attendance_filter == 'marked' %}Marked
+        {% elif attendance_filter == 'present' %}Present
+        {% elif attendance_filter == 'absent' %}Absent
+        {% elif attendance_filter == 'pending' %}Pending
+        {% endif %}
+        <a href="{% url 'volunteer_applications' %}?{% if selected_date %}date={{ selected_date }}{% endif %}{% if selected_company %}&company={{ selected_company }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="text-white ms-1"><i class="fas fa-times-circle"></i></a>
+      </span>
+      {% endif %}
+      
+      {% if status_filter %}
+      <span class="badge bg-info rounded-pill">
+        <i class="fas fa-clipboard-check me-1"></i> 
+        {% if status_filter == 'pending' %}Pending
+        {% elif status_filter == 'accepted' %}Accepted
+        {% elif status_filter == 'rejected' %}Rejected
+        {% endif %}
+        <a href="{% url 'volunteer_applications' %}?{% if selected_date %}date={{ selected_date }}{% endif %}{% if selected_company %}&company={{ selected_company }}{% endif %}{% if attendance_filter %}&attendance={{ attendance_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="text-white ms-1"><i class="fas fa-times-circle"></i></a>
+      </span>
+      {% endif %}
+      
+      {% if search_query %}
+      <span class="badge bg-info rounded-pill">
+        <i class="fas fa-search me-1"></i> "{{ search_query }}"
+        <a href="{% url 'volunteer_applications' %}?{% if selected_date %}date={{ selected_date }}{% endif %}{% if selected_company %}&company={{ selected_company }}{% endif %}{% if attendance_filter %}&attendance={{ attendance_filter }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}" class="text-white ms-1"><i class="fas fa-times-circle"></i></a>
+      </span>
+      {% endif %}
+      
+      <a href="{% url 'volunteer_applications' %}" class="ms-2 btn btn-sm btn-outline-secondary">
+        <i class="fas fa-times me-1"></i> Clear All
+      </a>
+    </div>
+  </div>
+</div>
+{% endif %}
+
 <!-- Applications List -->
 <div class="row">
   <div class="col-12">
-    <div class="card">
-      <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">Applications</h5>
-        <span class="badge bg-primary">{{ applications|length }} results</span>
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white py-3">
+        <div class="d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">
+            <i class="fas fa-list-alt me-2 text-primary"></i>Applications
+          </h5>
+          <div>
+            <span class="badge bg-primary rounded-pill px-3 py-2">{{ applications|length }} results</span>
+          </div>
+        </div>
       </div>
-      <div class="card-body">
+      <div class="card-body p-0">
         {% if applications %}
         <div class="table-responsive">
-          <table class="table table-hover">
-            <thead>
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
               <tr>
                 <th>Student</th>
-                <th>University Roll No</th>
+                <th>University ID</th>
                 <th>Company</th>
-                <th>Job Role</th>
-                <th>Interview Date</th>
+                <th>Position</th>
+                <th>Date</th>
+                <th>Status</th>
                 <th>Attendance</th>
-                <th>Actions</th>
+                <th class="text-center">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -96,42 +194,62 @@
               <tr>
                 <td>
                   <div class="d-flex align-items-center">
-                    <img src="{{ application.student.profile_pic.url }}" alt="Profile" class="rounded-circle me-2" width="32" height="32">
+                    <img src="{{ application.student.profile_pic.url }}" alt="Profile" class="rounded-circle me-2" width="40" height="40">
                     <div>
-                      <div>{{ application.student.first_name }} {{ application.student.last_name }}</div>
+                      <div class="fw-bold">{{ application.student.first_name }} {{ application.student.last_name }}</div>
                       <small class="text-muted">{{ application.student.course }} - {{ application.student.year }}</small>
                     </div>
                   </div>
                 </td>
                 <td>{{ application.student.university_roll_no }}</td>
-                <td>{{ application.job.company.name }}</td>
-                <td>{{ application.job.role }}</td>
-                <td>{{ application.job.interview_date }}</td>
                 <td>
-                  {% if application.attendance %}
-                    {% if application.attendance.is_present %}
-                      <span class="badge bg-success">Present</span>
+                  <div class="d-flex align-items-center">
+                    {% if application.job.company.logo %}
+                    <img src="{{ application.job.company.logo.url }}" alt="{{ application.job.company.name }}" class="me-2" width="24" height="24">
                     {% else %}
-                      <span class="badge bg-danger">Absent</span>
+                    <span class="me-2 text-muted"><i class="fas fa-building"></i></span>
                     {% endif %}
+                    {{ application.job.company.name }}
+                  </div>
+                </td>
+                <td>{{ application.job.role }}</td>
+                <td><span class="badge bg-light text-dark">{{ application.job.interview_date }}</span></td>
+                <td>
+                  {% if application.status == 'accepted' %}
+                    <span class="badge bg-success">Accepted</span>
+                  {% elif application.status == 'rejected' %}
+                    <span class="badge bg-danger">Rejected</span>
                   {% else %}
                     <span class="badge bg-warning">Pending</span>
                   {% endif %}
                 </td>
                 <td>
-                  {% if not application.attendance %}
-                    <div class="btn-group" role="group">
-                      <a href="{% url 'mark_attendance' application_id=application.id status='present' %}" class="btn btn-sm btn-success">
-                        <i class="fas fa-check me-1"></i> Present
+                  {% if application.attendance %}
+                    {% if application.attendance.is_present %}
+                      <span class="badge bg-success"><i class="fas fa-check me-1"></i>Present</span>
+                    {% else %}
+                      <span class="badge bg-danger"><i class="fas fa-times me-1"></i>Absent</span>
+                    {% endif %}
+                  {% else %}
+                    <span class="badge bg-secondary"><i class="fas fa-hourglass-half me-1"></i>Pending</span>
+                  {% endif %}
+                </td>
+                <td class="text-center">
+                  {% if not application.attendance and application.status == 'accepted' %}
+                    <div class="btn-group btn-group-sm" role="group">
+                      <a href="{% url 'mark_attendance' application_id=application.id status='present' %}" class="btn btn-success" data-bs-toggle="tooltip" title="Mark Present">
+                        <i class="fas fa-check"></i>
                       </a>
-                      <a href="{% url 'mark_attendance' application_id=application.id status='absent' %}" class="btn btn-sm btn-danger">
-                        <i class="fas fa-times me-1"></i> Absent
+                      <a href="{% url 'mark_attendance' application_id=application.id status='absent' %}" class="btn btn-danger" data-bs-toggle="tooltip" title="Mark Absent">
+                        <i class="fas fa-times"></i>
                       </a>
                     </div>
-                  {% else %}
-                    <a href="{% url 'change_attendance' attendance_id=application.attendance.id %}" class="btn btn-sm btn-outline-primary">
-                      <i class="fas fa-edit me-1"></i> Change
+                  {% elif application.attendance %}
+                    <a href="{% url 'change_attendance' attendance_id=application.attendance.id %}" class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="Change Attendance Status">
+                      <i class="fas fa-exchange-alt"></i>
                     </a>
+                  {% else %}
+                    <span class="badge bg-light text-muted">Not accepted</span>
                   {% endif %}
                 </td>
               </tr>
@@ -140,14 +258,64 @@
           </table>
         </div>
         {% else %}
-        <div class="text-center py-4">
-          <img src="{% static 'img/no-data.svg' %}" alt="No Data" class="img-fluid mb-3" style="max-width: 150px;">
+        <div class="text-center py-5">
+          <img src="{% static 'img/no-data.svg' %}" alt="No Data" class="img-fluid mb-3" style="max-width: 180px;">
           <h5>No Applications Found</h5>
-          <p class="text-muted">Try changing your search criteria or filters.</p>
+          <p class="text-muted px-4">We couldn't find any applications matching your current filters.</p>
+          <div class="mt-3">
+            <p class="mb-3">This could be because:</p>
+            <div class="d-flex flex-column flex-md-row justify-content-center gap-3 mb-3">
+              <div class="card border-0 bg-light p-3 text-center" style="max-width: 200px">
+                <i class="fas fa-users text-primary mb-2 fa-2x"></i>
+                <p class="small mb-0">No students have applied yet</p>
+              </div>
+              <div class="card border-0 bg-light p-3 text-center" style="max-width: 200px">
+                <i class="fas fa-filter text-primary mb-2 fa-2x"></i>
+                <p class="small mb-0">Your search criteria is too specific</p>
+              </div>
+              <div class="card border-0 bg-light p-3 text-center" style="max-width: 200px">
+                <i class="fas fa-calendar-alt text-primary mb-2 fa-2x"></i>
+                <p class="small mb-0">Event registration hasn't started</p>
+              </div>
+            </div>
+          </div>
+          <div class="mt-3">
+            <a href="{% url 'volunteer_applications' %}" class="btn btn-primary">
+              <i class="fas fa-sync me-1"></i> Reset Filters
+            </a>
+            <a href="{% url 'volunteer_dashboard' %}" class="btn btn-outline-secondary ms-2">
+              <i class="fas fa-arrow-left me-1"></i> Back to Dashboard
+            </a>
+          </div>
         </div>
         {% endif %}
       </div>
     </div>
   </div>
 </div>
+
+<style>
+  .form-floating > .form-control {
+    height: calc(3.5rem + 2px);
+    padding: 1rem 0.75rem;
+  }
+  
+  .form-floating > label {
+    padding: 1rem 0.75rem;
+  }
+  
+  .table tr:last-child td {
+    border-bottom: none;
+  }
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    // Initialize tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl)
+    });
+  });
+</script>
 {% endblock %} 
