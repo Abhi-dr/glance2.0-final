@@ -380,8 +380,10 @@
         <label for="email-input">Email</label>
         <div class="input-container">
           <input type="email" id="email-input" name="email" placeholder="Enter your email"
-            pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}" title="Please enter a valid Email ID" required />
+            pattern="[a-zA-Z0-9._%+-]+@(gmail\.com|gla\.ac\.in)$" 
+            title="Please enter an email ending with @gmail.com or @gla.ac.in" required />
           <div class="validation-icon"></div>
+          <div class="validation-message">Only @gmail.com or @gla.ac.in emails are allowed</div>
         </div>
       </div>
       <div class="form-group">
@@ -419,31 +421,67 @@
   document.addEventListener("DOMContentLoaded", function () {
     const inputs = document.querySelectorAll(".input-container input");
     const form = document.getElementById("loginForm");
+    const emailInput = document.getElementById("email-input");
     let isSubmitting = false;
 
     // Function to validate input fields
     function validateInput(input) {
       const container = input.parentElement;
       const isValid = input.checkValidity();
+      const validationMessage = container.querySelector('.validation-message');
 
       if (isValid && input.value.trim() !== "") {
         container.classList.remove("invalid");
         container.classList.add("valid");
+        if (validationMessage) {
+          validationMessage.style.display = 'none';
+        }
       } else {
         container.classList.remove("valid");
         if (input.value.trim() !== "") {
           container.classList.add("invalid");
+          if (validationMessage && input.id === "email-input") {
+            validationMessage.style.display = 'block';
+          }
         } else {
           container.classList.remove("invalid");
+          if (validationMessage) {
+            validationMessage.style.display = 'none';
+          }
         }
       }
     }
 
+    // Email validation - domain check
+    emailInput.addEventListener('input', function() {
+      const container = this.parentElement;
+      const validationMessage = container.querySelector('.validation-message');
+      
+      if (this.value) {
+        // Check for valid domain (@gmail.com or @gla.ac.in)
+        if (!this.checkValidity()) {
+          container.classList.add('invalid');
+          container.classList.remove('valid');
+          validationMessage.style.display = 'block';
+        } else {
+          container.classList.add('valid');
+          container.classList.remove('invalid');
+          validationMessage.style.display = 'none';
+        }
+      } else {
+        container.classList.remove('valid');
+        container.classList.remove('invalid');
+        validationMessage.style.display = 'none';
+      }
+    });
+
     // Real-time validation for all inputs
     inputs.forEach((input) => {
-      input.addEventListener("input", function () {
-        validateInput(this);
-      });
+      if (input.id !== "email-input") {  // Email input has its own validation
+        input.addEventListener("input", function () {
+          validateInput(this);
+        });
+      }
     });
 
     // Form submission handling
@@ -465,6 +503,17 @@
           hasError = true;
         }
       });
+
+      // Additional validation for email domain
+      if (emailInput.value) {
+        const emailValue = emailInput.value.toLowerCase();
+        if (!emailValue.endsWith('@gmail.com') && !emailValue.endsWith('@gla.ac.in')) {
+          emailInput.parentElement.classList.add("invalid");
+          const validationMessage = emailInput.parentElement.querySelector('.validation-message');
+          validationMessage.style.display = 'block';
+          hasError = true;
+        }
+      }
 
       if (hasError) {
         e.preventDefault();

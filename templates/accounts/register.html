@@ -543,9 +543,14 @@
               id="first_name"
               name="first_name"
               placeholder="Enter your first name"
+              pattern="[A-Za-z]+"
+              title="Please enter alphabets only"
               required
             />
             <div class="validation-icon"></div>
+            <div class="validation-message">
+              First name should contain only alphabets
+            </div>
           </div>
         </div>
 
@@ -557,9 +562,14 @@
               id="last_name"
               name="last_name"
               placeholder="Enter your last name"
+              pattern="[A-Za-z]+"
+              title="Please enter alphabets only"
               required
             />
             <div class="validation-icon"></div>
+            <div class="validation-message">
+              Last name should contain only alphabets
+            </div>
           </div>
         </div>
       </div>
@@ -574,13 +584,13 @@
               id="email"
               name="email"
               placeholder="Enter your email"
-              pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
-              title="Please enter a valid Email ID"
+              pattern="[a-zA-Z0-9._%+-]+@(gmail\.com|gla\.ac\.in)$"
+              title="Please enter an email ending with @gmail.com or @gla.ac.in"
               required
             />
             <div class="validation-icon"></div>
             <div class="validation-message">
-              This email is already registered. Please use a different email.
+              Only @gmail.com or @gla.ac.in emails are allowed
             </div>
           </div>
         </div>
@@ -708,7 +718,13 @@
     const emailInput = document.getElementById("email");
     const mobileInput = document.getElementById("mobile_number");
     const profilePicInput = document.getElementById("profile_pic");
+    const firstNameInput = document.getElementById("first_name");
+    const lastNameInput = document.getElementById("last_name");
     const registerButton = document.querySelector(".register-button");
+    
+    // Timeout variables for debouncing
+    let emailTimeout;
+    let mobileTimeout;
     
     const passReqs = {
       length: document.getElementById("length"),
@@ -719,8 +735,8 @@
     
     // Get all text/email/password inputs for validation
     const inputs = [
-      document.getElementById("first_name"),
-      document.getElementById("last_name"),
+      firstNameInput,
+      lastNameInput,
       emailInput,
       mobileInput,
       password,
@@ -735,14 +751,63 @@
       });
     });
     
-    // Email availability check
-    let emailTimeout;
+    // First name validation - letters only
+    firstNameInput.addEventListener('input', function() {
+      const container = this.parentElement;
+      const validationMessage = container.querySelector('.validation-message');
+      
+      if (this.value && !this.checkValidity()) {
+        container.classList.add('invalid');
+        container.classList.remove('valid');
+        validationMessage.style.display = 'block';
+      } else if (this.value) {
+        container.classList.add('valid');
+        container.classList.remove('invalid');
+        validationMessage.style.display = 'none';
+      } else {
+        container.classList.remove('valid');
+        container.classList.remove('invalid');
+        validationMessage.style.display = 'none';
+      }
+    });
+    
+    // Last name validation - letters only
+    lastNameInput.addEventListener('input', function() {
+      const container = this.parentElement;
+      const validationMessage = container.querySelector('.validation-message');
+      
+      if (this.value && !this.checkValidity()) {
+        container.classList.add('invalid');
+        container.classList.remove('valid');
+        validationMessage.style.display = 'block';
+      } else if (this.value) {
+        container.classList.add('valid');
+        container.classList.remove('invalid');
+        validationMessage.style.display = 'none';
+      } else {
+        container.classList.remove('valid');
+        container.classList.remove('invalid');
+        validationMessage.style.display = 'none';
+      }
+    });
+    
+    // Email validation - domain check
     emailInput.addEventListener('input', function() {
       clearTimeout(emailTimeout);
       const container = this.parentElement;
       const validationMessage = container.querySelector('.validation-message');
       
-      if (this.value && this.checkValidity()) {
+      if (this.value) {
+        // Check for valid domain (@gmail.com or @gla.ac.in)
+        if (!this.checkValidity()) {
+          container.classList.add('invalid');
+          container.classList.remove('valid');
+          validationMessage.textContent = "Only @gmail.com or @gla.ac.in emails are allowed";
+          validationMessage.style.display = 'block';
+          return;
+        }
+        
+        // Check email availability
         emailTimeout = setTimeout(function() {
           fetch(`/accounts/check_username_availability/?username=${encodeURIComponent(emailInput.value)}`)
             .then(response => response.json())
@@ -750,6 +815,7 @@
               if (!data.is_available) {
                 container.classList.add('invalid');
                 container.classList.remove('valid');
+                validationMessage.textContent = "This email is already registered. Please use a different email.";
                 validationMessage.style.display = 'block';
               } else {
                 container.classList.add('valid');
@@ -758,11 +824,14 @@
               }
             });
         }, 500);
+      } else {
+        container.classList.remove('valid');
+        container.classList.remove('invalid');
+        validationMessage.style.display = 'none';
       }
     });
     
     // Mobile availability check
-    let mobileTimeout;
     mobileInput.addEventListener('input', function() {
       clearTimeout(mobileTimeout);
       const container = this.parentElement;
@@ -897,6 +966,31 @@
         }
       });
       
+      // Additional validation for first name
+      if (!/^[A-Za-z]+$/.test(firstNameInput.value)) {
+        firstNameInput.parentElement.classList.add("invalid");
+        firstNameInput.parentElement.querySelector('.validation-message').style.display = 'block';
+        hasError = true;
+      }
+      
+      // Additional validation for last name
+      if (!/^[A-Za-z]+$/.test(lastNameInput.value)) {
+        lastNameInput.parentElement.classList.add("invalid");
+        lastNameInput.parentElement.querySelector('.validation-message').style.display = 'block';
+        hasError = true;
+      }
+      
+      // Additional validation for email domain
+      if (emailInput.value) {
+        const emailValue = emailInput.value.toLowerCase();
+        if (!emailValue.endsWith('@gmail.com') && !emailValue.endsWith('@gla.ac.in')) {
+          emailInput.parentElement.classList.add("invalid");
+          emailInput.parentElement.querySelector('.validation-message').textContent = "Only @gmail.com or @gla.ac.in emails are allowed";
+          emailInput.parentElement.querySelector('.validation-message').style.display = 'block';
+          hasError = true;
+        }
+      }
+      
       // Check if email is already registered
       const emailContainer = emailInput.parentElement;
       if (emailContainer.classList.contains('invalid')) {
@@ -999,3 +1093,4 @@
   });
 </script>
 {% endblock %}
+
