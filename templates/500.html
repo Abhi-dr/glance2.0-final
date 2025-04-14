@@ -1,0 +1,340 @@
+{% extends 'home/base.html' %}
+{% load static %}
+
+{% block title %}500 - Server Error{% endblock %}
+
+{% block css %}
+<style>
+  .error-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding-top: 80px;
+    padding-bottom: 40px;
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
+  }
+  
+  .error-content {
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 3rem;
+    border-radius: 1rem;
+    background-color: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    position: relative;
+    z-index: 2;
+  }
+  
+  .error-title {
+    font-size: 3.5rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    color: #e74a3b;
+    position: relative;
+    display: inline-block;
+  }
+  
+  .error-title::after {
+    content: "500";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 8rem;
+    opacity: 0.05;
+    z-index: -1;
+  }
+  
+  .error-subtitle {
+    font-size: 1.5rem;
+    color: #4e73df;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+  }
+  
+  .error-message {
+    font-size: 1.1rem;
+    color: #5a5c69;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+  }
+  
+  .error-image {
+    max-width: 300px;
+    margin: 2rem auto;
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  .error-code {
+    font-family: monospace;
+    background: #f8f9fc;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 2rem;
+    color: #e74a3b;
+    position: relative;
+    display: inline-block;
+  }
+  
+  .error-code::before {
+    content: ">";
+    position: absolute;
+    left: 10px;
+    color: #4e73df;
+  }
+  
+  .error-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+  
+  .btn-error {
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .btn-error:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+  }
+  
+  .gears {
+    position: absolute;
+    top: 60px;
+    right: 20px;
+    width: 120px;
+    height: 120px;
+    animation: spin 10s linear infinite;
+    opacity: 0.1;
+    z-index: 1;
+  }
+  
+  .paper-plane {
+    position: absolute;
+    bottom: 40px;
+    left: -50px;
+    width: 80px;
+    height: 80px;
+    animation: flyPlane 15s linear infinite;
+    z-index: 1;
+  }
+  
+  .funny-quote {
+    font-style: italic;
+    color: #4e73df;
+    margin: 2rem 0;
+    font-weight: 500;
+    position: relative;
+    padding: 0 2rem;
+  }
+  
+  .funny-quote::before,
+  .funny-quote::after {
+    content: '"';
+    font-size: 2rem;
+    position: absolute;
+    color: rgba(78, 115, 223, 0.2);
+  }
+  
+  .funny-quote::before {
+    left: 0;
+    top: -10px;
+  }
+  
+  .funny-quote::after {
+    right: 0;
+    bottom: -20px;
+  }
+  
+  /* Animations */
+  @keyframes float {
+    0% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
+    100% {
+      transform: translateY(0px);
+    }
+  }
+  
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  
+  @keyframes flyPlane {
+    0% {
+      transform: translateX(0) rotate(10deg);
+    }
+    100% {
+      transform: translateX(calc(100vw + 100px)) rotate(10deg);
+    }
+  }
+  
+  /* Particles */
+  .particles {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 0;
+    overflow: hidden;
+  }
+  
+  .particle {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.5;
+    animation-name: particleFall;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+  }
+  
+  @keyframes particleFall {
+    0% {
+      transform: translateY(-100px) rotate(0deg);
+      opacity: 0;
+    }
+    10% {
+      opacity: 0.5;
+    }
+    90% {
+      opacity: 0.5;
+    }
+    100% {
+      transform: translateY(calc(100vh + 100px)) rotate(360deg);
+      opacity: 0;
+    }
+  }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+    .error-title {
+      font-size: 2.5rem;
+    }
+    
+    .error-title::after {
+      font-size: 6rem;
+    }
+    
+    .error-subtitle {
+      font-size: 1.25rem;
+    }
+    
+    .error-content {
+      padding: 2rem 1.5rem;
+    }
+    
+    .error-image {
+      max-width: 200px;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="error-container">
+  <div class="particles" id="particles"></div>
+  
+  <img src="{% static 'img/home/gears.svg' %}" alt="Gears" class="gears">
+  <img src="{% static 'img/home/paper-airplane.svg' %}" alt="Paper Plane" class="paper-plane">
+  
+  <div class="error-content">
+    <h1 class="error-title">Server Error</h1>
+    <h2 class="error-subtitle">Oops! Our server is having a bad day</h2>
+    
+    <div class="error-image">
+      <img src="{% static 'img/home/error-robot.svg' %}" alt="Error Robot" class="img-fluid">
+    </div>
+    
+    <p class="error-message">
+      Looks like our server decided to take an unexpected coffee break. Our team of coding ninjas 
+      has been automatically notified and is working on the problem faster than you can say 
+      "have you tried turning it off and on again?"
+    </p>
+    
+    <div class="error-code">
+      HTTP 500 - Internal Server Error
+    </div>
+    
+    <p class="funny-quote">
+      "To err is human, but to really foul things up you need a computer."
+    </p>
+    
+    <div class="error-buttons">
+      <a href="{% url 'home' %}" class="btn btn-primary btn-lg btn-error">
+        <i class="fas fa-home me-2"></i> Go Home
+      </a>
+      <a href="javascript:history.back()" class="btn btn-outline-secondary btn-lg btn-error">
+        <i class="fas fa-arrow-left me-2"></i> Go Back
+      </a>
+      <a href="javascript:window.location.reload()" class="btn btn-success btn-lg btn-error">
+        <i class="fas fa-sync-alt me-2"></i> Try Again
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const particles = document.getElementById('particles');
+    const colors = ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b'];
+    
+    // Create particles
+    for (let i = 0; i < 50; i++) {
+      const particle = document.createElement('div');
+      particle.classList.add('particle');
+      
+      // Random styles
+      const size = Math.floor(Math.random() * 10) + 5;
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      const left = Math.random() * 100;
+      const delay = Math.random() * 15;
+      const duration = Math.random() * 10 + 10;
+      
+      particle.style.width = `${size}px`;
+      particle.style.height = `${size}px`;
+      particle.style.backgroundColor = color;
+      particle.style.left = `${left}%`;
+      particle.style.animationDelay = `${delay}s`;
+      particle.style.animationDuration = `${duration}s`;
+      
+      particles.appendChild(particle);
+    }
+    
+    // Easter egg - Konami code
+    let konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
+    let konamiIndex = 0;
+    
+    document.addEventListener('keydown', function(e) {
+      if (e.key === konamiCode[konamiIndex]) {
+        konamiIndex++;
+        if (konamiIndex === konamiCode.length) {
+          // Activate Easter egg
+          document.querySelector('.error-image img').src = "{% static 'img/home/dancing-robot.svg' %}";
+          document.querySelector('.funny-quote').innerText = "You found the secret code! This robot's got moves!";
+          konamiIndex = 0;
+        }
+      } else {
+        konamiIndex = 0;
+      }
+    });
+  });
+</script>
+{% endblock %} 

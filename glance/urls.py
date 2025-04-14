@@ -15,5 +15,7 @@ urlpatterns = [
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # handle 404
- 
 handler404 = "accounts.views.page_not_found_view"
+
+# handle 500
+handler500 = "accounts.views.server_error_view"

@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <!-- Large Gear -->
+  <g id="large-gear" fill="#4e73df">
+    <circle cx="100" cy="100" r="40" fill="#f8f9fc" stroke="#4e73df" stroke-width="2" />
+    <circle cx="100" cy="100" r="15" fill="#4e73df" />
+    <circle cx="100" cy="100" r="8" fill="#f6c23e" />
+    
+    <!-- Gear Teeth -->
+    <rect x="98" y="40" width="4" height="20" />
+    <rect x="98" y="140" width="4" height="20" />
+    <rect x="40" y="98" width="20" height="4" />
+    <rect x="140" y="98" width="20" height="4" />
+    
+    <!-- Diagonal Teeth -->
+    <rect x="57" y="57" width="20" height="4" transform="rotate(45 57 57)" />
+    <rect x="139" y="139" width="20" height="4" transform="rotate(45 139 139)" />
+    <rect x="57" y="139" width="20" height="4" transform="rotate(-45 57 139)" />
+    <rect x="139" y="57" width="20" height="4" transform="rotate(-45 139 57)" />
+  </g>
+  
+  <!-- Small Gear Top Right -->
+  <g id="small-gear-top-right" fill="#e74a3b">
+    <circle cx="150" cy="50" r="25" fill="#f8f9fc" stroke="#e74a3b" stroke-width="2" />
+    <circle cx="150" cy="50" r="10" fill="#e74a3b" />
+    <circle cx="150" cy="50" r="5" fill="#f6c23e" />
+    
+    <!-- Gear Teeth -->
+    <rect x="148.5" y="15" width="3" height="15" />
+    <rect x="148.5" y="70" width="3" height="15" />
+    <rect x="115" y="48.5" width="15" height="3" />
+    <rect x="170" y="48.5" width="15" height="3" />
+    
+    <!-- Diagonal Teeth -->
+    <rect x="127" y="27" width="15" height="3" transform="rotate(45 127 27)" />
+    <rect x="173" y="73" width="15" height="3" transform="rotate(45 173 73)" />
+    <rect x="127" y="73" width="15" height="3" transform="rotate(-45 127 73)" />
+    <rect x="173" y="27" width="15" height="3" transform="rotate(-45 173 27)" />
+  </g>
+  
+  <!-- Small Gear Bottom Left -->
+  <g id="small-gear-bottom-left" fill="#1cc88a">
+    <circle cx="50" cy="150" r="30" fill="#f8f9fc" stroke="#1cc88a" stroke-width="2" />
+    <circle cx="50" cy="150" r="12" fill="#1cc88a" />
+    <circle cx="50" cy="150" r="6" fill="#f6c23e" />
+    
+    <!-- Gear Teeth -->
+    <rect x="48.5" y="110" width="3" height="15" />
+    <rect x="48.5" y="175" width="3" height="15" />
+    <rect x="10" y="148.5" width="15" height="3" />
+    <rect x="75" y="148.5" width="15" height="3" />
+    
+    <!-- Diagonal Teeth -->
+    <rect x="24" y="124" width="15" height="3" transform="rotate(45 24 124)" />
+    <rect x="76" y="176" width="15" height="3" transform="rotate(45 76 176)" />
+    <rect x="24" y="176" width="15" height="3" transform="rotate(-45 24 176)" />
+    <rect x="76" y="124" width="15" height="3" transform="rotate(-45 76 124)" />
+  </g>
+</svg> 
