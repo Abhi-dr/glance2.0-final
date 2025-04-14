@@ -36,7 +36,7 @@ INSTALLED_APPS = [
     'student.apps.StudentConfig',
     "administration.apps.AdministrationConfig",
     'volunteer.apps.VolunteerConfig',
-    'dbbackup'
+    'dbbackup',
     
     'import_export',
     "user_visit"
