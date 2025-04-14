@@ -3,9 +3,6 @@ from .models import Contact, Company_Carousel
 from django.contrib import messages
 
 def home(request):
-    
-    images = Company_Carousel.objects.all()
-    
     if request.method == "POST":
         name = request.POST.get("name")
         email = request.POST.get("email")
@@ -22,11 +19,7 @@ def home(request):
         messages.success(request, "Your message has been sent successfully.")
         return redirect("home")
     
-    parameters = {
-        'images': images
-    }
-    
-    return render(request, 'home/index.html', parameters)
+    return render(request, 'home/index.html')
 
 
 # ========================================== ALUMNI REGISTRATIONS =========================================
@@ -40,6 +33,5 @@ def terms(request):
     return render(request, 'home/terms.html')
 
 def companies(request):
-    day = request.GET.get('day', 1)  # Default to day 1 if not specified
-    companies = Company_Carousel.objects.filter(day=day)
-    return render(request, 'home/companies.html', {'companies': companies, 'day': day})
+    day = request.GET.get('day', '1')  # Default to day 1 if not specified
+    return render(request, 'home/companies.html', {'day': day})

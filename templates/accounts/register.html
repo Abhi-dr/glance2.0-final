@@ -995,13 +995,13 @@
         }
       }
 
-      // Check if email is already registered
+      // Check if email has validation errors
       const emailContainer = emailInput.parentElement;
       if (emailContainer.classList.contains('invalid')) {
         hasError = true;
       }
 
-      // Check if mobile is already registered
+      // Check if mobile has validation errors
       const mobileContainer = mobileInput.parentElement;
       if (mobileContainer.classList.contains('invalid')) {
         hasError = true;
@@ -1038,16 +1038,34 @@
         hasError = true;
       }
 
+      // Log validation state for debugging
+      console.log("Form validation error:", hasError);
+      console.log("Error messages:", errorMessages);
+
       // Prevent submission if there are errors
       if (hasError) {
         e.preventDefault();
         // Show all error messages
-        if (errorMessages.length > 0) {
+        if (errorMessages.length > 0 && window.innerWidth > 480) {
           alert(errorMessages.join('\n'));
         }
       } else {
         registerButton.textContent = "Registering...";
         registerButton.disabled = true;
+        
+        // Debug form data
+        console.log("Form is valid, submitting...");
+        const formData = new FormData(form);
+        for (let [key, value] of formData.entries()) {
+          console.log(key + ': ' + value);
+        }
+      }
+    });
+    
+    // Debug issue where form might be valid but not submitting
+    form.addEventListener("submit", function(e) {
+      if (!e.defaultPrevented) {
+        console.log("Form is being submitted!");
       }
     });
   });

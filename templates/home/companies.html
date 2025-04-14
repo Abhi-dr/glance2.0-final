@@ -3,69 +3,186 @@
 
 {% block body %}
 <div class="container mt-5 pt-5">
-    <h2 class="text-center mb-4">Companies</h2>
+    <h2 class="text-center mb-4">Our Partners</h2>
     
-    <!-- Day Selection -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="btn-group" role="group">
-                <a href="?day=1" class="btn btn-outline-primary {% if day == 1 %}active{% endif %}">Day 1</a>
-                <a href="?day=2" class="btn btn-outline-primary {% if day == 2 %}active{% endif %}">Day 2</a>
-                <a href="?day=3" class="btn btn-outline-primary {% if day == 3 %}active{% endif %}">Day 3</a>
-            </div>
+    <!-- Day Filter Buttons -->
+    <div class="day-filter text-center mb-5">
+        <div class="btn-group" role="group" aria-label="Day filter">
+            <a href="{% url 'companies' %}?day=1" class="btn btn-outline-primary {% if day == '1' or day == 1 %}active{% endif %}">Day 1</a>
+            <a href="{% url 'companies' %}?day=2" class="btn btn-outline-primary {% if day == '2' or day == 2 %}active{% endif %}">Day 2</a>
+            <a href="{% url 'companies' %}?day=3" class="btn btn-outline-primary {% if day == '3' or day == 3 %}active{% endif %}">Day 3</a>
         </div>
     </div>
-
-    <!-- Companies Carousel -->
-    <div class="row justify-content-center">
-        <div class="col-md-10">
-            <div id="companiesCarousel" class="carousel slide" data-bs-ride="carousel">
-                <div class="carousel-inner">
-                    {% for company in companies %}
-                    <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                        <img src="{{ company.image.url }}" class="d-block w-100 rounded" alt="{{ company.name }}" style="max-height: 500px; object-fit: contain;">
+    
+    <!-- Dynamic Company Display -->
+    <div class="companies-showcase">
+        {% if companies %}
+            {% for company in companies %}
+                <div class="company-card" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:50 }}">
+                    <div class="company-logo">
+                        <img src="{{ company.image.url }}" alt="Company Logo" loading="lazy">
                     </div>
-                    {% empty %}
-                    <div class="carousel-item active">
-                        <div class="text-center py-5">
-                            <h3>No companies scheduled for Day {{ day }}</h3>
-                        </div>
-                    </div>
-                    {% endfor %}
                 </div>
-                {% if companies|length > 1 %}
-                <button class="carousel-control-prev" type="button" data-bs-target="#companiesCarousel" data-bs-slide="prev">
-                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Previous</span>
-                </button>
-                <button class="carousel-control-next" type="button" data-bs-target="#companiesCarousel" data-bs-slide="next">
-                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Next</span>
-                </button>
-                {% endif %}
+            {% endfor %}
+        {% else %}
+            <div class="col-12 text-center">
+                <p>No companies found for Day {{ day }}</p>
             </div>
-        </div>
+        {% endif %}
+    </div>
+    
+    <div class="text-center mt-5">
+        <a href="{% url 'home' %}#companies" class="btn btn-primary">
+            <i class="fas fa-arrow-left"></i> Back to Home
+        </a>
     </div>
 </div>
 
 <style>
-    .carousel {
-        background: rgba(255, 255, 255, 0.9);
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    /* Modern company showcase styling */
+    .companies-showcase {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 2.5rem;
+        margin: 3rem 0;
     }
     
-    .carousel-item img {
-        max-height: 500px;
-        object-fit: contain;
+    .company-card {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-radius: 24px;
+        padding: 2rem;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+        transform: perspective(1000px) rotateX(0deg);
+        height: 170px;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
     }
     
-    .btn-group {
-        background: rgba(255, 255, 255, 0.9);
-        padding: 10px;
-        border-radius: 10px;
-        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    .company-card:hover {
+        transform: perspective(1000px) rotateX(5deg) translateY(-5px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15), 0 5px 15px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .company-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle at center, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 70%);
+        opacity: 0;
+        transition: opacity 0.5s ease;
+        pointer-events: none;
+    }
+    
+    .company-card:hover::before {
+        opacity: 1;
+    }
+    
+    .company-logo {
+        height: 100px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        z-index: 1;
+    }
+    
+    .company-logo img {
+        max-height: 100%;
+        max-width: 100%;
+        filter: brightness(1) drop-shadow(0 8px 24px rgba(0, 0, 0, 0.15));
+        transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+        transform-origin: center;
+    }
+    
+    .company-card:hover .company-logo img {
+        filter: brightness(1.3) drop-shadow(0 12px 30px rgba(0, 0, 0, 0.25));
+        transform: scale(1.08);
+    }
+    
+    .day-filter .btn-group {
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        border-radius: 12px;
+        overflow: hidden;
+    }
+    
+    .day-filter .btn {
+        padding: 10px 20px;
+        border-radius: 0;
+        transition: all 0.3s ease;
+        border-width: 1px;
+        font-weight: 500;
+    }
+    
+    .day-filter .btn:first-child {
+        border-top-left-radius: 12px;
+        border-bottom-left-radius: 12px;
+    }
+    
+    .day-filter .btn:last-child {
+        border-top-right-radius: 12px;
+        border-bottom-right-radius: 12px;
+    }
+    
+    .day-filter .btn.active {
+        transform: scale(1.05);
+        z-index: 5;
+    }
+    
+    @media (max-width: 992px) {
+        .companies-showcase {
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 2rem;
+        }
+        
+        .company-card {
+            padding: 1.8rem;
+            height: 150px;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .companies-showcase {
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .company-card {
+            padding: 1.5rem;
+            height: 130px;
+        }
+        
+        .company-logo {
+            height: 80px;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .companies-showcase {
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 1rem;
+        }
+        
+        .company-card {
+            padding: 1.2rem;
+            height: 110px;
+            border-radius: 18px;
+        }
+        
+        .company-logo {
+            height: 70px;
+        }
     }
 </style>
 {% endblock %} 
