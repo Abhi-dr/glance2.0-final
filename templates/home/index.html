@@ -340,7 +340,7 @@ Fair 2.0 - GLA University{% endblock %} {% block css %}
                 <div class="gallery-info">
                   <h5>Inauguration Ceremony</h5>
                   <p>Opening of Glance 1.0 by the University Director</p>
-                  <a href="https://source.unsplash.com/random/1200x800/?conference,inauguration" class="gallery-popup">
+                  <a href="{% static 'img/home/i1.jpg' %}" class="gallery-popup">
                     <i class="fas fa-search-plus"></i>
                   </a>
                 </div>
@@ -355,7 +355,7 @@ Fair 2.0 - GLA University{% endblock %} {% block css %}
                 <div class="gallery-info">
                   <h5>Interview Sessions</h5>
                   <p>Students participating in on-the-spot interviews</p>
-                  <a href="https://source.unsplash.com/random/1200x800/?interview,corporate" class="gallery-popup">
+                  <a href="{% static 'img/home/inv.jpg' %}" class="gallery-popup">
                     <i class="fas fa-search-plus"></i>
                   </a>
                 </div>
@@ -370,7 +370,7 @@ Fair 2.0 - GLA University{% endblock %} {% block css %}
                 <div class="gallery-info">
                   <h5>Technical Workshop</h5>
                   <p>Industry experts conducting technical workshops</p>
-                  <a href="https://source.unsplash.com/random/1200x800/?workshop,tech" class="gallery-popup">
+                  <a href="{% static 'img/home/w.jpg' %}" class="gallery-popup">
                     <i class="fas fa-search-plus"></i>
                   </a>
                 </div>
@@ -385,7 +385,7 @@ Fair 2.0 - GLA University{% endblock %} {% block css %}
                 <div class="gallery-info">
                   <h5>Team Performance</h5>
                   <p>Students showcasing their talents during the event</p>
-                  <a href="https://source.unsplash.com/random/1200x800/?Team,performance" class="gallery-popup">
+                  <a href="{% static 'img/home/workshop.jpg' %}" class="gallery-popup">
                     <i class="fas fa-search-plus"></i>
                   </a>
                 </div>
@@ -400,7 +400,7 @@ Fair 2.0 - GLA University{% endblock %} {% block css %}
                 <div class="gallery-info">
                   <h5>Company Booth</h5>
                   <p>Students interacting with company representatives</p>
-                  <a href="https://source.unsplash.com/random/1200x800/?job,fair" class="gallery-popup">
+                  <a href="{% static 'img/home/inv1.jpg' %}" class="gallery-popup">
                     <i class="fas fa-search-plus"></i>
                   </a>
                 </div>
@@ -415,7 +415,7 @@ Fair 2.0 - GLA University{% endblock %} {% block css %}
                 <div class="gallery-info">
                   <h5>Resume Building Workshop</h5>
                   <p>Students learning how to create effective resumes</p>
-                  <a href="https://source.unsplash.com/random/1200x800/?seminar,business" class="gallery-popup">
+                  <a href="{% static 'img/home/w1.jpg' %}" class="gallery-popup">
                     <i class="fas fa-search-plus"></i>
                   </a>
                 </div>
@@ -430,7 +430,7 @@ Fair 2.0 - GLA University{% endblock %} {% block css %}
                 <div class="gallery-info">
                   <h5>Inauguration Ceremony</h5>
                   <p>Official inauguration of Glance 1.0</p>
-                  <a href="https://source.unsplash.com/random/1200x800/?ribbon,cutting" class="gallery-popup">
+                  <a href="{% static 'img/home/i.jpg' %}" class="gallery-popup">
                     <i class="fas fa-search-plus"></i>
                   </a>
                 </div>
@@ -445,7 +445,7 @@ Fair 2.0 - GLA University{% endblock %} {% block css %}
                 <div class="gallery-info">
                   <h5></h5>
                   <p>Team of Glance 1.0</p>
-                  <a href="https://source.unsplash.com/random/1200x800/?award,ceremony" class="gallery-popup">
+                  <a href="{% static 'img/home/t.jpg' %}" class="gallery-popup">
                     <i class="fas fa-search-plus"></i>
                   </a>
                 </div>
@@ -460,7 +460,7 @@ Fair 2.0 - GLA University{% endblock %} {% block css %}
                 <div class="gallery-info">
                   <h5>Group Discussion</h5>
                   <p>Students participating in group discussion rounds</p>
-                  <a href="https://source.unsplash.com/random/1200x800/?group,discussion" class="gallery-popup">
+                  <a href="{% static 'img/home/inv4.jpg' %}" class="gallery-popup">
                     <i class="fas fa-search-plus"></i>
                   </a>
                 </div>
@@ -536,47 +536,47 @@ Fair 2.0 - GLA University{% endblock %} {% block css %}
         <p class="section-subtitle">The dedicated individuals behind Glance 2.0</p>
 
         <div class="row g-4 justify-content-center">
-            <!-- Team Member 1 -->      
-            <div class="col-lg-3 col-md-6">
-                <div class="team-card">
-                    <div class="team-img">
-                        <img src="{% static 'img/home/team/dk.jpeg' %}" alt="Divyanshu Khandelwal" class="img-fluid">
-                    </div>
-                    <div class="team-info">
-                        <h4>Divyanshu Khandelwal</h4>
-                        <p class="team-position">Technical Team Advisor </p>
-                        <p class="team-desc">Co-Founder and Educator @The Angaar Batch🔥</p>
-                    </div>
-                </div>
+          <!-- Team Member 1 -->
+          <div class="col-lg-3 col-md-6">
+            <div class="team-card">
+              <div class="team-img">
+                <img src="{% static 'img/home/team/dk.jpeg' %}" alt="Divyanshu Khandelwal" class="img-fluid">
+              </div>
+              <div class="team-info">
+                <h4>Divyanshu Khandelwal</h4>
+                <p class="team-position">Technical Team Advisor </p>
+                <p class="team-desc">Co-Founder and Educator @The Angaar Batch🔥</p>
+              </div>
             </div>
+          </div>
 
-            <!-- Team Member 2 -->
-            <div class="col-lg-3 col-md-6">
-                <div class="team-card">
-                    <div class="team-img">
-                        <img src="{% static 'img/home/team/paras.jpg' %}" alt="Paras Mittal" class="img-fluid">
-                    </div>
-                    <div class="team-info">
-                        <h4>Paras Mittal</h4>
-                        <p class="team-position">President, Alumni Affairs & Technical Head</p>
-                        <p class="team-desc"></p>
-                    </div>
-                </div>
+          <!-- Team Member 2 -->
+          <div class="col-lg-3 col-md-6">
+            <div class="team-card">
+              <div class="team-img">
+                <img src="{% static 'img/home/team/paras.jpg' %}" alt="Paras Mittal" class="img-fluid">
+              </div>
+              <div class="team-info">
+                <h4>Paras Mittal</h4>
+                <p class="team-position">President, Alumni Affairs & Technical Head</p>
+                <p class="team-desc"></p>
+              </div>
             </div>
+          </div>
 
-            <!-- Team Member 3 -->
-            <div class="col-lg-3 col-md-6">
-                <div class="team-card">
-                    <div class="team-img">
-                        <img src="{% static 'img/home/team/amit.jpeg' %}" alt="Amit Kumar" class="img-fluid">
-                    </div>
-                    <div class="team-info">
-                        <h4>Amit Kumar</h4>
-                        <p class="team-position">Technical Team Member</p>
-                        <p class="team-desc"></p>
-                    </div>
-                </div>
+          <!-- Team Member 3 -->
+          <div class="col-lg-3 col-md-6">
+            <div class="team-card">
+              <div class="team-img">
+                <img src="{% static 'img/home/team/amit.jpeg' %}" alt="Amit Kumar" class="img-fluid">
+              </div>
+              <div class="team-info">
+                <h4>Amit Kumar</h4>
+                <p class="team-position">Technical Team Member</p>
+                <p class="team-desc"></p>
+              </div>
             </div>
+          </div>
         </div>
       </div>
     </section>
