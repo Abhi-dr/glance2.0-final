@@ -30,3 +30,5 @@ glance/migrations/0013_alter_user_last_name_max_length.py
 glance/migrations/0014_alter_user_last_name_max_length.py
 management/
 backups/
+/static/
+
