@@ -56,7 +56,7 @@
             --btn-primary-text: #ffffff;
             --btn-danger-bg: #ef4444;
             --btn-danger-text: #ffffff;
-            
+
             body {
                 background: linear-gradient(to bottom right, #1a1a27, #2c2c40);
                 background-repeat: no-repeat;
@@ -67,21 +67,21 @@
                 background: var(--sidebar-bg);
             }
         }
-        
+
         body {
             background: linear-gradient(to bottom right, var(--body-bg-gradient-start), var(--body-bg-gradient-end));
             background-repeat: no-repeat;
             background-attachment: fixed;
             min-height: 100vh;
         }
-        
+
         /* Sidebar Enhancements */
         .left-sidebar {
-            box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.05);
-            border-right: 1px solid rgba(0,0,0,0.05);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.05);
+            border-right: 1px solid rgba(0, 0, 0, 0.05);
             background-color: var(--sidebar-bg);
         }
-        
+
         .sidebar-link.hover-effect {
             border-radius: 10px;
             transition: all 0.3s ease;
@@ -89,36 +89,36 @@
             padding: 12px 15px;
             color: var(--sidebar-text);
         }
-        
+
         .hide-menu {
             color: var(--sidebar-text);
             font-weight: 500;
             font-size: 0.9rem;
         }
-        
+
         .sidebar-link.hover-effect:hover {
             background-color: var(--sidebar-hover-bg);
             transform: translateX(5px);
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
         }
-        
+
         .sidebar-link.hover-effect .ti {
             color: var(--sidebar-icon-color);
         }
-        
+
         .sidebar-item .rounded-circle {
             transition: all 0.3s ease;
             width: 36px;
             height: 36px;
             background-color: var(--sidebar-icon-bg) !important;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.04);
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.04);
         }
-        
+
         .sidebar-link.hover-effect:hover .rounded-circle {
             transform: scale(1.1);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
-        
+
         /* Section headers */
         .nav-small-cap {
             margin-top: 8px;
@@ -130,19 +130,19 @@
             color: var(--sidebar-heading);
             letter-spacing: 0.5px;
         }
-        
+
         .nav-small-cap .d-flex {
             border-left: 3px solid var(--sidebar-icon-color);
             background-color: var(--sidebar-section-bg) !important;
             border-radius: 0 8px 8px 0;
             padding: 8px 12px;
         }
-        
+
         .nav-small-cap .nav-small-cap-icon {
             margin-right: 5px;
             color: var(--sidebar-icon-color);
         }
-        
+
         /* Profile card styling */
         .profile-card {
             background: linear-gradient(135deg, #0ea5e9, #06b6d4);
@@ -151,39 +151,39 @@
             box-shadow: 0 8px 15px rgba(14, 165, 233, 0.2);
             transition: all 0.4s ease;
         }
-        
+
         [data-bs-theme="dark"] .profile-card {
             background: linear-gradient(135deg, #0369a1, #0284c7);
             box-shadow: 0 8px 15px rgba(3, 105, 161, 0.3);
         }
-        
+
         .profile-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 12px 20px rgba(14, 165, 233, 0.25);
         }
-        
+
         .profile-card .rounded-circle {
             border: 3px solid rgba(255, 255, 255, 0.3);
             width: 48px !important;
             height: 48px !important;
             transition: transform 0.3s ease;
         }
-        
+
         .profile-card:hover .rounded-circle {
             transform: scale(1.05);
         }
-        
+
         .profile-card h6 {
             font-weight: 700;
             font-size: 1.1rem;
             margin-bottom: 4px;
         }
-        
+
         .profile-card p {
             opacity: 0.85;
             font-size: 0.9rem;
         }
-        
+
         .profile-card .btn {
             border-radius: 8px;
             font-weight: 500;
@@ -192,16 +192,16 @@
             padding: 0.4rem 0;
             transition: all 0.3s ease;
         }
-        
+
         .profile-card .btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
-        
+
         .profile-card .btn i {
             margin-right: 4px;
         }
-        
+
         /* Logout button styling */
         .sidebar-item .btn-danger {
             transition: all 0.3s ease;
@@ -209,35 +209,35 @@
             border: none;
             box-shadow: 0 4px 6px rgba(245, 54, 92, 0.2);
         }
-        
+
         .sidebar-item .btn-danger:hover {
             transform: translateY(-2px);
             background-color: #f5365c;
             box-shadow: 0 7px 14px rgba(245, 54, 92, 0.3);
         }
-        
+
         /* Active menu item */
-        .sidebar-item.active .sidebar-link, 
+        .sidebar-item.active .sidebar-link,
         .sidebar-link.active {
             background-color: var(--sidebar-active-bg);
             color: var(--sidebar-active-text);
             font-weight: 600;
             box-shadow: 0 4px 8px rgba(94, 114, 228, 0.3);
         }
-        
-        .sidebar-item.active .sidebar-link .hide-menu, 
+
+        .sidebar-item.active .sidebar-link .hide-menu,
         .sidebar-link.active .hide-menu {
             color: var(--sidebar-active-text);
         }
-        
+
         .sidebar-link.active .rounded-circle {
             background-color: rgba(255, 255, 255, 0.2) !important;
         }
-        
+
         .sidebar-link.active .ti {
             color: white !important;
         }
-        
+
         /* Welcome message styling */
         .welcome-message {
             display: flex;
@@ -246,95 +246,104 @@
             font-size: 1rem;
             color: var(--sidebar-heading);
         }
-        
+
         [data-bs-theme="dark"] .welcome-message {
             color: #e2e8f0;
         }
-        
+
         .welcome-message .name {
             font-weight: 700;
             margin-left: 4px;
             color: var(--sidebar-icon-color);
         }
-        
+
         [data-bs-theme="dark"] .welcome-message .name {
             color: #90cdf4;
         }
-        
+
         /* Remove those extra bg-light classes with custom colors */
-        .bg-light-primary, .bg-light-success, .bg-light-info, 
-        .bg-light-warning, .bg-light-danger, .bg-light-secondary {
-            display: none; /* These classes are no longer used */
+        .bg-light-primary,
+        .bg-light-success,
+        .bg-light-info,
+        .bg-light-warning,
+        .bg-light-danger,
+        .bg-light-secondary {
+            display: none;
+            /* These classes are no longer used */
         }
-        
-        .text-primary, .text-success, .text-info, 
-        .text-warning, .text-danger, .text-secondary {
+
+        .text-primary,
+        .text-success,
+        .text-info,
+        .text-warning,
+        .text-danger,
+        .text-secondary {
             color: var(--sidebar-icon-color) !important;
         }
-        
+
         /* Header styling */
         .app-header {
             background-color: var(--header-bg);
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
         }
-        
+
         [data-bs-theme="dark"] .app-header {
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
         }
-        
+
         /* Icon backgrounds */
         .menu-icon-bg {
             background-color: var(--sidebar-icon-bg);
             box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
         }
-        
+
         [data-bs-theme="dark"] .menu-icon-bg {
             background-color: rgba(255, 255, 255, 0.1);
             box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
         }
-        
+
         /* Override text colors */
         .text-primary {
             color: var(--sidebar-icon-color) !important;
         }
-        
+
         [data-bs-theme="dark"] .text-primary {
             color: #90cdf4 !important;
         }
-        
+
         /* Active menu styling improvements */
         .sidebar-link.active .menu-icon-bg {
             background-color: rgba(255, 255, 255, 0.3) !important;
         }
-        
+
         .sidebar-link.active .text-primary {
             color: white !important;
         }
-        
+
         /* App header improvements */
         .app-header {
             background-color: var(--header-bg);
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
         }
-        
+
         [data-bs-theme="dark"] .app-header {
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
         }
-        
+
         /* Ensure notification icon is visible */
         .app-header .nav-icon-hover i {
             color: var(--sidebar-icon-color);
         }
-        
+
         [data-bs-theme="dark"] .app-header .nav-icon-hover i {
             color: #90cdf4;
         }
-        
+
         /* Fix dropdowns */
         .dropdown-menu {
             box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
         }
-        
+
         [data-bs-theme="dark"] .dropdown-menu {
             box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.5);
         }
@@ -457,18 +466,18 @@
                 background-color: var(--bs-body-bg);
                 box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
             }
-            
+
             .navbar-nav {
                 flex-direction: row;
                 align-items: center;
             }
-            
+
             .dropdown-menu {
                 position: absolute;
                 right: 0;
                 left: auto;
             }
-            
+
             .navbar-collapse {
                 position: absolute;
                 top: 100%;
@@ -481,30 +490,31 @@
                 width: auto;
                 min-width: 10rem;
             }
-            
+
             .body-wrapper {
-                padding-top: 60px; /* Add padding to account for fixed header */
+                padding-top: 60px;
+                /* Add padding to account for fixed header */
                 margin-bottom: 20px;
             }
-            
+
             .card {
                 margin-bottom: 1rem;
             }
-            
+
             .fs-3 {
                 font-size: 1rem !important;
             }
-            
+
             /* Fix for the theme toggle button */
             .themeToggle {
                 margin-right: 1rem;
             }
-            
+
             /* Fix for the sidebar on mobile */
             .left-sidebar {
                 z-index: 1050;
             }
-            
+
             .left-sidebar.show-menu {
                 display: block;
                 position: fixed;
@@ -514,18 +524,19 @@
                 height: 100%;
                 z-index: 1050;
             }
-            
+
             /* Adjust profile display on mobile */
             .row-cols-lg-3 {
-                display: block; /* Show on mobile but with better spacing */
+                display: block;
+                /* Show on mobile but with better spacing */
                 margin-top: 10px;
             }
-            
+
             /* Improve job detail page responsiveness */
             .d-md-flex {
                 flex-direction: column;
             }
-            
+
             .card-img-top {
                 width: 100% !important;
                 max-width: 250px !important;
@@ -534,18 +545,18 @@
                 float: none !important;
                 display: block;
             }
-            
+
             /* Make buttons full width on mobile */
             .mx-9 {
                 margin-left: 1rem !important;
                 margin-right: 1rem !important;
             }
-            
+
             /* Better spacing in general */
             .card-body {
                 padding: 1rem;
             }
-            
+
             /* Backdrop for sidebar */
             .sidebar-backdrop {
                 display: none;
@@ -557,19 +568,19 @@
                 background-color: rgba(0, 0, 0, 0.5);
                 z-index: 1049;
             }
-            
+
             .sidebar-backdrop.show {
                 display: block;
             }
         }
-        
+
         /* Ensure proper display on screens between mobile and desktop */
         @media (min-width: 768px) and (max-width: 991px) {
             .d-md-flex {
                 display: flex;
                 flex-direction: row;
             }
-            
+
             .card-img-top {
                 max-width: 200px !important;
                 margin-right: 20px !important;
@@ -616,11 +627,14 @@
                             <div class="card bg-primary shadow-sm border-0 profile-card">
                                 <div class="card-body p-3">
                                     <div class="d-flex align-items-center">
-                                        <div class="rounded-circle me-3 overflow-hidden" style="width: 40px; height: 40px;">
-                                            <img src="{{ student.profile_pic.url }}" alt="Profile" class="img-fluid" style="width: 100%; height: 100%; object-fit: cover;">
+                                        <div class="rounded-circle me-3 overflow-hidden"
+                                            style="width: 40px; height: 40px;">
+                                            <img src="{{ student.profile_pic.url }}" alt="Profile" class="img-fluid"
+                                                style="width: 100%; height: 100%; object-fit: cover;">
                                         </div>
                                         <div>
-                                            <h6 class="fw-semibold mb-0 fs-4 text-white">{{ student.first_name }} {{ student.last_name }}</h6>
+                                            <h6 class="fw-semibold mb-0 fs-4 text-white">{{ student.first_name }} {{
+                                                student.last_name }}</h6>
                                             <p class="mb-0 text-white-50 fs-6">Student</p>
                                         </div>
                                     </div>
@@ -646,7 +660,8 @@
 
                         <li class="sidebar-item">
                             <a class="sidebar-link hover-effect" href="{% url 'student' %}" aria-expanded="false">
-                                <span class="rounded-circle menu-icon-bg p-2 me-2 d-flex align-items-center justify-content-center">
+                                <span
+                                    class="rounded-circle menu-icon-bg p-2 me-2 d-flex align-items-center justify-content-center">
                                     <i class="ti ti-layout-dashboard text-primary"></i>
                                 </span>
                                 <span class="hide-menu">Home Dashboard</span>
@@ -654,8 +669,10 @@
                         </li>
 
                         <li class="sidebar-item">
-                            <a class="sidebar-link hover-effect" href="{% url 'my_applications' %}" aria-expanded="false">
-                                <span class="rounded-circle menu-icon-bg p-2 me-2 d-flex align-items-center justify-content-center">
+                            <a class="sidebar-link hover-effect" href="{% url 'my_applications' %}"
+                                aria-expanded="false">
+                                <span
+                                    class="rounded-circle menu-icon-bg p-2 me-2 d-flex align-items-center justify-content-center">
                                     <i class="ti ti-cards text-primary"></i>
                                 </span>
                                 <span class="hide-menu">My Applications</span>
@@ -664,7 +681,8 @@
 
                         <li class="sidebar-item">
                             <a class="sidebar-link hover-effect" href="{% url 'all_jobs' %}" aria-expanded="false">
-                                <span class="rounded-circle menu-icon-bg p-2 me-2 d-flex align-items-center justify-content-center">
+                                <span
+                                    class="rounded-circle menu-icon-bg p-2 me-2 d-flex align-items-center justify-content-center">
                                     <i class="ti ti-briefcase text-primary"></i>
                                 </span>
                                 <span class="hide-menu">All Jobs</span>
@@ -681,7 +699,8 @@
 
                         <li class="sidebar-item">
                             <a class="sidebar-link hover-effect" href="{% url 'upload_resume' %}" aria-expanded="false">
-                                <span class="rounded-circle menu-icon-bg p-2 me-2 d-flex align-items-center justify-content-center">
+                                <span
+                                    class="rounded-circle menu-icon-bg p-2 me-2 d-flex align-items-center justify-content-center">
                                     <i class="ti ti-file-upload text-primary"></i>
                                 </span>
                                 {% if student.resume %}
@@ -702,7 +721,8 @@
 
                         <li class="sidebar-item">
                             <a class="sidebar-link hover-effect" href="{% url 'notifications' %}" aria-expanded="false">
-                                <span class="rounded-circle menu-icon-bg p-2 me-2 d-flex align-items-center justify-content-center">
+                                <span
+                                    class="rounded-circle menu-icon-bg p-2 me-2 d-flex align-items-center justify-content-center">
                                     <i class="ti ti-bell-ringing text-primary"></i>
                                 </span>
                                 <span class="hide-menu">What's New</span>
@@ -711,7 +731,8 @@
 
                         <li class="sidebar-item">
                             <a class="sidebar-link hover-effect" href="{% url 'support' %}" aria-expanded="false">
-                                <span class="rounded-circle menu-icon-bg p-2 me-2 d-flex align-items-center justify-content-center">
+                                <span
+                                    class="rounded-circle menu-icon-bg p-2 me-2 d-flex align-items-center justify-content-center">
                                     <i class="ti ti-help text-primary"></i>
                                 </span>
                                 <span class="hide-menu">Support</span>
@@ -822,7 +843,7 @@
     <script src="{% static 'js/dashboard/libs/bootstrap/dist/js/bootstrap.bundle.min.js' %}"></script>
     <script src="{% static 'js/dashboard/js/sidebarmenu.js' %}"></script>
     <script src="{% static 'js/dashboard/js/app.min.js' %}"></script>
-    <script src="{% static 'js/dashboard/libs/apexcharts/dist/apexcharts.min.js' %}"></script>
+
     <script src="{% static 'js/dashboard/libs/simplebar/dist/simplebar.js' %}"></script>
     <script src="{% static 'js/dashboard/js/dashboard.js' %}"></script>
 
@@ -831,23 +852,23 @@
         const toggleTheme = () => {
             const currentTheme = document.documentElement.getAttribute('data-bs-theme');
             const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-                    document.documentElement.setAttribute('data-bs-theme', newTheme);
-                    localStorage.setItem('theme', newTheme);
+            document.documentElement.setAttribute('data-bs-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
         };
 
         // Add event listener for the theme toggle button
         document.addEventListener('DOMContentLoaded', function () {
             const themeToggleBtn = document.getElementById('themeToggle');
-            
+
             // Set initial state of toggle switch based on current theme
             const currentTheme = document.documentElement.getAttribute('data-bs-theme');
             themeToggleBtn.checked = currentTheme === 'dark';
-            
+
             themeToggleBtn.addEventListener('change', toggleTheme);
-            
+
             // Highlight active sidebar item
             highlightActiveMenuItem();
-            
+
             // Mobile navigation
             if (window.innerWidth < 992) {
                 // Add classes for better mobile display
@@ -855,7 +876,7 @@
                 if (navbarCollapse) {
                     navbarCollapse.classList.add('p-2');
                 }
-                
+
                 // Create backdrop for sidebar if it doesn't exist
                 let backdrop = document.querySelector('.sidebar-backdrop');
                 if (!backdrop) {
@@ -863,11 +884,11 @@
                     backdrop.classList.add('sidebar-backdrop');
                     document.body.appendChild(backdrop);
                 }
-                
+
                 // Handle navbar toggler on mobile
                 const headerCollapse = document.getElementById('headerCollapse');
                 if (headerCollapse) {
-                    headerCollapse.addEventListener('click', function(e) {
+                    headerCollapse.addEventListener('click', function (e) {
                         e.preventDefault();
                         const sidebar = document.querySelector('.left-sidebar');
                         if (sidebar) {
@@ -882,9 +903,9 @@
                         }
                     });
                 }
-                
+
                 // Close sidebar when clicking backdrop
-                backdrop.addEventListener('click', function() {
+                backdrop.addEventListener('click', function () {
                     const sidebar = document.querySelector('.left-sidebar');
                     if (sidebar) {
                         sidebar.classList.remove('show-menu');
@@ -892,11 +913,11 @@
                         document.body.style.overflow = '';
                     }
                 });
-                
+
                 // Handle all links in sidebar to ensure it closes after navigation
                 const sidebarLinks = document.querySelectorAll('.sidebar-link');
                 sidebarLinks.forEach(link => {
-                    link.addEventListener('click', function() {
+                    link.addEventListener('click', function () {
                         const sidebar = document.querySelector('.left-sidebar');
                         if (sidebar && window.innerWidth < 992) {
                             setTimeout(() => {
@@ -908,37 +929,37 @@
                     });
                 });
             }
-        
-        // Get references to the sidebar and the toggle button
-        const sidebar = document.getElementById('sidebar');
-        const sidebarCollapse = document.getElementById('sidebarCollapse');
 
-        // Function to close the sidebar
-        function closeSidebar() {
-            sidebar.classList.remove('show');
-        }
+            // Get references to the sidebar and the toggle button
+            const sidebar = document.getElementById('sidebar');
+            const sidebarCollapse = document.getElementById('sidebarCollapse');
 
-        // Event listener for clicks on the toggle button
+            // Function to close the sidebar
+            function closeSidebar() {
+                sidebar.classList.remove('show');
+            }
+
+            // Event listener for clicks on the toggle button
             if (sidebarCollapse) {
-        sidebarCollapse.addEventListener('click', function () {
-            sidebar.classList.toggle('show');
-        });
+                sidebarCollapse.addEventListener('click', function () {
+                    sidebar.classList.toggle('show');
+                });
             }
 
-        // Event listener for clicks outside the sidebar
-        document.addEventListener('click', function (event) {
-            const target = event.target;
+            // Event listener for clicks outside the sidebar
+            document.addEventListener('click', function (event) {
+                const target = event.target;
                 if (sidebar && !sidebar.contains(target) && target !== sidebarCollapse) {
-                closeSidebar();
-            }
+                    closeSidebar();
+                }
+            });
         });
-        });
-        
+
         // Function to highlight the active menu item based on current URL
         function highlightActiveMenuItem() {
             const currentUrl = window.location.href;
             const sidebarLinks = document.querySelectorAll('.sidebar-link');
-            
+
             sidebarLinks.forEach(link => {
                 if (currentUrl.includes(link.getAttribute('href'))) {
                     link.classList.add('active');
@@ -949,7 +970,7 @@
                     }
                 }
             });
-            
+
             // Handle special case for dashboard home
             if (currentUrl.endsWith('/student/') || currentUrl.endsWith('/student')) {
                 const dashboardLink = document.querySelector('a[href="{% url "student" %}"]');
@@ -975,11 +996,11 @@
             background-color: #2d3748;
             border-color: #4a5568;
         }
-        
+
         [data-bs-theme="dark"] .dropdown-item {
             color: #e2e8f0;
         }
-        
+
         [data-bs-theme="dark"] .dropdown-item:hover {
             background-color: #4a5568;
             color: #ffffff;
@@ -990,71 +1011,83 @@
             background-color: var(--sidebar-bg);
             color: var(--sidebar-text);
         }
-        
+
         [data-bs-theme="dark"] .card {
             background-color: #2d3748;
             color: #e2e8f0;
         }
-        
+
         /* Fix table visibility in dark mode */
         [data-bs-theme="dark"] .table {
             color: #e2e8f0;
         }
-        
-        [data-bs-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) > * {
+
+        [data-bs-theme="dark"] .table-striped>tbody>tr:nth-of-type(odd)>* {
             color: #e2e8f0;
             background-color: rgba(255, 255, 255, 0.05);
         }
-        
+
         /* Fix form fields in dark mode */
         [data-bs-theme="dark"] .form-control {
             background-color: #2d3748;
             border-color: #4a5568;
             color: #e2e8f0;
         }
-        
+
         [data-bs-theme="dark"] .form-select {
             background-color: #2d3748;
             border-color: #4a5568;
             color: #e2e8f0;
         }
-        
+
         /* Fix text visibility in all major components */
         [data-bs-theme="dark"] .text-dark,
         [data-bs-theme="dark"] .text-body,
         [data-bs-theme="dark"] .text-muted {
             color: #e2e8f0 !important;
         }
-        
+
         /* Ensure buttons are visible */
         [data-bs-theme="dark"] .btn-outline-primary {
             color: #90cdf4;
             border-color: #90cdf4;
         }
-        
+
         [data-bs-theme="dark"] .btn-outline-primary:hover {
             background-color: #4c6ef5;
             color: #ffffff;
             border-color: #4c6ef5;
         }
-        
+
         /* Fix link colors in dark mode */
         [data-bs-theme="dark"] a {
             color: #90cdf4;
         }
-        
+
         [data-bs-theme="dark"] a:hover {
             color: #63b3ed;
         }
-        
+
         /* Page content wrapper */
         .body-wrapper {
             background-color: var(--body-bg-gradient-end);
             min-height: calc(100vh - 60px);
         }
-        
+
         /* Fix text in page content */
-        p, h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+        p,
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        .h1,
+        .h2,
+        .h3,
+        .h4,
+        .h5,
+        .h6 {
             color: var(--sidebar-text);
         }
     </style>
@@ -1064,20 +1097,20 @@
         .st-sunMoonThemeToggleBtn svg {
             color: var(--sidebar-icon-color) !important;
         }
-        
+
         [data-bs-theme="dark"] .st-sunMoonThemeToggleBtn svg {
             color: #90cdf4 !important;
         }
-        
+
         /* Improve header visibility */
         .app-header .navbar-light .navbar-nav .nav-link {
             color: var(--sidebar-text);
         }
-        
+
         [data-bs-theme="dark"] .app-header .navbar-light .navbar-nav .nav-link {
             color: #e2e8f0;
         }
-        
+
         [data-bs-theme="dark"] .app-header .btn-primary {
             background-color: #4c6ef5;
             border-color: #4c6ef5;
@@ -1091,42 +1124,42 @@
             border-color: var(--btn-primary-bg) !important;
             color: var(--btn-primary-text) !important;
         }
-        
+
         .btn-primary:hover {
             background-color: #0d9488 !important;
             border-color: #0d9488 !important;
         }
-        
+
         .btn-danger {
             background-color: var(--btn-danger-bg) !important;
             border-color: var(--btn-danger-bg) !important;
             color: var(--btn-danger-text) !important;
         }
-        
+
         .btn-danger:hover {
             background-color: #dc2626 !important;
             border-color: #dc2626 !important;
         }
-        
+
         .btn-outline-primary {
             color: var(--sidebar-icon-color) !important;
             border-color: var(--sidebar-icon-color) !important;
         }
-        
+
         .btn-outline-primary:hover {
             background-color: var(--sidebar-active-bg) !important;
             color: white !important;
         }
-        
+
         /* Active menu styling improvements */
         .sidebar-link.active .menu-icon-bg {
             background-color: rgba(255, 255, 255, 0.3) !important;
         }
-        
+
         .sidebar-link.active .text-primary {
             color: white !important;
         }
-        
+
         /* Style section headers with a green accent */
         .nav-small-cap .d-flex {
             border-left: 3px solid var(--sidebar-icon-color);
@@ -1141,12 +1174,12 @@
             margin: 2px 0;
             transition: all 0.3s ease;
         }
-        
+
         .nav-item a.nav-link:hover {
             background-color: rgba(16, 185, 129, 0.1);
             color: var(--sidebar-active-text);
         }
-        
+
         /* Profile card styling */
         .profile-card {
             background: linear-gradient(135deg, #0ea5e9, #06b6d4);
@@ -1155,39 +1188,39 @@
             box-shadow: 0 8px 15px rgba(14, 165, 233, 0.2);
             transition: all 0.4s ease;
         }
-        
+
         [data-bs-theme="dark"] .profile-card {
             background: linear-gradient(135deg, #0369a1, #0284c7);
             box-shadow: 0 8px 15px rgba(3, 105, 161, 0.3);
         }
-        
+
         .profile-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 12px 20px rgba(14, 165, 233, 0.25);
         }
-        
+
         .profile-card .rounded-circle {
             border: 3px solid rgba(255, 255, 255, 0.3);
             width: 48px !important;
             height: 48px !important;
             transition: transform 0.3s ease;
         }
-        
+
         .profile-card:hover .rounded-circle {
             transform: scale(1.05);
         }
-        
+
         .profile-card h6 {
             font-weight: 700;
             font-size: 1.1rem;
             margin-bottom: 4px;
         }
-        
+
         .profile-card p {
             opacity: 0.85;
             font-size: 0.9rem;
         }
-        
+
         .profile-card .btn {
             border-radius: 8px;
             font-weight: 500;
@@ -1196,12 +1229,12 @@
             padding: 0.4rem 0;
             transition: all 0.3s ease;
         }
-        
+
         .profile-card .btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
-        
+
         .profile-card .btn i {
             margin-right: 4px;
         }
@@ -1217,75 +1250,75 @@
             margin-bottom: 20px;
             border-left: 4px solid transparent;
         }
-        
+
         .alert-success {
             background-color: #d1fae5;
             color: #065f46;
             border-left-color: #10b981;
         }
-        
+
         .alert-danger {
             background-color: #fee2e2;
             color: #b91c1c;
             border-left-color: #ef4444;
         }
-        
+
         .alert-warning {
             background-color: #fef3c7;
             color: #92400e;
             border-left-color: #f59e0b;
         }
-        
+
         .alert-info {
             background-color: #dbeafe;
             color: #1e40af;
             border-left-color: #3b82f6;
         }
-        
+
         [data-bs-theme="dark"] .alert-success {
             background-color: rgba(16, 185, 129, 0.2);
             color: #ecfdf5;
             border-left-color: #10b981;
         }
-        
+
         [data-bs-theme="dark"] .alert-danger {
             background-color: rgba(239, 68, 68, 0.2);
             color: #fef2f2;
             border-left-color: #ef4444;
         }
-        
+
         [data-bs-theme="dark"] .alert-warning {
             background-color: rgba(245, 158, 11, 0.2);
             color: #fffbeb;
             border-left-color: #f59e0b;
         }
-        
+
         [data-bs-theme="dark"] .alert-info {
             background-color: rgba(59, 130, 246, 0.2);
             color: #eff6ff;
             border-left-color: #3b82f6;
         }
-        
+
         /* Mobile improvements for profile card */
         @media (max-width: 767px) {
             .profile-card {
                 padding: 15px;
                 margin-bottom: 15px;
             }
-            
+
             .profile-card .rounded-circle {
                 width: 40px !important;
                 height: 40px !important;
             }
-            
+
             .profile-card h6 {
                 font-size: 1rem;
             }
-            
+
             .profile-card p {
                 font-size: 0.8rem;
             }
-            
+
             .profile-card .btn {
                 font-size: 0.75rem;
             }

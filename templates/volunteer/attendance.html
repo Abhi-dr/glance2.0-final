@@ -334,57 +334,68 @@
   }
 </style>
 
-<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-<script>
-  document.addEventListener("DOMContentLoaded", function() {
-    // Initialize tooltips
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-      return new bootstrap.Tooltip(tooltipTriggerEl)
-    });
-    
-    // Initialize attendance chart if the element exists
-    if (document.getElementById('attendance-chart')) {
-      var options = {
-        series: [{{ attendance_rate }}, {{ 100|add:'-'|add:attendance_rate }}],
-        chart: {
-          type: 'donut',
-          height: 60,
-          sparkline: {
-            enabled: true
-          }
-        },
-        colors: ['#28a745', '#dc3545'],
-        labels: ['Present', 'Absent'],
-        legend: {
-          show: false
-        },
-        dataLabels: {
-          enabled: false
-        },
-        tooltip: {
-          enabled: true,
-          y: {
-            formatter: function(value) {
-              return value + "%";
-            }
-          }
-        },
-        stroke: {
-          width: 2
-        },
-        plotOptions: {
-          pie: {
-            donut: {
-              size: '65%'
-            }
-          }
-        }
-      };
+<!-- Chart container -->
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <h5 class="card-title mb-0">Attendance Statistics</h5>
+    </div>
+    <div class="card-body">
+        <div id="attendance-chart" data-present="{{ present_count }}" data-absent="{{ absent_count }}"></div>
+    </div>
+</div>
 
-      var chart = new ApexCharts(document.getElementById('attendance-chart'), options);
-      chart.render();
+<script src="{% static 'js/dashboard/libs/apexcharts/dist/apexcharts.min.js' %}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Wait a bit for libraries to fully load
+        setTimeout(function() {
+            initializeAttendanceChart();
+        }, 300);
+    });
+
+    function initializeAttendanceChart() {
+        if (typeof ApexCharts === 'undefined') {
+            console.error('ApexCharts library not loaded. Charts may not render correctly.');
+            return;
+        }
+
+        try {
+            var chartElement = document.querySelector("#attendance-chart");
+            if (!chartElement) {
+                console.error('Chart container element not found');
+                return;
+            }
+            
+            // Get data from data attributes
+            var presentCount = parseInt(chartElement.getAttribute('data-present') || 0);
+            var absentCount = parseInt(chartElement.getAttribute('data-absent') || 0);
+
+            var options = {
+                series: [presentCount, absentCount],
+                chart: {
+                    type: 'pie',
+                    height: 350
+                },
+                labels: ['Present', 'Absent'],
+                colors: ['#28a745', '#dc3545'],
+                responsive: [{
+                    breakpoint: 480,
+                    options: {
+                        chart: {
+                            width: 200
+                        },
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }]
+            };
+
+            var chart = new ApexCharts(chartElement, options);
+            chart.render();
+        } catch (error) {
+            console.error('Error initializing attendance chart:', error);
+        }
     }
-  });
 </script>
 {% endblock %} 
