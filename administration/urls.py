@@ -33,5 +33,6 @@ urlpatterns = [
     path("export_job_applications_csv/<int:job_id>", dataDownload.export_job_applications_csv, name="export_job_applications_csv"),
     path("download_job_resumes/<int:job_id>", dataDownload.download_job_resumes, name="download_job_resumes"),
     path("download_resumes", dataDownload.download_resumes, name="download_resumes"),
-
+    path("export_filtered_students_pdf", dataDownload.export_filtered_students_pdf, name="export_filtered_students_pdf"),
+    path("export_filtered_students/", dataDownload.export_filtered_students, name="export_filtered_students"),
 ]
