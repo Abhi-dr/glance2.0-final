@@ -4,6 +4,7 @@ from . import views, dataDownload
 urlpatterns = [
     path("", views.administration, name="administration"),
     path("companies", views.companies, name="companies"),
+    path("filter_page", views.filter_page, name="filter_page"),
     
     path("company/<int:id>", views.company, name="company"),
     path("job_details/<str:slug>", views.job_details, name="job_details"),
@@ -31,7 +32,6 @@ urlpatterns = [
     path("export_uneligible_students", dataDownload.export_uneligible_students, name="export_uneligible_students"),
     path("export_job_applications_csv/<int:job_id>", dataDownload.export_job_applications_csv, name="export_job_applications_csv"),
     path("download_job_resumes/<int:job_id>", dataDownload.download_job_resumes, name="download_job_resumes"),
-    
     path("download_resumes", dataDownload.download_resumes, name="download_resumes"),
 
 ]

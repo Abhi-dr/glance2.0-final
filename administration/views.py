@@ -634,3 +634,15 @@ def export_company_applications_summary_csv(request):
 # for student in Student.objects.all():
 #     student.no_of_companies_left = 10
 #     student.save()
+
+@login_required(login_url='login')
+@staff_member_required(login_url='login')
+def filter_page(request):
+    """
+    View for the advanced filter page with DataTables integration
+    """
+    user = User.objects.get(id=request.user.id)
+    
+    return render(request, "administration/filter_page.html", {
+        "user": user,
+    })
