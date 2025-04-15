@@ -34,5 +34,8 @@ urlpatterns = [
     path("download_job_resumes/<int:job_id>", dataDownload.download_job_resumes, name="download_job_resumes"),
     path("download_resumes", dataDownload.download_resumes, name="download_resumes"),
     path("export_filtered_students_pdf", dataDownload.export_filtered_students_pdf, name="export_filtered_students_pdf"),
-    path("export_filtered_students/", dataDownload.export_filtered_students, name="export_filtered_students"),
+    path("export_filtered_students", dataDownload.export_filtered_students, name="export_filtered_students"),
+    path("export_all_students", dataDownload.export_all_students, name="export_all_students"),
+    path("simple_export", dataDownload.simple_export, name="simple_export"),
+    path("filtered_export", dataDownload.filtered_export, name="filtered_export"),
 ]

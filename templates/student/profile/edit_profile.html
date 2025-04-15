@@ -365,6 +365,8 @@ Student - Edit Profile
                                         <select class="form-select" name="alumni_status" id="alumni_status" required>
                                             <option value="Current Student" {% if student.alumni_status == 'Current Student' %}selected{% endif %}>Current Student</option>
                                             <option value="Alumni" {% if student.alumni_status == 'Alumni' %}selected{% endif %}>Alumni</option>
+                                            <option value="Online Student" {% if student.alumni_status == 'Online Student' %}selected{% endif %}>Online Student</option>
+
                                         </select>
                                         <div class="invalid-feedback">Please select your alumni status.</div>
                                     </div>

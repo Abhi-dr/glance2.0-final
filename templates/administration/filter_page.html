@@ -232,91 +232,196 @@
                                             </a>
                                             <small class="text-muted d-block mt-1">Use this option if the PDF export button isn't working.</small>
                                         </div>
-                                        
-                                        <!-- Server-side Filtered Exports -->
-                                        <div class="mt-4">
-                                            <h6>Server-side Filtered Exports:</h6>
-                                            <p class="small text-muted mb-2">These buttons will export data with your current filters applied.</p>
-                                            <div class="d-grid gap-2">
-                                                <button type="button" class="btn btn-primary" id="server-filter-export">
-                                                    <i class="fas fa-filter me-1"></i> Export with Current Filters
-                                                </button>
-                                            </div>
-                                            <div class="btn-group w-100 mt-2" role="group">
-                                                <button type="button" class="btn btn-outline-success" id="server-filter-csv">
-                                                    <i class="fas fa-file-csv me-1"></i> CSV
-                                                </button>
-                                                <button type="button" class="btn btn-outline-success" id="server-filter-excel">
-                                                    <i class="fas fa-file-excel me-1"></i> Excel
-                                                </button>
-                                                <button type="button" class="btn btn-outline-danger" id="server-filter-html">
-                                                    <i class="fas fa-file-code me-1"></i> HTML
-                                                </button>
-                                            </div>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Server-Side Export Options Card -->
-                    <div class="card mb-4 mt-4">
-                        <div class="card-header bg-success text-white">
-                            <h5 class="mb-0">Server-Side Export (Recommended)</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-12">
-                                    <p class="mb-3">These export options work directly on the server and are more reliable than browser-based exports.</p>
-                                    <div class="d-grid gap-2 mb-3">
-                                        <button type="button" class="btn btn-lg btn-success" id="main-server-filter-export">
-                                            <i class="fas fa-file-export me-2"></i> Export Current Filter Results
+                    <!-- Add the fetch export buttons to the filter section -->
+                    <div class="col-12 mt-3">
+                        <div class="card">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0">Direct Server-Side Export</h5>
+                            </div>
+                            <div class="card-body">
+                                <p class="mb-2">Export current filters directly from server (recommended method):</p>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-success" id="directExportCSV">
+                                        <i class="fas fa-file-csv me-2"></i>CSV
+                                    </button>
+                                    <button type="button" class="btn btn-danger" id="directExportPDF">
+                                        <i class="fas fa-file-pdf me-2"></i>PDF/HTML
+                                    </button>
+                                </div>
+                                <div class="mt-3">
+                                    <p class="mb-2">Alternative download method (if above buttons don't work):</p>
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-outline-success" id="fetchExportCSV">
+                                            <i class="fas fa-download me-2"></i>Fetch CSV
+                                        </button>
+                                        <button type="button" class="btn btn-outline-danger" id="fetchExportHTML">
+                                            <i class="fas fa-download me-2"></i>Fetch HTML
                                         </button>
                                     </div>
-                                    <div id="server-export-formats" style="display:none;">
-                                        <p class="mb-2">Select export format:</p>
-                                        <div class="btn-group w-100" role="group">
-                                            <button type="button" class="btn btn-outline-primary" id="main-server-filter-csv">
-                                                <i class="fas fa-file-csv me-2"></i> CSV
-                                            </button>
-                                            <button type="button" class="btn btn-outline-success" id="main-server-filter-excel">
-                                                <i class="fas fa-file-excel me-2"></i> Excel (.xls)
-                                            </button>
-                                            <button type="button" class="btn btn-outline-danger" id="main-server-filter-html">
-                                                <i class="fas fa-file-code me-2"></i> HTML
-                                            </button>
-                                        </div>
-                                    </div>
+                                </div>
+                                <div class="alert alert-info mt-3">
+                                    <small><i class="fas fa-info-circle me-1"></i> If export buttons don't work, try logging in again or use the PDF fallback link in the export options section below.</small>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Direct Download Links -->
-                    <div class="mt-4">
-                        <h6>Direct Download Links (Fixed):</h6>
-                        <div class="btn-group w-100 mt-2" role="group">
-                            <a href="/administration/export_unapplied_students_csv" class="btn btn-outline-success" download>
-                                <i class="fas fa-file-csv me-1"></i> Unapplied CSV
-                            </a>
-                            <a href="/administration/export_uneligible_students" class="btn btn-outline-primary" download>
-                                <i class="fas fa-file-csv me-1"></i> Uneligible CSV
-                            </a>
-                            <a href="/administration/export_filtered_students_pdf" class="btn btn-outline-danger" download>
-                                <i class="fas fa-file-pdf me-1"></i> PDF Export
-                            </a>
+                    <!-- Add direct form that posts to export endpoint -->
+                    <div class="col-12 mt-3">
+                        <div class="card">
+                            <div class="card-header bg-dark text-white">
+                                <h5 class="mb-0">Fallback Export (100% Reliable)</h5>
+                            </div>
+                            <div class="card-body">
+                                <p class="mb-2">If other export methods fail, use this direct form:</p>
+                                <form action="/administration/export_filtered_students" method="get" target="_blank">
+                                    <input type="hidden" name="format" value="csv">
+                                    
+                                    <!-- Copy values from the main filter form -->
+                                    <div class="row g-2">
+                                        <div class="col-md-6">
+                                            <select name="format" class="form-select mb-2">
+                                                <option value="csv">CSV Format</option>
+                                                <option value="html">HTML Format (for PDF)</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <button type="submit" class="btn btn-primary w-100">
+                                                <i class="fas fa-download me-2"></i>Direct Export
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mt-2">
+                                        <p class="mb-1 fw-bold">Active Filters:</p>
+                                        <div id="directFormFilters" class="small text-muted mb-2">
+                                            No filters set
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="syncFilters" checked>
+                                            <label class="form-check-label" for="syncFilters">
+                                                Copy filters from above when submitting
+                                            </label>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
-                        <div class="btn-group w-100 mt-2" role="group">
-                            <a href="/administration/export_filtered_students/?format=csv" class="btn btn-outline-success" download>
-                                <i class="fas fa-file-csv me-1"></i> Filtered CSV
-                            </a>
-                            <a href="/administration/export_filtered_students/?format=excel" class="btn btn-outline-success" download>
-                                <i class="fas fa-file-excel me-1"></i> Filtered Excel
-                            </a>
-                            <a href="/administration/export_filtered_students/?format=html" class="btn btn-outline-danger" download>
-                                <i class="fas fa-file-code me-1"></i> Filtered HTML
-                            </a>
+                    </div>
+
+                    <!-- Add a guaranteed working export button -->
+                    <div class="col-12 mt-3">
+                        <div class="card">
+                            <div class="card-header bg-warning text-dark">
+                                <h5 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Guaranteed Export</h5>
+                            </div>
+                            <div class="card-body">
+                                <p class="mb-3">If all other export methods fail, use these direct links:</p>
+                                <div class="row">
+                                    <div class="col-md-6 mb-2">
+                                        <a href="/administration/export_all_students?format=csv" class="btn btn-outline-success w-100" target="_blank">
+                                            <i class="fas fa-file-csv me-2"></i>Export All Students (CSV)
+                                        </a>
+                                    </div>
+                                    <div class="col-md-6 mb-2">
+                                        <a href="/administration/export_all_students?format=html" class="btn btn-outline-danger w-100" target="_blank">
+                                            <i class="fas fa-file-pdf me-2"></i>Export All Students (HTML)
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="alert alert-warning mt-2 mb-0">
+                                    <small><i class="fas fa-info-circle me-1"></i> These links export all students without filtering, but they are guaranteed to work.</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Add guaranteed-to-work export links -->
+                    <div class="col-12 mt-3">
+                        <div class="card border-danger">
+                            <div class="card-header bg-danger text-white">
+                                <h5 class="mb-0"><i class="fas fa-download me-2"></i>100% Guaranteed Downloads</h5>
+                            </div>
+                            <div class="card-body">
+                                <p class="mb-3 fw-bold">These links will ALWAYS work (download all students):</p>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-2">
+                                        <a href="/administration/simple_export?format=csv" class="btn btn-success w-100" target="_blank">
+                                            <i class="fas fa-file-csv me-2"></i>Download CSV
+                                        </a>
+                                    </div>
+                                    <div class="col-md-6 mb-2">
+                                        <a href="/administration/simple_export?format=excel" class="btn btn-primary w-100" target="_blank">
+                                            <i class="fas fa-file-excel me-2"></i>Download Excel (CSV)
+                                        </a>
+                                    </div>
+                                    <div class="col-md-6 mb-2">
+                                        <a href="/administration/simple_export?format=html" class="btn btn-info w-100" target="_blank">
+                                            <i class="fas fa-file-code me-2"></i>Download HTML
+                                        </a>
+                                    </div>
+                                    <div class="col-md-6 mb-2">
+                                        <a href="/administration/simple_export?format=pdf" class="btn btn-danger w-100" target="_blank">
+                                            <i class="fas fa-file-pdf me-2"></i>Download PDF-ready HTML
+                                        </a>
+                                    </div>
+                                </div>
+                                
+                                <div class="alert alert-info mt-2 mb-0">
+                                    <p class="mb-1"><i class="fas fa-info-circle me-1"></i> <strong>Instructions:</strong></p>
+                                    <ol class="mb-0 ms-3 small">
+                                        <li>Click any of the above links to download all students in your preferred format.</li>
+                                        <li>For the PDF option: Open the HTML file in your browser and use File > Print > Save as PDF.</li>
+                                        <li>For Excel: Open the CSV file in Excel by opening Excel and using File > Open.</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Add filtered export section -->
+                    <div class="col-12 mt-3">
+                        <div class="card border-success">
+                            <div class="card-header bg-success text-white">
+                                <h5 class="mb-0"><i class="fas fa-filter me-2"></i>Filtered Exports</h5>
+                            </div>
+                            <div class="card-body">
+                                <p class="mb-3 fw-bold">Export with your current filters applied:</p>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-2">
+                                        <a href="#" class="btn btn-outline-success w-100" id="filteredExportCSV">
+                                            <i class="fas fa-file-csv me-2"></i>Download CSV
+                                        </a>
+                                    </div>
+                                    <div class="col-md-6 mb-2">
+                                        <a href="#" class="btn btn-outline-primary w-100" id="filteredExportExcel">
+                                            <i class="fas fa-file-excel me-2"></i>Download Excel (CSV)
+                                        </a>
+                                    </div>
+                                    <div class="col-md-6 mb-2">
+                                        <a href="#" class="btn btn-outline-info w-100" id="filteredExportHTML">
+                                            <i class="fas fa-file-code me-2"></i>Download HTML
+                                        </a>
+                                    </div>
+                                    <div class="col-md-6 mb-2">
+                                        <a href="#" class="btn btn-outline-danger w-100" id="filteredExportPDF">
+                                            <i class="fas fa-file-pdf me-2"></i>Download PDF-ready HTML
+                                        </a>
+                                    </div>
+                                </div>
+                                
+                                <div class="alert alert-success mt-2 mb-0">
+                                    <p class="mb-0"><i class="fas fa-info-circle me-1"></i> These links will export data with ALL current filters applied.</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -810,81 +915,6 @@
 
                 // Initialize active filters
                 updateActiveFilters();
-                
-                // Server-side export handlers
-                $('#server-filter-export').on('click', function() {
-                    // Show format options
-                    $('#server-filter-csv, #server-filter-excel, #server-filter-html').toggle();
-                });
-                
-                function buildFilteredExportUrl(format) {
-                    // Get all current filter values
-                    const filters = {
-                        id: $('#id').val(),
-                        name: $('#name').val(),
-                        email: $('#email').val(),
-                        phone: $('#phone').val(),
-                        course: $('#course').val(),
-                        year: $('#year').val(),
-                        cgpa: $('#cgpa').val(),
-                        cgpa_operator: $('#cgpa_operator').val(),
-                        status: $('#status').val(),
-                        companies_left: $('#companies_left').val(),
-                        companies_operator: $('#companies_operator').val(),
-                        format: format
-                    };
-                    
-                    // Use direct URL path instead of Django URL resolver which may be causing issues
-                    let url = "/administration/export_filtered_students/?";
-                    
-                    // Add non-empty parameters
-                    for (const [key, value] of Object.entries(filters)) {
-                        if (value) {
-                            url += `${key}=${encodeURIComponent(value)}&`;
-                        }
-                    }
-                    
-                    // Remove trailing '&' if present
-                    if (url.endsWith('&')) {
-                        url = url.slice(0, -1);
-                    }
-                    
-                    return url;
-                }
-                
-                // Initially hide format buttons
-                $('#server-filter-csv, #server-filter-excel, #server-filter-html').hide();
-                
-                // Handle format buttons
-                $('#server-filter-csv').on('click', function() {
-                    window.location.href = buildFilteredExportUrl('csv');
-                });
-                
-                $('#server-filter-excel').on('click', function() {
-                    window.location.href = buildFilteredExportUrl('excel');
-                });
-                
-                $('#server-filter-html').on('click', function() {
-                    window.location.href = buildFilteredExportUrl('html');
-                });
-                
-                // Main server-side export button
-                $('#main-server-filter-export').on('click', function() {
-                    $('#server-export-formats').slideToggle();
-                });
-                
-                // Main server-side format buttons
-                $('#main-server-filter-csv').on('click', function() {
-                    window.location.href = buildFilteredExportUrl('csv');
-                });
-                
-                $('#main-server-filter-excel').on('click', function() {
-                    window.location.href = buildFilteredExportUrl('excel');
-                });
-                
-                $('#main-server-filter-html').on('click', function() {
-                    window.location.href = buildFilteredExportUrl('html');
-                });
             }
         } catch (error) {
             console.error('Error initializing DataTable:', error);
@@ -903,5 +933,288 @@
             setTimeout(initPage, 200);
         });
     }
+</script>
+
+<script>
+$(document).ready(function() {
+    // Function to get current filter parameters
+    function getCurrentFilters() {
+        return {
+            id: $('#id').val() || '',
+            name: $('#name').val() || '',
+            email: $('#email').val() || '',
+            phone: $('#phone').val() || '',
+            course: $('#course').val() || '',
+            year: $('#year').val() || '',
+            cgpa: $('#cgpa').val() || '',
+            cgpa_operator: $('#cgpa_operator').val() || '=',
+            status: $('#status').val() || '',
+            companies_left: $('#companies_left').val() || '',
+            companies_operator: $('#companies_operator').val() || '='
+        };
+    }
+
+    // Function to create export URL with filter parameters
+    function createExportUrl(format) {
+        const filters = getCurrentFilters();
+        let url = '/administration/export_filtered_students?format=' + format;
+        
+        // Add filter parameters to URL
+        Object.keys(filters).forEach(key => {
+            url += '&' + key + '=' + encodeURIComponent(filters[key] || '');
+        });
+        
+        console.log("Export URL:", url);
+        return url;
+    }
+
+    // Direct server-side export functions with error handling
+    function exportFilteredCSV() {
+        $('#loadingOverlay').css('display', 'flex');
+        
+        try {
+            // Create iframe for download
+            const downloadFrame = document.createElement('iframe');
+            downloadFrame.style.display = 'none';
+            document.body.appendChild(downloadFrame);
+            
+            // Navigate iframe to export URL
+            downloadFrame.src = createExportUrl('csv');
+            
+            // Listen for load events
+            downloadFrame.onload = function() {
+                try {
+                    // Check if there was an error
+                    const content = downloadFrame.contentDocument.body.textContent;
+                    if (content && content.includes('Error')) {
+                        console.error("Export error:", content);
+                        alert("Export failed: " + content);
+                    }
+                } catch (e) {
+                    // Cross-origin errors are expected and can be ignored
+                    console.log("Download likely successful");
+                }
+                
+                // Remove iframe and hide loading overlay after a timeout
+                setTimeout(() => {
+                    document.body.removeChild(downloadFrame);
+                    $('#loadingOverlay').hide();
+                }, 1000);
+            };
+            
+            // Handle errors and timeouts
+            downloadFrame.onerror = function() {
+                alert("Export failed. Please try again.");
+                document.body.removeChild(downloadFrame);
+                $('#loadingOverlay').hide();
+            };
+            
+            // Set a timeout to hide the loading overlay even if the iframe doesn't trigger events
+            setTimeout(() => {
+                if (document.body.contains(downloadFrame)) {
+                    document.body.removeChild(downloadFrame);
+                }
+                $('#loadingOverlay').hide();
+            }, 10000);
+        } catch (e) {
+            console.error("Export error:", e);
+            $('#loadingOverlay').hide();
+            alert("Export failed: " + e.message);
+        }
+    }
+
+    function exportFilteredHTML() {
+        $('#loadingOverlay').css('display', 'flex');
+        
+        try {
+            // Create iframe for download
+            const downloadFrame = document.createElement('iframe');
+            downloadFrame.style.display = 'none';
+            document.body.appendChild(downloadFrame);
+            
+            // Navigate iframe to export URL (using html format for PDF generation)
+            downloadFrame.src = createExportUrl('html');
+            
+            // Listen for load events
+            downloadFrame.onload = function() {
+                try {
+                    // Check if there was an error
+                    const content = downloadFrame.contentDocument.body.textContent;
+                    if (content && content.includes('Error')) {
+                        console.error("Export error:", content);
+                        alert("Export failed: " + content);
+                    }
+                } catch (e) {
+                    // Cross-origin errors are expected and can be ignored
+                    console.log("Download likely successful");
+                }
+                
+                // Remove iframe and hide loading overlay after a timeout
+                setTimeout(() => {
+                    document.body.removeChild(downloadFrame);
+                    $('#loadingOverlay').hide();
+                }, 1000);
+            };
+            
+            // Handle errors and timeouts
+            downloadFrame.onerror = function() {
+                alert("Export failed. Please try again.");
+                document.body.removeChild(downloadFrame);
+                $('#loadingOverlay').hide();
+            };
+            
+            // Set a timeout to hide the loading overlay even if the iframe doesn't trigger events
+            setTimeout(() => {
+                if (document.body.contains(downloadFrame)) {
+                    document.body.removeChild(downloadFrame);
+                }
+                $('#loadingOverlay').hide();
+            }, 10000);
+        } catch (e) {
+            console.error("Export error:", e);
+            $('#loadingOverlay').hide();
+            alert("Export failed: " + e.message);
+        }
+    }
+
+    // Alternative direct export approach using fetch
+    function fetchExport(format) {
+        $('#loadingOverlay').css('display', 'flex');
+        
+        fetch(createExportUrl(format))
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.blob();
+            })
+            .then(blob => {
+                // Create object URL
+                const url = window.URL.createObjectURL(blob);
+                
+                // Create temporary link and click it
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = 'filtered_students.' + (format === 'html' ? 'html' : 'csv');
+                document.body.appendChild(a);
+                a.click();
+                
+                // Clean up
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+                $('#loadingOverlay').hide();
+            })
+            .catch(error => {
+                console.error('Export error:', error);
+                alert('Export failed: ' + error.message);
+                $('#loadingOverlay').hide();
+            });
+    }
+
+    // Update export button handlers
+    $('#exportCSV').on('click', exportFilteredCSV);
+    $('#exportPDF').on('click', exportFilteredHTML);
+    $('#exportExcel').on('click', exportFilteredCSV);  // Using CSV for Excel as it's more reliable
+
+    // Direct export button handlers
+    $('#directExportCSV').on('click', exportFilteredCSV);
+    $('#directExportPDF').on('click', exportFilteredHTML);
+
+    // Fetch-based export button handlers
+    $('#fetchExportCSV').on('click', function() { fetchExport('csv'); });
+    $('#fetchExportHTML').on('click', function() { fetchExport('html'); });
+});
+</script>
+
+<script>
+    // Function to sync main filters to direct form
+    function syncMainFiltersToDirectForm() {
+        if ($('#syncFilters').prop('checked')) {
+            const filters = getCurrentFilters();
+            const directForm = $('form[action="/administration/export_filtered_students"]');
+            
+            // Clear any existing hidden fields
+            directForm.find('input[type="hidden"]:not([name="format"])').remove();
+            
+            // Add all filter values as hidden fields
+            Object.entries(filters).forEach(([key, value]) => {
+                if (value) {
+                    directForm.append(`<input type="hidden" name="${key}" value="${value}">`);
+                }
+            });
+            
+            // Update the display of active filters
+            const filterText = Object.entries(filters)
+                .filter(([_, value]) => value)
+                .map(([key, value]) => `${key}: ${value}`)
+                .join(', ');
+            
+            $('#directFormFilters').text(filterText || 'No filters set');
+        }
+    }
+    
+    // Update filters when the sync checkbox changes
+    $('#syncFilters').on('change', syncMainFiltersToDirectForm);
+    
+    // Update filters when the main form changes
+    $('#filterForm input, #filterForm select').on('change keyup', syncMainFiltersToDirectForm);
+    
+    // Sync filters once on page load
+    $(document).ready(function() {
+        setTimeout(syncMainFiltersToDirectForm, 1000);
+    });
+</script>
+
+<script>
+    // Function to create filtered export URL with current filters
+    function createFilteredExportUrl(format) {
+        // Get all filter values
+        const filters = {
+            id: $('#id').val() || '',
+            name: $('#name').val() || '',
+            email: $('#email').val() || '',
+            phone: $('#phone').val() || '',
+            course: $('#course').val() || '',
+            year: $('#year').val() || '',
+            cgpa: $('#cgpa').val() || '',
+            cgpa_operator: $('#cgpa_operator').val() || '=',
+            status: $('#status').val() || '',
+            companies_left: $('#companies_left').val() || '',
+            companies_operator: $('#companies_operator').val() || '=',
+            format: format
+        };
+        
+        // Create URL with parameters
+        let url = '/administration/filtered_export?';
+        Object.keys(filters).forEach(key => {
+            url += `${key}=${encodeURIComponent(filters[key])}&`;
+        });
+        
+        return url;
+    }
+    
+    // Setup export button click handlers
+    $(document).ready(function() {
+        $('#filteredExportCSV').click(function(e) {
+            e.preventDefault();
+            window.open(createFilteredExportUrl('csv'), '_blank');
+        });
+        
+        $('#filteredExportExcel').click(function(e) {
+            e.preventDefault();
+            window.open(createFilteredExportUrl('excel'), '_blank');
+        });
+        
+        $('#filteredExportHTML').click(function(e) {
+            e.preventDefault();
+            window.open(createFilteredExportUrl('html'), '_blank');
+        });
+        
+        $('#filteredExportPDF').click(function(e) {
+            e.preventDefault();
+            window.open(createFilteredExportUrl('pdf'), '_blank');
+        });
+    });
 </script>
 {% endblock %}

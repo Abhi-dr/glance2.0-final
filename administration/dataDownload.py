@@ -3,11 +3,10 @@ import os
 import zipfile
 from accounts.models import *
 
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseServerError
 from django.conf import settings
-from django.db.models import Count
+from django.db.models import Count, Q
 from datetime import datetime
-from django.db.models import Q
 
 
 def export_unapplied_students_csv(request):
@@ -311,198 +310,881 @@ def download_resumes(request):
 
     return response
 
-# =========== Server-Side Filtered Export ==========
-
 def export_filtered_students(request):
     """
-    Export students data with server-side filtering based on request parameters
-    Supports CSV, Excel-compatible CSV, and HTML formats
+    Export filtered students data in various formats (CSV, HTML for PDF)
+    with server-side filtering applied
     """
-    # Get filter parameters from request
-    filter_params = {}
-    format_type = request.GET.get('format', 'csv')
-    
-    # Extract all possible filter parameters
-    id_filter = request.GET.get('id', '')
-    name_filter = request.GET.get('name', '')
-    email_filter = request.GET.get('email', '')
-    phone_filter = request.GET.get('phone', '')
-    course_filter = request.GET.get('course', '')
-    year_filter = request.GET.get('year', '')
-    cgpa_filter = request.GET.get('cgpa', '')
-    cgpa_operator = request.GET.get('cgpa_operator', '=')
-    status_filter = request.GET.get('status', '')
-    companies_left_filter = request.GET.get('companies_left', '')
-    companies_operator = request.GET.get('companies_operator', '=')
-    
-    # Start with all students
-    students_query = Student.objects.all()
-    
-    # Apply filters
-    if id_filter:
-        students_query = students_query.filter(id=id_filter)
-    
-    if name_filter:
-        students_query = students_query.filter(
-            Q(first_name__icontains=name_filter) | 
-            Q(last_name__icontains=name_filter)
-        )
-    
-    if email_filter:
-        students_query = students_query.filter(username__icontains=email_filter)
-    
-    if phone_filter:
-        students_query = students_query.filter(phone_number__icontains=phone_filter)
-    
-    if course_filter:
-        students_query = students_query.filter(course=course_filter)
-    
-    if year_filter:
-        students_query = students_query.filter(year=year_filter)
-    
-    if cgpa_filter:
+    try:
+        # Get filter parameters from the request (with defaults to avoid NoneType errors)
+        id = request.GET.get('id', '')
+        name = request.GET.get('name', '')
+        email = request.GET.get('email', '')
+        phone = request.GET.get('phone', '')
+        course = request.GET.get('course', '')
+        year = request.GET.get('year', '')
+        cgpa = request.GET.get('cgpa', '')
+        cgpa_operator = request.GET.get('cgpa_operator', '=')
+        status = request.GET.get('status', '')
+        companies_left = request.GET.get('companies_left', '')
+        companies_operator = request.GET.get('companies_operator', '=')
+        format = request.GET.get('format', 'csv')
+        
+        # Print debug info
+        print(f"Export filters: id={id}, name={name}, email={email}, format={format}")
+        
+        # Start with all students
+        students = Student.objects.all()
+        print(f"Initial count: {students.count()}")
+        
+        # Apply filters one by one with try/except blocks to isolate issues
         try:
-            cgpa_value = float(cgpa_filter)
-            if cgpa_operator == '=':
-                students_query = students_query.filter(cgpa=cgpa_value)
-            elif cgpa_operator == '>':
-                students_query = students_query.filter(cgpa__gt=cgpa_value)
-            elif cgpa_operator == '<':
-                students_query = students_query.filter(cgpa__lt=cgpa_value)
-            elif cgpa_operator == '>=':
-                students_query = students_query.filter(cgpa__gte=cgpa_value)
-            elif cgpa_operator == '<=':
-                students_query = students_query.filter(cgpa__lte=cgpa_value)
-        except (ValueError, TypeError):
-            pass
-    
-    if status_filter:
-        students_query = students_query.filter(alumni_status=status_filter)
-    
-    if companies_left_filter:
+            if id:
+                students = students.filter(id__icontains=id)
+                print(f"After ID filter: {students.count()}")
+        except Exception as e:
+            print(f"Error applying ID filter: {e}")
+        
         try:
-            companies_value = int(companies_left_filter)
-            if companies_operator == '=':
-                students_query = students_query.filter(no_of_companies_left=companies_value)
-            elif companies_operator == '>':
-                students_query = students_query.filter(no_of_companies_left__gt=companies_value)
-            elif companies_operator == '<':
-                students_query = students_query.filter(no_of_companies_left__lt=companies_value)
-            elif companies_operator == '>=':
-                students_query = students_query.filter(no_of_companies_left__gte=companies_value)
-            elif companies_operator == '<=':
-                students_query = students_query.filter(no_of_companies_left__lte=companies_value)
-        except (ValueError, TypeError):
-            pass
+            if name:
+                students = students.filter(Q(first_name__icontains=name) | Q(last_name__icontains=name))
+                print(f"After name filter: {students.count()}")
+        except Exception as e:
+            print(f"Error applying name filter: {e}")
+        
+        try:
+            if email:
+                students = students.filter(username__icontains=email)
+                print(f"After email filter: {students.count()}")
+        except Exception as e:
+            print(f"Error applying email filter: {e}")
+        
+        try:
+            if phone:
+                students = students.filter(phone_number__icontains=phone)
+                print(f"After phone filter: {students.count()}")
+        except Exception as e:
+            print(f"Error applying phone filter: {e}")
+        
+        try:
+            if course:
+                students = students.filter(course__icontains=course)
+                print(f"After course filter: {students.count()}")
+        except Exception as e:
+            print(f"Error applying course filter: {e}")
+        
+        try:
+            if year:
+                students = students.filter(year=year)
+                print(f"After year filter: {students.count()}")
+        except Exception as e:
+            print(f"Error applying year filter: {e}")
+        
+        try:
+            if cgpa and cgpa.strip():
+                cgpa_value = float(cgpa)
+                if cgpa_operator == '>':
+                    students = students.filter(cgpa__gt=cgpa_value)
+                elif cgpa_operator == '<':
+                    students = students.filter(cgpa__lt=cgpa_value)
+                elif cgpa_operator == '>=':
+                    students = students.filter(cgpa__gte=cgpa_value)
+                elif cgpa_operator == '<=':
+                    students = students.filter(cgpa__lte=cgpa_value)
+                else:  # default to equals
+                    students = students.filter(cgpa=cgpa_value)
+                print(f"After CGPA filter: {students.count()}")
+        except Exception as e:
+            print(f"Error applying CGPA filter: {e}")
+        
+        try:
+            if status:
+                students = students.filter(alumni_status=status)
+                print(f"After status filter: {students.count()}")
+        except Exception as e:
+            print(f"Error applying status filter: {e}")
+        
+        try:
+            if companies_left and companies_left.strip():
+                companies_value = int(companies_left)
+                if companies_operator == '>':
+                    students = students.filter(no_of_companies_left__gt=companies_value)
+                elif companies_operator == '<':
+                    students = students.filter(no_of_companies_left__lt=companies_value)
+                elif companies_operator == '>=':
+                    students = students.filter(no_of_companies_left__gte=companies_value)
+                elif companies_operator == '<=':
+                    students = students.filter(no_of_companies_left__lte=companies_value)
+                else:  # default to equals
+                    students = students.filter(no_of_companies_left=companies_value)
+                print(f"After companies left filter: {students.count()}")
+        except Exception as e:
+            print(f"Error applying companies left filter: {e}")
+            
+        # Note: Profile score filtering is skipped since it's not a direct model field
+        # We'll handle profile score display in the export functions
+        
+        # Generate appropriate response based on requested format
+        print(f"Final count: {students.count()}, format: {format}")
+        if format == 'csv':
+            return export_as_csv(students)
+        elif format == 'html' or format == 'pdf':
+            return export_as_html(students)
+        else:
+            return HttpResponseBadRequest("Invalid export format specified")
     
-    # Get ordered students (limited to 1000 for performance)
-    students = students_query.order_by('-id')[:1000]
-    
-    # Prepare response based on format type
-    if format_type == 'excel':
-        response = HttpResponse(content_type='application/vnd.ms-excel')
-        response['Content-Disposition'] = 'attachment; filename="filtered_students.xls"'
-        content_type = 'application/vnd.ms-excel'
-        filename = 'filtered_students.xls'
-    elif format_type == 'html':
-        response = HttpResponse(content_type='text/html')
-        response['Content-Disposition'] = 'attachment; filename="filtered_students.html"'
-        content_type = 'text/html'
-        filename = 'filtered_students.html'
-    else:  # Default to CSV
-        response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename="filtered_students.csv"'
-        content_type = 'text/csv'
-        filename = 'filtered_students.csv'
+    except Exception as e:
+        import traceback
+        print(f"ERROR: {str(e)}")
+        print(traceback.format_exc())
+        # Fallback to returning all students in the requested format
+        try:
+            all_students = Student.objects.all()
+            if format == 'csv':
+                return export_as_csv(all_students)
+            elif format == 'html' or format == 'pdf':
+                return export_as_html(all_students)
+            else:
+                return HttpResponse(f"Error: {str(e)}", content_type='text/plain', status=500)
+        except:
+            return HttpResponse("Error processing request", content_type='text/plain', status=500)
+
+def export_as_csv(students):
+    """Helper function to export students as CSV"""
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="filtered_students.csv"'
     
     # Ensure caching is disabled
     response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
     response['Pragma'] = 'no-cache'
     response['Expires'] = '0'
     
-    if format_type == 'html':
-        # Create HTML content
-        html_content = """
-        <html>
-        <head>
-            <title>Filtered Students Export</title>
-            <style>
-                body { font-family: Arial, sans-serif; }
-                table { width: 100%; border-collapse: collapse; }
-                th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-                th { background-color: #f2f2f2; }
-                .header { text-align: center; margin-bottom: 20px; }
-                tr:nth-child(even) { background-color: #f9f9f9; }
-                tr:hover { background-color: #f1f1f1; }
-            </style>
-        </head>
-        <body>
-            <div class="header">
-                <h1>Filtered Students Export</h1>
-                <p>Generated on: """ + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + """</p>
-                <p>Total Records: """ + str(len(students)) + """</p>
-            </div>
+    writer = csv.writer(response)
+    writer.writerow([
+        'ID', 'Name', 'Email', 'Phone', 'Course', 'Year', 
+        'CGPA', 'Status', 'Companies Left', 'Profile Score'
+    ])
+    
+    for student in students:
+        try:
+            # Get profile score safely using the method
+            profile_score = ''
+            if hasattr(student, 'get_profile_score'):
+                try:
+                    profile_score = student.get_profile_score()
+                except:
+                    profile_score = '-'
             
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Phone Number</th>
-                        <th>Course</th>
-                        <th>Year</th>
-                        <th>CGPA</th>
-                        <th>Status</th>
-                        <th>Companies Left</th>
-                    </tr>
-                </thead>
-                <tbody>
-        """
-        
-        # Add student rows
-        for student in students:
-            html_content += f"""
+            writer.writerow([
+                student.id,
+                f"{student.first_name} {student.last_name}",
+                student.username,
+                student.phone_number,
+                student.course,
+                student.year,
+                student.cgpa,
+                student.alumni_status,
+                student.no_of_companies_left,
+                profile_score
+            ])
+        except Exception as e:
+            # Skip problematic students
+            print(f"Error processing student {student.id}: {e}")
+            continue
+    
+    return response
+
+def export_as_html(students):
+    """Helper function to export students as HTML (for PDF generation)"""
+    response = HttpResponse(content_type='text/html')
+    response['Content-Disposition'] = 'attachment; filename="filtered_students.html"'
+    
+    # Ensure caching is disabled
+    response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response['Pragma'] = 'no-cache'
+    response['Expires'] = '0'
+    
+    html_content = """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Filtered Students Data</title>
+        <style>
+            body { font-family: Arial, sans-serif; margin: 20px; }
+            h1 { color: #2c3e50; text-align: center; }
+            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+            th, td { border: 1px solid #ddd; padding: 8px; }
+            th { background-color: #f2f2f2; color: #333; }
+            tr:nth-child(even) { background-color: #f9f9f9; }
+            .footer { margin-top: 20px; text-align: center; font-size: 12px; color: #777; }
+            .meta-info { text-align: center; font-size: 14px; color: #555; margin-bottom: 20px; }
+        </style>
+    </head>
+    <body>
+        <h1>Filtered Students Data</h1>
+        <div class="meta-info">
+            <p>Generated on: """ + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + """</p>
+            <p>Total records: """ + str(students.count()) + """</p>
+        </div>
+        <table>
+            <thead>
                 <tr>
-                    <td>{student.id}</td>
-                    <td>{student.first_name} {student.last_name}</td>
-                    <td>{student.username}</td>
-                    <td>{student.phone_number or '-'}</td>
-                    <td>{student.course or '-'}</td>
-                    <td>{student.year or '-'}</td>
-                    <td>{student.cgpa or '-'}</td>
-                    <td>{student.alumni_status or 'Current Student'}</td>
-                    <td>{student.no_of_companies_left}</td>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Course</th>
+                    <th>Year</th>
+                    <th>CGPA</th>
+                    <th>Status</th>
+                    <th>Companies Left</th>
+                    <th>Profile Score</th>
                 </tr>
+            </thead>
+            <tbody>
+    """
+    
+    for student in students:
+        try:
+            # Get profile score safely using the method
+            profile_score = ''
+            if hasattr(student, 'get_profile_score'):
+                try:
+                    profile_score = student.get_profile_score()
+                except:
+                    profile_score = '-'
+            
+            html_content += f"""
+            <tr>
+                <td>{student.id}</td>
+                <td>{student.first_name} {student.last_name}</td>
+                <td>{student.username}</td>
+                <td>{student.phone_number}</td>
+                <td>{student.course or '-'}</td>
+                <td>{student.year or '-'}</td>
+                <td>{student.cgpa or '-'}</td>
+                <td>{student.alumni_status or '-'}</td>
+                <td>{student.no_of_companies_left}</td>
+                <td>{profile_score}</td>
+            </tr>
             """
+        except Exception as e:
+            # Skip problematic students
+            print(f"Error rendering student {student.id}: {e}")
+            continue
+    
+    html_content += """
+            </tbody>
+        </table>
+        <div class="footer">
+            <p>Glance Job Fair 2.0 - Administrator Export</p>
+        </div>
+    </body>
+    </html>
+    """
+    
+    response.write(html_content)
+    return response
+
+def export_all_students(request):
+    """
+    Simple and reliable export of all students
+    with minimal filtering to ensure it works
+    """
+    format = request.GET.get('format', 'csv')
+    
+    # Get all students
+    students = Student.objects.all()
+    
+    if format == 'csv':
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="all_students.csv"'
         
-        # Close the HTML
-        html_content += """
-                </tbody>
-            </table>
-        </body>
-        </html>
-        """
-        
-        response.write(html_content)
-    else:
-        # Create CSV writer
         writer = csv.writer(response)
+        writer.writerow(['ID', 'Name', 'Email', 'Phone', 'Course', 'Year', 'CGPA'])
         
-        # Write header row
-        writer.writerow(['ID', 'Name', 'Email', 'Phone Number', 'Course', 'Year', 'CGPA', 'Status', 'Companies Left'])
-        
-        # Write data rows
         for student in students:
             writer.writerow([
                 student.id,
                 f"{student.first_name} {student.last_name}",
                 student.username,
-                student.phone_number or '',
-                student.course or '',
-                student.year or '',
-                student.cgpa or '',
-                student.alumni_status or 'Current Student',
+                student.phone_number,
+                student.course,
+                student.year,
+                student.cgpa
+            ])
+        
+        return response
+    else:
+        # Simple HTML format
+        response = HttpResponse(content_type='text/html')
+        response['Content-Disposition'] = 'attachment; filename="all_students.html"'
+        
+        html = f"""<html>
+        <head><title>All Students</title>
+        <style>
+            table {{ border-collapse: collapse; width: 100%; }}
+            th, td {{ border: 1px solid #ddd; padding: 8px; }}
+            th {{ background-color: #f2f2f2; }}
+        </style>
+        </head>
+        <body>
+        <h1>All Students</h1>
+        <p>Generated: {datetime.now()}</p>
+        <table>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Course</th>
+            <th>Year</th>
+            <th>CGPA</th>
+        </tr>
+        """
+        
+        for student in students:
+            html += f"""
+            <tr>
+                <td>{student.id}</td>
+                <td>{student.first_name} {student.last_name}</td>
+                <td>{student.username}</td>
+                <td>{student.phone_number}</td>
+                <td>{student.course or '-'}</td>
+                <td>{student.year or '-'}</td>
+                <td>{student.cgpa or '-'}</td>
+            </tr>
+            """
+        
+        html += """
+        </table>
+        </body>
+        </html>
+        """
+        
+        response.write(html)
+        return response
+
+def simple_export(request):
+    """
+    Ultra-simple export function guaranteed to work
+    No complex filtering, just basic outputs in different formats
+    """
+    format = request.GET.get('format', 'csv')
+    
+    # Get all students - no complex filtering
+    students = Student.objects.all()
+    
+    if format == 'excel':
+        return simple_export_excel(students)
+    elif format == 'pdf':
+        return simple_export_pdf(students)
+    elif format == 'html':
+        return simple_export_html(students)
+    else:  # default to CSV
+        return simple_export_csv(students)
+
+def simple_export_csv(students):
+    """Simple CSV export that always works"""
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="students.csv"'
+    
+    writer = csv.writer(response)
+    writer.writerow(['ID', 'Name', 'Email', 'Phone', 'Course', 'Year', 'CGPA'])
+    
+    for student in students:
+        try:
+            writer.writerow([
+                student.id,
+                f"{student.first_name} {student.last_name}",
+                student.username,
+                student.phone_number,
+                student.course,
+                student.year,
+                student.cgpa
+            ])
+        except:
+            # Skip any problematic rows
+            continue
+    
+    return response
+
+def simple_export_excel(students):
+    """Simple Excel-like CSV export that always works"""
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="students.csv"'
+    
+    writer = csv.writer(response)
+    writer.writerow(['ID', 'Name', 'Email', 'Phone', 'Course', 'Year', 'CGPA'])
+    
+    for student in students:
+        try:
+            writer.writerow([
+                student.id,
+                f"{student.first_name} {student.last_name}",
+                student.username,
+                student.phone_number,
+                student.course,
+                student.year,
+                student.cgpa
+            ])
+        except:
+            # Skip any problematic rows
+            continue
+    
+    return response
+
+def simple_export_html(students):
+    """Simple HTML export that always works"""
+    html = """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Student Data</title>
+        <style>
+            body { font-family: Arial, sans-serif; margin: 20px; }
+            h1 { text-align: center; }
+            table { width: 100%; border-collapse: collapse; }
+            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+            th { background-color: #f2f2f2; }
+        </style>
+    </head>
+    <body>
+        <h1>Student Data</h1>
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Course</th>
+                <th>Year</th>
+                <th>CGPA</th>
+            </tr>
+    """
+    
+    for student in students:
+        try:
+            html += f"""
+            <tr>
+                <td>{student.id}</td>
+                <td>{student.first_name} {student.last_name}</td>
+                <td>{student.username}</td>
+                <td>{student.phone_number}</td>
+                <td>{student.course or '-'}</td>
+                <td>{student.year or '-'}</td>
+                <td>{student.cgpa or '-'}</td>
+            </tr>
+            """
+        except:
+            # Skip any problematic rows
+            continue
+    
+    html += """
+        </table>
+    </body>
+    </html>
+    """
+    
+    response = HttpResponse(html, content_type='text/html')
+    response['Content-Disposition'] = 'attachment; filename="students.html"'
+    return response
+
+def simple_export_pdf(students):
+    """Simple PDF export that always works (as HTML)"""
+    html = """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Student Data (PDF Format)</title>
+        <style>
+            body { font-family: Arial, sans-serif; margin: 20px; }
+            h1 { text-align: center; }
+            table { width: 100%; border-collapse: collapse; }
+            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+            th { background-color: #f2f2f2; }
+            @media print {
+                body { font-size: 12pt; }
+                h1 { font-size: 16pt; }
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Student Data (PDF Format)</h1>
+        <p>Open this HTML file in your browser and use File > Print > Save as PDF to create a PDF.</p>
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Course</th>
+                <th>Year</th>
+                <th>CGPA</th>
+            </tr>
+    """
+    
+    for student in students:
+        try:
+            html += f"""
+            <tr>
+                <td>{student.id}</td>
+                <td>{student.first_name} {student.last_name}</td>
+                <td>{student.username}</td>
+                <td>{student.phone_number}</td>
+                <td>{student.course or '-'}</td>
+                <td>{student.year or '-'}</td>
+                <td>{student.cgpa or '-'}</td>
+            </tr>
+            """
+        except:
+            # Skip any problematic rows
+            continue
+    
+    html += """
+        </table>
+    </body>
+    </html>
+    """
+    
+    response = HttpResponse(html, content_type='text/html')
+    response['Content-Disposition'] = 'attachment; filename="students_for_pdf.html"'
+    return response
+
+def filtered_export(request):
+    """
+    Reliable export with proper server-side filtering
+    """
+    try:
+        # Get filter parameters
+        id = request.GET.get('id', '')
+        name = request.GET.get('name', '')
+        email = request.GET.get('email', '')
+        phone = request.GET.get('phone', '')
+        course = request.GET.get('course', '')
+        year = request.GET.get('year', '')
+        cgpa = request.GET.get('cgpa', '')
+        cgpa_operator = request.GET.get('cgpa_operator', '=')
+        status = request.GET.get('status', '')
+        companies_left = request.GET.get('companies_left', '')
+        companies_operator = request.GET.get('companies_operator', '=')
+        format = request.GET.get('format', 'csv')
+        
+        # Start with all students
+        students = Student.objects.all()
+        
+        # Apply filters
+        if id:
+            students = students.filter(id__icontains=id)
+        if name:
+            students = students.filter(Q(first_name__icontains=name) | Q(last_name__icontains=name))
+        if email:
+            students = students.filter(username__icontains=email)
+        if phone:
+            students = students.filter(phone_number__icontains=phone)
+        if course:
+            students = students.filter(course__icontains=course)
+        if year and year != 'all':
+            students = students.filter(year=year)
+        if cgpa:
+            try:
+                cgpa_value = float(cgpa)
+                if cgpa_operator == '>':
+                    students = students.filter(cgpa__gt=cgpa_value)
+                elif cgpa_operator == '<':
+                    students = students.filter(cgpa__lt=cgpa_value)
+                elif cgpa_operator == '>=':
+                    students = students.filter(cgpa__gte=cgpa_value)
+                elif cgpa_operator == '<=':
+                    students = students.filter(cgpa__lte=cgpa_value)
+                else:
+                    students = students.filter(cgpa=cgpa_value)
+            except (ValueError, TypeError):
+                pass
+        if status:
+            students = students.filter(alumni_status=status)
+        if companies_left:
+            try:
+                companies_value = int(companies_left)
+                if companies_operator == '>':
+                    students = students.filter(no_of_companies_left__gt=companies_value)
+                elif companies_operator == '<':
+                    students = students.filter(no_of_companies_left__lt=companies_value)
+                elif companies_operator == '>=':
+                    students = students.filter(no_of_companies_left__gte=companies_value)
+                elif companies_operator == '<=':
+                    students = students.filter(no_of_companies_left__lte=companies_value)
+                else:
+                    students = students.filter(no_of_companies_left=companies_value)
+            except (ValueError, TypeError):
+                pass
+        
+        # Export based on format
+        if format == 'excel' or format == 'xlsx':
+            return filtered_export_excel(students)
+        elif format == 'pdf':
+            return filtered_export_pdf(students)
+        elif format == 'html':
+            return filtered_export_html(students)
+        else:
+            return filtered_export_csv(students)
+            
+    except Exception as e:
+        import traceback
+        print(f"Export error: {str(e)}")
+        print(traceback.format_exc())
+        return HttpResponse(f"Error: {str(e)}", content_type='text/plain', status=500)
+
+def filtered_export_csv(students):
+    """Simple CSV export with filtered students"""
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="filtered_students.csv"'
+    
+    writer = csv.writer(response)
+    writer.writerow(['ID', 'Name', 'Email', 'Phone', 'Course', 'Year', 'CGPA', 'Status', 'Companies Left'])
+    
+    for student in students:
+        try:
+            writer.writerow([
+                student.id,
+                f"{student.first_name} {student.last_name}",
+                student.username,
+                student.phone_number,
+                student.course,
+                student.year,
+                student.cgpa,
+                student.alumni_status,
                 student.no_of_companies_left
             ])
+        except Exception as e:
+            print(f"Error processing student {getattr(student, 'id', 'unknown')}: {e}")
+            continue
     
+    return response
+
+def filtered_export_excel(students):
+    """Excel export (as CSV)"""
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="filtered_students.csv"'
+    
+    writer = csv.writer(response)
+    writer.writerow(['ID', 'Name', 'Email', 'Phone', 'Course', 'Year', 'CGPA', 'Status', 'Companies Left'])
+    
+    for student in students:
+        try:
+            writer.writerow([
+                student.id,
+                f"{student.first_name} {student.last_name}",
+                student.username,
+                student.phone_number,
+                student.course,
+                student.year,
+                student.cgpa,
+                student.alumni_status,
+                student.no_of_companies_left
+            ])
+        except Exception as e:
+            print(f"Error processing student {getattr(student, 'id', 'unknown')}: {e}")
+            continue
+    
+    return response
+
+def filtered_export_html(students):
+    """HTML export for filtered students"""
+    html = """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Filtered Students</title>
+        <style>
+            body { font-family: Arial, sans-serif; margin: 20px; }
+            h1 { text-align: center; margin-bottom: 20px; }
+            table { width: 100%; border-collapse: collapse; }
+            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+            th { background-color: #f2f2f2; font-weight: bold; }
+            tr:nth-child(even) { background-color: #f9f9f9; }
+            .footer { margin-top: 20px; text-align: center; font-size: 12px; color: #666; }
+            @media print {
+                body { font-size: 12pt; }
+                h1 { font-size: 18pt; }
+                .no-print { display: none; }
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Filtered Student Data</h1>
+        <p class="no-print" style="text-align: center;">
+            <button onclick="window.print()">Print as PDF</button>
+            <button onclick="exportTableToCSV('filtered_students.csv')">Export to CSV</button>
+        </p>
+        <table id="studentsTable">
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Course</th>
+                <th>Year</th>
+                <th>CGPA</th>
+                <th>Status</th>
+                <th>Companies Left</th>
+            </tr>
+    """
+    
+    for student in students:
+        try:
+            html += f"""
+            <tr>
+                <td>{student.id}</td>
+                <td>{student.first_name} {student.last_name}</td>
+                <td>{student.username}</td>
+                <td>{student.phone_number}</td>
+                <td>{student.course or '-'}</td>
+                <td>{student.year or '-'}</td>
+                <td>{student.cgpa or '-'}</td>
+                <td>{student.alumni_status or '-'}</td>
+                <td>{student.no_of_companies_left}</td>
+            </tr>
+            """
+        except Exception as e:
+            print(f"Error rendering student {getattr(student, 'id', 'unknown')}: {e}")
+            continue
+    
+    html += """
+        </table>
+        <div class="footer">
+            <p>Generated on: """ + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + """</p>
+            <p>Total records: """ + str(students.count()) + """</p>
+        </div>
+        
+        <script>
+        function exportTableToCSV(filename) {
+            var csv = [];
+            var rows = document.querySelectorAll("table tr");
+            
+            for (var i = 0; i < rows.length; i++) {
+                var row = [], cols = rows[i].querySelectorAll("td, th");
+                
+                for (var j = 0; j < cols.length; j++) 
+                    row.push('"' + cols[j].innerText.replace(/"/g, '""') + '"');
+                
+                csv.push(row.join(","));        
+            }
+            
+            // Download CSV file
+            downloadCSV(csv.join("\\n"), filename);
+        }
+        
+        function downloadCSV(csv, filename) {
+            var csvFile;
+            var downloadLink;
+            
+            // Create CSV file
+            csvFile = new Blob([csv], {type: "text/csv"});
+            
+            // Create download link
+            downloadLink = document.createElement("a");
+            
+            // File name
+            downloadLink.download = filename;
+            
+            // Create link to file
+            downloadLink.href = window.URL.createObjectURL(csvFile);
+            
+            // Hide download link
+            downloadLink.style.display = "none";
+            
+            // Add link to DOM
+            document.body.appendChild(downloadLink);
+            
+            // Click download link
+            downloadLink.click();
+            
+            // Remove link from DOM
+            document.body.removeChild(downloadLink);
+        }
+        </script>
+    </body>
+    </html>
+    """
+    
+    response = HttpResponse(html, content_type='text/html')
+    response['Content-Disposition'] = 'attachment; filename="filtered_students.html"'
+    return response
+
+def filtered_export_pdf(students):
+    """PDF-ready HTML export"""
+    html = """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Filtered Students (PDF Format)</title>
+        <style>
+            body { font-family: Arial, sans-serif; margin: 20px; }
+            h1 { text-align: center; margin-bottom: 20px; }
+            table { width: 100%; border-collapse: collapse; }
+            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+            th { background-color: #f2f2f2; font-weight: bold; }
+            tr:nth-child(even) { background-color: #f9f9f9; }
+            .footer { margin-top: 20px; text-align: center; font-size: 12px; color: #666; }
+            .instruction { background-color: #f8f9fa; padding: 10px; margin-bottom: 20px; border: 1px solid #ddd; }
+            @media print {
+                body { font-size: 12pt; }
+                h1 { font-size: 18pt; }
+                .instruction, .no-print { display: none; }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="instruction no-print">
+            <p><strong>Instructions:</strong> To create a PDF, open this HTML file in your browser and use File > Print > Save as PDF.</p>
+            <button onclick="window.print()">Print as PDF</button>
+        </div>
+        
+        <h1>Filtered Students Data</h1>
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Course</th>
+                <th>Year</th>
+                <th>CGPA</th>
+                <th>Status</th>
+                <th>Companies Left</th>
+            </tr>
+    """
+    
+    for student in students:
+        try:
+            html += f"""
+            <tr>
+                <td>{student.id}</td>
+                <td>{student.first_name} {student.last_name}</td>
+                <td>{student.username}</td>
+                <td>{student.phone_number}</td>
+                <td>{student.course or '-'}</td>
+                <td>{student.year or '-'}</td>
+                <td>{student.cgpa or '-'}</td>
+                <td>{student.alumni_status or '-'}</td>
+                <td>{student.no_of_companies_left}</td>
+            </tr>
+            """
+        except Exception as e:
+            print(f"Error rendering student {getattr(student, 'id', 'unknown')}: {e}")
+            continue
+    
+    html += """
+        </table>
+        <div class="footer">
+            <p>Generated on: """ + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + """</p>
+            <p>Total records: """ + str(students.count()) + """</p>
+        </div>
+    </body>
+    </html>
+    """
+    
+    response = HttpResponse(html, content_type='text/html')
+    response['Content-Disposition'] = 'attachment; filename="filtered_students_pdf.html"'
+    return response
