@@ -4,6 +4,59 @@
 
 {% block extra_css %}
 <style>
+    /* Document section styling */
+    .document-section {
+        background-color: #f8f9fa;
+        border-left: 5px solid #0d6efd;
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 5px;
+    }
+    
+    .document-title {
+        font-weight: 600;
+        color: #0d6efd;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+    }
+    
+    .document-title i {
+        margin-right: 8px;
+    }
+    
+    .document-instructions {
+        background-color: #fff;
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 10px;
+        border: 1px solid #dee2e6;
+    }
+    
+    .document-instructions h6 {
+        font-weight: 600;
+        margin-bottom: 10px;
+        color: #495057;
+    }
+    
+    .document-instructions ul {
+        padding-left: 20px;
+        margin-bottom: 0;
+    }
+    
+    .document-instructions ul li {
+        margin-bottom: 5px;
+    }
+    
+    .required-badge {
+        background-color: #dc3545;
+        color: white;
+        padding: 3px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        margin-left: 8px;
+    }
+    
     /* Mobile-specific styles */
     @media (max-width: 768px) {
         .input-group {
@@ -73,6 +126,46 @@
         background-color: #0dcaf0 !important;
         color: #000 !important;
     }
+    
+    /* Documents summary section */
+    .documents-summary {
+        background-color: #e9f7fe;
+        border-radius: 5px;
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+    
+    .documents-summary h5 {
+        color: #0d6efd;
+        border-bottom: 1px solid #bee5eb;
+        padding-bottom: 10px;
+        margin-bottom: 15px;
+    }
+    
+    .documents-summary ul {
+        margin-bottom: 0;
+    }
+    
+    .documents-summary li {
+        margin-bottom: 8px;
+    }
+    
+    .document-status {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        margin-right: 8px;
+        vertical-align: middle;
+    }
+    
+    .status-uploaded {
+        background-color: #28a745;
+    }
+    
+    .status-missing {
+        background-color: #dc3545;
+    }
 </style>
 {% endblock %}
 
@@ -82,13 +175,9 @@
     <div class="card">
         <div class="card-body">
             {% if student.resume %}
-
             <h5 class="card-title fw-semibold mb-4">Update Documents</h5>
-
             {% else %}
-
             <h5 class="card-title fw-semibold mb-4">Upload Documents</h5>
-
             {% endif %}
 
             <p class="mb-0">Remember! This is a crucial step towards your success</p>
@@ -96,13 +185,38 @@
     </div>
 
     {% for message in messages %}
-
     <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert">
       <strong>{{ message.tag }}</strong> {{ message }}
       <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
-    
     {% endfor %}
+
+    <!-- Documents Summary Section -->
+    <div class="documents-summary">
+        <h5><i class="ti ti-files me-2"></i>Documents Status</h5>
+        <ul class="list-unstyled">
+            <li>
+                <span class="document-status {% if student.resume %}status-uploaded{% else %}status-missing{% endif %}"></span>
+                Resume 
+                {% if student.resume %}<span class="badge bg-success">Uploaded</span>{% else %}<span class="badge bg-danger">Required</span>{% endif %}
+            </li>
+            <li>
+                <span class="document-status {% if student.tenth_marksheet %}status-uploaded{% else %}status-missing{% endif %}"></span>
+                Highschool Marksheet 
+                {% if student.tenth_marksheet %}<span class="badge bg-success">Uploaded</span>{% else %}<span class="badge bg-danger">Required</span>{% endif %}
+            </li>
+            <li>
+                <span class="document-status {% if student.twelfth_marksheet %}status-uploaded{% else %}status-missing{% endif %}"></span>
+                Intermediate Marksheet 
+                {% if student.twelfth_marksheet %}<span class="badge bg-success">Uploaded</span>{% else %}<span class="badge bg-danger">Required</span>{% endif %}
+            </li>
+            <li>
+                <span class="document-status {% if student.college_profile_print %}status-uploaded{% else %}status-missing{% endif %}"></span>
+                College Profile Print 
+                {% if student.college_profile_print %}<span class="badge bg-success">Uploaded</span>{% else %}<span class="badge bg-danger">Required</span>{% endif %}
+            </li>
+        </ul>
+    </div>
 
     <div class="card">
         <div class="card-body">
@@ -286,88 +400,139 @@
             <form method="post" enctype="multipart/form-data" id="uploadForm">
                 {% csrf_token %}
 
-                <div class="mb-4">
-                    <label for="resumeFile" class="form-label">Upload Resume <small class="text-muted">(PDF only, max 5MB)</small></label>
-                    <div class="input-group">
-                        <input class="form-control" type="file" id="resumeFile" name="resume" accept="application/pdf,.pdf"/>
-                        <span class="input-group-text">
-                            <i class="ti ti-file-upload"></i>
-                        </span>
+                <!-- Resume Section -->
+                <div class="document-section">
+                    <div class="document-title">
+                        <i class="ti ti-file-text"></i> Resume <span class="required-badge">Required</span>
                     </div>
-                    <div class="form-text">
-                        <span class="badge bg-info me-1"><i class="ti ti-device-mobile me-1"></i>Mobile users</span>
-                        Take a clear photo or use a document scanning app (like Adobe Scan or CamScanner)
+                    
+                    <div class="document-instructions">
+                        <h6>What to include:</h6>
+                        <ul>
+                            <li>Personal details and contact information</li>
+                            <li>Educational background</li>
+                            <li>Skills and technical competencies</li>
+                            <li>Projects and work experience</li>
+                            <li>Achievements and extracurricular activities</li>
+                        </ul>
                     </div>
-                    <div class="invalid-feedback">
-                        Please select a valid PDF file less than 5MB in size.
-                    </div>
-                </div>
-
-                <div class="mb-4">
-                    <label for="tenthFile" class="form-label">HighSchool Marksheet <small class="text-muted">(PDF only, max 5MB)</small></label>
-                    <div class="input-group">
-                        <input class="form-control" type="file" id="tenthFile" name="tenth_marksheet" accept="application/pdf,.pdf"/>
-                        <span class="input-group-text">
-                            <i class="ti ti-file-upload"></i>
-                        </span>
-                    </div>
-                    <div class="form-text">
-                        <span class="badge bg-info me-1"><i class="ti ti-device-mobile me-1"></i>Mobile users</span>
-                        Place document on a flat surface with good lighting for best results
-                    </div>
-                    <div class="invalid-feedback">
-                        Please select a valid PDF file less than 5MB in size.
-                    </div>
-                </div>
-
-                <div class="mb-4">
-                    <label for="twelfthFile" class="form-label">Intermediate Marksheet <small class="text-muted">(PDF only, max 5MB)</small></label>
-                    <div class="input-group">
-                        <input class="form-control" type="file" id="twelfthFile" name="twelfth_marksheet" accept="application/pdf,.pdf"/>
-                        <span class="input-group-text">
-                            <i class="ti ti-file-upload"></i>
-                        </span>
-                    </div>
-                    <div class="form-text">
-                        <span class="badge bg-info me-1"><i class="ti ti-device-mobile me-1"></i>Mobile users</span>
-                        Use PDF converter apps if you have image files
-                    </div>
-                    <div class="invalid-feedback">
-                        Please select a valid PDF file less than 5MB in size.
+                    
+                    <div class="mb-4">
+                        <label for="resumeFile" class="form-label">Upload Resume <small class="text-muted">(PDF only, max 5MB)</small></label>
+                        <div class="input-group">
+                            <input class="form-control" type="file" id="resumeFile" name="resume" accept="application/pdf,.pdf"/>
+                            <span class="input-group-text">
+                                <i class="ti ti-file-upload"></i>
+                            </span>
+                        </div>
+                        <div class="form-text">
+                            <span class="badge bg-info me-1"><i class="ti ti-device-mobile me-1"></i>Mobile users</span>
+                            Take a clear photo or use a document scanning app (like Adobe Scan or CamScanner)
+                        </div>
+                        <div class="invalid-feedback">
+                            Please select a valid PDF file less than 5MB in size.
+                        </div>
                     </div>
                 </div>
 
-                <div class="mb-4">
-                    <label for="profileFile" class="form-label">College Profile Print <small class="text-muted">(PDF only, max 5MB)</small></label>
-                    <ul>
-                        <li>
-                            <small>1. Go to <a href="https://glauniversity.in:8085" target="_blank">glauniversity.in:8085</a></small>                            
-                        </li>
-                        <li>
-                            <small>2. Click on 'Main Account' section</small>
-                        </li>
-                        <li>
-                            <small>3. Click on <b>'Profile Print'</b></small>
-                        </li>
-                        <li>
-                            <small>4. Click on <b>'Print'</b> button and save as PDF</small>
-                        </li>
-                        <li>
-                            <small>5. <b>On mobile:</b> Use "Save as PDF" option in the share menu or take screenshots and convert to PDF</small>
-                        </li>
-                    </ul>
-                    <div class="input-group">
-                        <input class="form-control" type="file" id="profileFile" name="college_profile_print" accept="application/pdf,.pdf"/>
-                        <span class="input-group-text">
-                            <i class="ti ti-file-upload"></i>
-                        </span>
+                <!-- Highschool Marksheet Section -->
+                <div class="document-section">
+                    <div class="document-title">
+                        <i class="ti ti-certificate"></i> Highschool Marksheet <span class="required-badge">Required</span>
                     </div>
-                    <div class="form-text">
-                        <span class="badge bg-info me-1"><i class="ti ti-device-mobile me-1"></i>Mobile users</span>
-                        If saving as PDF doesn't work, use screenshot and convert to PDF
+                    
+                    <div class="document-instructions">
+                        <h6>Important notes:</h6>
+                        <ul>
+                            <li>Upload your Class 10th/SSC final marksheet</li>
+                            <li>Make sure all subjects and percentages are clearly visible</li>
+                            <li>The document should include your name and registration number</li>
+                        </ul>
                     </div>
-                    <div class="invalid-feedback">
-                        Please select a valid PDF file less than 5MB in size.
+                    
+                    <div class="mb-4">
+                        <label for="tenthFile" class="form-label">Highschool Marksheet <small class="text-muted">(PDF only, max 5MB)</small></label>
+                        <div class="input-group">
+                            <input class="form-control" type="file" id="tenthFile" name="tenth_marksheet" accept="application/pdf,.pdf"/>
+                            <span class="input-group-text">
+                                <i class="ti ti-file-upload"></i>
+                            </span>
+                        </div>
+                        <div class="form-text">
+                            <span class="badge bg-info me-1"><i class="ti ti-device-mobile me-1"></i>Mobile users</span>
+                            Place document on a flat surface with good lighting for best results
+                        </div>
+                        <div class="invalid-feedback">
+                            Please select a valid PDF file less than 5MB in size.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Intermediate Marksheet Section -->
+                <div class="document-section">
+                    <div class="document-title">
+                        <i class="ti ti-certificate"></i> Intermediate Marksheet <span class="required-badge">Required</span>
+                    </div>
+                    
+                    <div class="document-instructions">
+                        <h6>Important notes:</h6>
+                        <ul>
+                            <li>Upload your Class 12th/HSC final marksheet</li>
+                            <li>Ensure your percentage/CGPA is clearly visible</li>
+                            <li>All subjects and marks should be legible</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="twelfthFile" class="form-label">Intermediate Marksheet <small class="text-muted">(PDF only, max 5MB)</small></label>
+                        <div class="input-group">
+                            <input class="form-control" type="file" id="twelfthFile" name="twelfth_marksheet" accept="application/pdf,.pdf"/>
+                            <span class="input-group-text">
+                                <i class="ti ti-file-upload"></i>
+                            </span>
+                        </div>
+                        <div class="form-text">
+                            <span class="badge bg-info me-1"><i class="ti ti-device-mobile me-1"></i>Mobile users</span>
+                            Use PDF converter apps if you have image files
+                        </div>
+                        <div class="invalid-feedback">
+                            Please select a valid PDF file less than 5MB in size.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- College Profile Print Section -->
+                <div class="document-section">
+                    <div class="document-title">
+                        <i class="ti ti-building-university"></i> College Profile Print <span class="required-badge">Required</span>
+                    </div>
+                    
+                    <div class="document-instructions">
+                        <h6>How to obtain your College Profile Print:</h6>
+                        <ol>
+                            <li>Go to <a href="https://glauniversity.in:8085" target="_blank">glauniversity.in:8085</a></li>                            
+                            <li>Click on 'Main Account' section</li>
+                            <li>Click on <b>'Profile Print'</b></li>
+                            <li>Click on <b>'Print'</b> button and save as PDF</li>
+                            <li><b>On mobile:</b> Use "Save as PDF" option in the share menu or take screenshots and convert to PDF</li>
+                        </ol>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="profileFile" class="form-label">College Profile Print <small class="text-muted">(PDF only, max 5MB)</small></label>
+                        <div class="input-group">
+                            <input class="form-control" type="file" id="profileFile" name="college_profile_print" accept="application/pdf,.pdf"/>
+                            <span class="input-group-text">
+                                <i class="ti ti-file-upload"></i>
+                            </span>
+                        </div>
+                        <div class="form-text">
+                            <span class="badge bg-info me-1"><i class="ti ti-device-mobile me-1"></i>Mobile users</span>
+                            If saving as PDF doesn't work, use screenshot and convert to PDF
+                        </div>
+                        <div class="invalid-feedback">
+                            Please select a valid PDF file less than 5MB in size.
+                        </div>
                     </div>
                 </div>
 

@@ -12,6 +12,8 @@ from django.core.mail import send_mail
 
 import requests
 
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
 # Comment out the external API email functions
 """
 def send_email_async(to, subject, text):
@@ -197,11 +199,23 @@ def shortlisted_students(request):
             Q(student__email__icontains=query) |
             Q(student__phone_number__icontains=query) |
             Q(student__year__icontains=query))
+    
+    # Pagination
+    page = request.GET.get('page', 1)
+    paginator = Paginator(shortlisted_applications, 20)  # Show 20 applications per page
+    
+    try:
+        paginated_applications = paginator.page(page)
+    except PageNotAnInteger:
+        paginated_applications = paginator.page(1)
+    except EmptyPage:
+        paginated_applications = paginator.page(paginator.num_pages)
 
     return render(request, "administration/shortlisted_students.html", {
         "user": user,
-        "shortlisted_applications": shortlisted_applications,
-        "query": query
+        "shortlisted_applications": paginated_applications,
+        "query": query,
+        "total_count": shortlisted_applications.count()
     })
 
 # ============================================ MAIN PAGE REJECTED STUDENTS =============================
@@ -222,11 +236,23 @@ def rejected_students(request):
             Q(student__email__icontains=query) |
             Q(student__phone_number__icontains=query) |
             Q(student__year__icontains=query))
+    
+    # Pagination
+    page = request.GET.get('page', 1)
+    paginator = Paginator(rejected_applications, 20)  # Show 20 applications per page
+    
+    try:
+        paginated_applications = paginator.page(page)
+    except PageNotAnInteger:
+        paginated_applications = paginator.page(1)
+    except EmptyPage:
+        paginated_applications = paginator.page(paginator.num_pages)
 
     return render(request, "administration/rejected_students.html", {
         "user": user,
-        "rejected_applications": rejected_applications,
-        "query": query
+        "rejected_applications": paginated_applications,
+        "query": query,
+        "total_count": rejected_applications.count()
     })
 
 # ============================================ ADD NOTIFICATION =========================================
@@ -300,25 +326,40 @@ def all_students(request):
     students = Student.objects.all()
     
     # sort the students based on the number of jobs they have applied for
-    
     students = sorted(students, key=lambda x: x.application_set.count(), reverse=True)
     
     query = request.POST.get("query")
     if query:
-        students = students.filter(
-            Q(first_name__icontains=query) |
-            Q(last_name__icontains=query) |
-            Q(email__icontains=query) |
-            Q(phone_number__icontains=query) |
-            Q(year__icontains=query) |
-            Q(course__icontains=query))
-        
-        
+        filtered_students = []
+        for student in students:
+            if (query.lower() in student.first_name.lower() or 
+                query.lower() in student.last_name.lower() or 
+                (student.email and query.lower() in student.email.lower()) or 
+                (student.phone_number and query.lower() in student.phone_number) or 
+                (student.year and query.lower() in student.year.lower()) or 
+                (student.course and query.lower() in student.course.lower())):
+                filtered_students.append(student)
+        students = filtered_students
+    
+    # Get the total count before pagination
+    total_count = len(students)
+    
+    # Pagination
+    page = request.GET.get('page', 1)
+    paginator = Paginator(students, 20)  # Show 20 students per page
+    
+    try:
+        paginated_students = paginator.page(page)
+    except PageNotAnInteger:
+        paginated_students = paginator.page(1)
+    except EmptyPage:
+        paginated_students = paginator.page(paginator.num_pages)
 
     return render(request, "administration/all_students.html", {
         "user": user,
-        "students": students,
-        "query": query
+        "students": paginated_students,
+        "query": query,
+        "total_count": total_count
     })
 
 # ===============================================================================================

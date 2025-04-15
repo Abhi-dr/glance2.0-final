@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.core.mail import send_mail
 from datetime import datetime
 from django.db.models import Q
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 
 # ========================================= DASHBOARD =========================================
 
@@ -99,7 +100,18 @@ def home(request):
 def my_applications(request):
     
     student = Student.objects.get(id=request.user.id)
-    applications = Application.objects.filter(student=student)
+    applications_list = Application.objects.filter(student=student).order_by('-application_date')
+    
+    # Pagination
+    page = request.GET.get('page', 1)
+    paginator = Paginator(applications_list, 8)  # Show 8 applications per page
+    
+    try:
+        applications = paginator.page(page)
+    except PageNotAnInteger:
+        applications = paginator.page(1)
+    except EmptyPage:
+        applications = paginator.page(paginator.num_pages)
     
     parameters = {
         "student": student,
@@ -242,76 +254,36 @@ def upload_resume(request):
 
 # ================================== ALL COMPANIES ===========================================
 
-# @login_required(login_url='login')
-# def all_jobs(request):
-    
-#     student = Student.objects.get(id=request.user.id)
-    
-#     # Initialize with all jobs
-#     jobs = Job.objects.all()
-    
-#     # Check if student has applied to any jobs and exclude them
-#     applied_jobs = Application.objects.filter(student=student).values_list('job__id', flat=True)
-#     jobs = jobs.exclude(id__in=applied_jobs)
-    
-#     # Handle backlog filtering with None check
-#     if student.backlog is not None and student.backlog > 0:
-#         jobs = jobs.exclude(is_backlog_allowed=False)
-    
-#     # Apply additional filters only if student has complete profile
-#     if all([student.tenth is not None, student.twelfth is not None, student.cgpa is not None]):
-#         # Filter jobs by eligibility criteria
-#         jobs = jobs.filter(
-#             tenth_percentage__lte=student.tenth,
-#             twelfth_percentage__lte=student.twelfth,
-#             cgpa_criteria__lte=student.cgpa
-#         )
-#     else:
-#         # Inform student that profile completion is needed for filtering
-#         messages.info(request, "Complete your profile to see jobs filtered by your qualifications.")
-    
-#     # Handle search query
-#     query = request.POST.get("query")
-#     if query:
-#         # Search by company name, job title, or description
-#         jobs = Job.objects.filter(
-#             Q(title__icontains=query) |
-#             Q(description__icontains=query) |
-#             Q(company__name__icontains=query)
-#         ).exclude(id__in=applied_jobs)
-        
-#         # Apply backlog filter to search results too
-#         if student.backlog is not None and student.backlog > 0:
-#             jobs = jobs.exclude(is_backlog_allowed=False)
-    
-#     parameters = {
-#         "student": student,
-#         "jobs": jobs,
-#         "query": query
-#     }
-    
-#     return render(request, 'student/all_jobs.html', parameters)
 @login_required(login_url='login')
 def all_jobs(request):
     
     student = Student.objects.get(id=request.user.id)
-    jobs = Job.objects.all().exclude(applications__student=student)
+    jobs_list = Job.objects.all().exclude(applications__student=student)
     # for application in Application.objects.filter(student=student):
     #     jobs = jobs.exclude(interview_date=application.job.interview_date)
     if student.backlog:
         if student.backlog > 0:
-            jobs = jobs.exclude(is_backlog_allowed=False)    
+            jobs_list = jobs_list.exclude(is_backlog_allowed=False)    
             
-    query = request.POST.get("query")
-    print(query)
+    query = request.GET.get("query")
     if query:
         # fetch the companies based on the name of the company, job role and descritiption
-        
-        jobs = Job.objects.filter(
+        jobs_list = Job.objects.filter(
             Q(title__icontains=query) |
             Q(description__icontains=query) |
             Q(company__name__icontains=query)
         ).exclude(applications__student=student)
+    
+    # Pagination
+    page = request.GET.get('page', 1)
+    paginator = Paginator(jobs_list, 12)  # Show 12 jobs per page
+    
+    try:
+        jobs = paginator.page(page)
+    except PageNotAnInteger:
+        jobs = paginator.page(1)
+    except EmptyPage:
+        jobs = paginator.page(paginator.num_pages)
     
     parameters = {
         "student": student,
