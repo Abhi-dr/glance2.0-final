@@ -111,6 +111,16 @@
                                     <option value="B.Tech">B.Tech</option>
                                     <option value="BBA">BBA</option>
                                     <option value="BCA">BCA</option>
+                                    <option value="MBA">MBA</option>
+                                    <option value="MCA">MCA</option>
+                                    <option value="M.Tech">M.Tech</option>
+                                    <option value="B.Sc">B.Sc</option>
+                                    <option value="M.Sc">M.Sc</option>
+                                    <option value="B.Com">B.Com</option>
+                                    <option value="M.Com">M.Com</option>
+                                    <option value="B.A">B.A</option>
+                                    <option value="M.A">M.A</option>
+                                    <option value="Ph.D">Ph.D</option>
                                 </select>
                             </div>
                             <div class="col-md-3">
@@ -176,6 +186,16 @@
                                         placeholder="Score" min="0" max="100">
                                 </div>
                             </div>
+                            <div class="col-md-3">
+                                <label for="company" class="form-label">Applied to Company</label>
+                                <input type="text" class="form-control" id="company" name="company" 
+                                    placeholder="Company name...">
+                            </div>
+                            <div class="col-md-3">
+                                <label for="job" class="form-label">Applied to Job</label>
+                                <input type="text" class="form-control" id="job" name="job"
+                                    placeholder="Job title...">
+                            </div>
                             <div class="col-12">
                                 <button type="submit" class="btn btn-primary">Apply Filters</button>
                                 <button type="button" class="btn btn-secondary" id="resetFilters">Reset</button>
@@ -185,6 +205,51 @@
 
                     <!-- Active Filters -->
                     <div class="active-filters" id="activeFilters"></div>
+
+                    <!-- Message to Filtered Students Section -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0"><i class="fas fa-envelope me-2"></i>Send Message to Filtered Students</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="messageForm" class="row g-3" action="{% url 'send_message_to_filtered_students' %}" method="POST">
+                                {% csrf_token %}
+                                <!-- Hidden fields to pass all current filter values -->
+                                <input type="hidden" id="msg_id" name="id">
+                                <input type="hidden" id="msg_name" name="name">
+                                <input type="hidden" id="msg_email" name="email">
+                                <input type="hidden" id="msg_phone" name="phone">
+                                <input type="hidden" id="msg_course" name="course">
+                                <input type="hidden" id="msg_year" name="year">
+                                <input type="hidden" id="msg_cgpa" name="cgpa">
+                                <input type="hidden" id="msg_cgpa_operator" name="cgpa_operator">
+                                <input type="hidden" id="msg_status" name="status">
+                                <input type="hidden" id="msg_companies_left" name="companies_left">
+                                <input type="hidden" id="msg_companies_operator" name="companies_operator">
+                                <input type="hidden" id="msg_profile_score" name="profile_score">
+                                <input type="hidden" id="msg_score_operator" name="score_operator">
+                                <input type="hidden" id="msg_company" name="company">
+                                <input type="hidden" id="msg_job" name="job">
+                                
+                                <div class="col-md-12">
+                                    <label for="messageSubject" class="form-label">Subject</label>
+                                    <input type="text" class="form-control" id="messageSubject" name="subject" placeholder="Message subject..." required>
+                                </div>
+                                <div class="col-md-12">
+                                    <label for="messageContent" class="form-label">Message Content</label>
+                                    <textarea class="form-control" id="messageContent" name="content" rows="4" placeholder="Type your message here..." required></textarea>
+                                </div>
+                                <div class="col-12">
+                                    <button type="submit" class="btn btn-info" id="sendMessageBtn">
+                                        <i class="fas fa-paper-plane me-2"></i>Send Message
+                                    </button>
+                                    <div class="form-text mt-2">
+                                        Message will be sent to all students matching your current filters as both email and notification.
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
 
                     <!-- Export Options Section -->
                     <div class="card mb-4">
@@ -1147,39 +1212,159 @@ $(document).ready(function() {
             status: $('#status').val() || '',
             companies_left: $('#companies_left').val() || '',
             companies_operator: $('#companies_operator').val() || '=',
+            profile_score: $('#profile_score').val() || '',
+            score_operator: $('#score_operator').val() || '=',
             format: format
         };
         
         // Create URL with parameters
         let url = '/administration/filtered_export?';
         Object.keys(filters).forEach(key => {
-            url += `${key}=${encodeURIComponent(filters[key])}&`;
+            // Only add parameters with values
+            if (filters[key]) {
+                url += `${key}=${encodeURIComponent(filters[key])}&`;
+            }
         });
         
+        // Debug
+        console.log("Export URL:", url);
         return url;
+    }
+    
+    // Function to download via iframe (more reliable than window.open for file downloads)
+    function downloadViaIframe(url) {
+        // Show loading overlay
+        const overlay = $('<div class="loading-overlay"><div class="spinner"></div><p>Preparing download...</p></div>');
+        overlay.css({
+            'position': 'fixed',
+            'top': 0,
+            'left': 0,
+            'width': '100%',
+            'height': '100%',
+            'background-color': 'rgba(0,0,0,0.5)',
+            'z-index': 9999,
+            'display': 'flex',
+            'flex-direction': 'column',
+            'justify-content': 'center',
+            'align-items': 'center',
+            'color': 'white'
+        });
+        
+        // Add spinner
+        overlay.find('.spinner').css({
+            'border': '5px solid #f3f3f3',
+            'border-top': '5px solid #3498db',
+            'border-radius': '50%',
+            'width': '50px',
+            'height': '50px',
+            'animation': 'spin 2s linear infinite'
+        });
+        
+        // Add keyframes for spinner
+        if ($('style#spinner-style').length === 0) {
+            $('head').append('<style id="spinner-style">@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>');
+        }
+        
+        $('body').append(overlay);
+        
+        // Create a temporary iframe for download
+        const iframe = $('<iframe>', {
+            src: url,
+            id: 'download-iframe',
+            style: 'display: none'
+        }).appendTo('body');
+        
+        // Remove overlay and iframe after a reasonable timeout
+        setTimeout(function() {
+            overlay.fadeOut(300, function() {
+                $(this).remove();
+            });
+            
+            // Keep iframe a bit longer to ensure download starts
+            setTimeout(function() {
+                iframe.remove();
+            }, 5000);
+        }, 3000);
     }
     
     // Setup export button click handlers
     $(document).ready(function() {
         $('#filteredExportCSV').click(function(e) {
             e.preventDefault();
-            window.open(createFilteredExportUrl('csv'), '_blank');
+            downloadViaIframe(createFilteredExportUrl('csv'));
         });
         
         $('#filteredExportExcel').click(function(e) {
             e.preventDefault();
-            window.open(createFilteredExportUrl('excel'), '_blank');
+            downloadViaIframe(createFilteredExportUrl('excel'));
         });
         
         $('#filteredExportHTML').click(function(e) {
             e.preventDefault();
-            window.open(createFilteredExportUrl('html'), '_blank');
+            downloadViaIframe(createFilteredExportUrl('html'));
         });
         
         $('#filteredExportPDF').click(function(e) {
             e.preventDefault();
-            window.open(createFilteredExportUrl('pdf'), '_blank');
+            // Using HTML format for PDF is more reliable across browsers
+            downloadViaIframe(createFilteredExportUrl('html'));
         });
+    });
+</script>
+
+<script>
+    // Function to update the hidden input fields in the message form with current filter values
+    function updateMessageFormFields() {
+        // Get all filter values
+        const filters = {
+            id: $('#id').val() || '',
+            name: $('#name').val() || '',
+            email: $('#email').val() || '',
+            phone: $('#phone').val() || '',
+            course: $('#course').val() || '',
+            year: $('#year').val() || '',
+            cgpa: $('#cgpa').val() || '',
+            cgpa_operator: $('#cgpa_operator').val() || '=',
+            status: $('#status').val() || '',
+            companies_left: $('#companies_left').val() || '',
+            companies_operator: $('#companies_operator').val() || '=',
+            profile_score: $('#profile_score').val() || '',
+            score_operator: $('#score_operator').val() || '=',
+            company: $('#company').val() || '',
+            job: $('#job').val() || ''
+        };
+        
+        // Update hidden fields in message form
+        $('#msg_id').val(filters.id);
+        $('#msg_name').val(filters.name);
+        $('#msg_email').val(filters.email);
+        $('#msg_phone').val(filters.phone);
+        $('#msg_course').val(filters.course);
+        $('#msg_year').val(filters.year);
+        $('#msg_cgpa').val(filters.cgpa);
+        $('#msg_cgpa_operator').val(filters.cgpa_operator);
+        $('#msg_status').val(filters.status);
+        $('#msg_companies_left').val(filters.companies_left);
+        $('#msg_companies_operator').val(filters.companies_operator);
+        $('#msg_profile_score').val(filters.profile_score);
+        $('#msg_score_operator').val(filters.score_operator);
+        $('#msg_company').val(filters.company);
+        $('#msg_job').val(filters.job);
+    }
+    
+    // Update message form fields when filter form changes
+    $('#filterForm input, #filterForm select').on('change', function() {
+        updateMessageFormFields();
+    });
+    
+    // Update message form fields when filter form is submitted
+    $('#filterForm').on('submit', function() {
+        updateMessageFormFields();
+    });
+    
+    // Update message form fields on page load
+    $(document).ready(function() {
+        updateMessageFormFields();
     });
 </script>
 {% endblock %}

@@ -328,6 +328,8 @@ def export_filtered_students(request):
         status = request.GET.get('status', '')
         companies_left = request.GET.get('companies_left', '')
         companies_operator = request.GET.get('companies_operator', '=')
+        profile_score = request.GET.get('profile_score', '')
+        score_operator = request.GET.get('score_operator', '=')
         format = request.GET.get('format', 'csv')
         
         # Print debug info
@@ -421,8 +423,42 @@ def export_filtered_students(request):
         except Exception as e:
             print(f"Error applying companies left filter: {e}")
             
-        # Note: Profile score filtering is skipped since it's not a direct model field
-        # We'll handle profile score display in the export functions
+        # Filter by profile score if provided (profile score is calculated on the fly)
+        if profile_score:
+            try:
+                # We can't filter directly on profile_score as it's not a database field
+                # We'll fetch all students and filter in Python
+                all_students = list(students)
+                filtered_students = []
+                
+                profile_score_value = float(profile_score)
+                
+                for student in all_students:
+                    try:
+                        if hasattr(student, 'get_profile_score'):
+                            student_score = student.get_profile_score()
+                            if student_score is not None:
+                                if score_operator == '>' and student_score > profile_score_value:
+                                    filtered_students.append(student)
+                                elif score_operator == '<' and student_score < profile_score_value:
+                                    filtered_students.append(student)
+                                elif score_operator == '>=' and student_score >= profile_score_value:
+                                    filtered_students.append(student)
+                                elif score_operator == '<=' and student_score <= profile_score_value:
+                                    filtered_students.append(student)
+                                elif score_operator == '=' and student_score == profile_score_value:
+                                    filtered_students.append(student)
+                    except Exception as e:
+                        print(f"Error checking profile score for student {getattr(student, 'id', 'unknown')}: {e}")
+                        continue
+                
+                # Convert list back to a queryset
+                student_ids = [student.id for student in filtered_students]
+                students = Student.objects.filter(id__in=student_ids)
+                
+            except (ValueError, TypeError) as e:
+                print(f"Error filtering by profile score: {e}")
+                pass
         
         # Generate appropriate response based on requested format
         print(f"Final count: {students.count()}, format: {format}")
@@ -868,6 +904,8 @@ def filtered_export(request):
         status = request.GET.get('status', '')
         companies_left = request.GET.get('companies_left', '')
         companies_operator = request.GET.get('companies_operator', '=')
+        profile_score = request.GET.get('profile_score', '')
+        score_operator = request.GET.get('score_operator', '=')
         format = request.GET.get('format', 'csv')
         
         # Start with all students
@@ -918,6 +956,43 @@ def filtered_export(request):
                     students = students.filter(no_of_companies_left=companies_value)
             except (ValueError, TypeError):
                 pass
+                
+        # Filter by profile score if provided (profile score is calculated on the fly)
+        if profile_score:
+            try:
+                # We can't filter directly on profile_score as it's not a database field
+                # We'll fetch all students and filter in Python
+                all_students = list(students)
+                filtered_students = []
+                
+                profile_score_value = float(profile_score)
+                
+                for student in all_students:
+                    try:
+                        if hasattr(student, 'get_profile_score'):
+                            student_score = student.get_profile_score()
+                            if student_score is not None:
+                                if score_operator == '>' and student_score > profile_score_value:
+                                    filtered_students.append(student)
+                                elif score_operator == '<' and student_score < profile_score_value:
+                                    filtered_students.append(student)
+                                elif score_operator == '>=' and student_score >= profile_score_value:
+                                    filtered_students.append(student)
+                                elif score_operator == '<=' and student_score <= profile_score_value:
+                                    filtered_students.append(student)
+                                elif score_operator == '=' and student_score == profile_score_value:
+                                    filtered_students.append(student)
+                    except Exception as e:
+                        print(f"Error checking profile score for student {getattr(student, 'id', 'unknown')}: {e}")
+                        continue
+                
+                # Convert list back to a queryset
+                student_ids = [student.id for student in filtered_students]
+                students = Student.objects.filter(id__in=student_ids)
+                
+            except (ValueError, TypeError) as e:
+                print(f"Error filtering by profile score: {e}")
+                pass
         
         # Export based on format
         if format == 'excel' or format == 'xlsx':
@@ -963,30 +1038,48 @@ def filtered_export_csv(students):
     return response
 
 def filtered_export_excel(students):
-    """Excel export (as CSV)"""
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="filtered_students.csv"'
+    """Excel export using xlwt library"""
+    import xlwt
     
-    writer = csv.writer(response)
-    writer.writerow(['ID', 'Name', 'Email', 'Phone', 'Course', 'Year', 'CGPA', 'Status', 'Companies Left'])
+    # Create a workbook and add a worksheet
+    wb = xlwt.Workbook(encoding='utf-8')
+    ws = wb.add_sheet('Filtered Students')
     
+    # Define styles
+    header_style = xlwt.easyxf('font: bold on; align: wrap on, vert centre, horiz center; pattern: pattern solid, fore_color gray25')
+    date_style = xlwt.easyxf(num_format_str='YYYY-MM-DD')
+    
+    # Write header row
+    headers = ['ID', 'Name', 'Email', 'Phone', 'Course', 'Year', 'CGPA', 'Status', 'Companies Left']
+    for col_idx, header in enumerate(headers):
+        ws.write(0, col_idx, header, header_style)
+        # Set column width
+        ws.col(col_idx).width = 256 * 20  # 20 characters wide
+    
+    # Write data rows
+    row_idx = 1
     for student in students:
         try:
-            writer.writerow([
-                student.id,
-                f"{student.first_name} {student.last_name}",
-                student.username,
-                student.phone_number,
-                student.course,
-                student.year,
-                student.cgpa,
-                student.alumni_status,
-                student.no_of_companies_left
-            ])
+            ws.write(row_idx, 0, student.id)
+            ws.write(row_idx, 1, f"{student.first_name} {student.last_name}")
+            ws.write(row_idx, 2, student.username)
+            ws.write(row_idx, 3, student.phone_number)
+            ws.write(row_idx, 4, student.course or '-')
+            ws.write(row_idx, 5, student.year or '-')
+            ws.write(row_idx, 6, student.cgpa or '-')
+            ws.write(row_idx, 7, student.alumni_status or '-')
+            ws.write(row_idx, 8, student.no_of_companies_left)
+            row_idx += 1
         except Exception as e:
             print(f"Error processing student {getattr(student, 'id', 'unknown')}: {e}")
             continue
     
+    # Create HTTP response with the Excel file
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename="filtered_students.xls"'
+    
+    # Save the workbook to the response
+    wb.save(response)
     return response
 
 def filtered_export_html(students):
@@ -1113,78 +1206,93 @@ def filtered_export_html(students):
     return response
 
 def filtered_export_pdf(students):
-    """PDF-ready HTML export"""
-    html = """
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>Filtered Students (PDF Format)</title>
-        <style>
-            body { font-family: Arial, sans-serif; margin: 20px; }
-            h1 { text-align: center; margin-bottom: 20px; }
-            table { width: 100%; border-collapse: collapse; }
-            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-            th { background-color: #f2f2f2; font-weight: bold; }
-            tr:nth-child(even) { background-color: #f9f9f9; }
-            .footer { margin-top: 20px; text-align: center; font-size: 12px; color: #666; }
-            .instruction { background-color: #f8f9fa; padding: 10px; margin-bottom: 20px; border: 1px solid #ddd; }
-            @media print {
-                body { font-size: 12pt; }
-                h1 { font-size: 18pt; }
-                .instruction, .no-print { display: none; }
-            }
-        </style>
-    </head>
-    <body>
-        <div class="instruction no-print">
-            <p><strong>Instructions:</strong> To create a PDF, open this HTML file in your browser and use File > Print > Save as PDF.</p>
-            <button onclick="window.print()">Print as PDF</button>
-        </div>
+    """PDF export using ReportLab library"""
+    try:
+        # Import ReportLab modules
+        from reportlab.lib import colors
+        from reportlab.lib.pagesizes import landscape, A4
+        from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+        from reportlab.lib.styles import getSampleStyleSheet
+        from io import BytesIO
         
-        <h1>Filtered Students Data</h1>
-        <table>
-            <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>Course</th>
-                <th>Year</th>
-                <th>CGPA</th>
-                <th>Status</th>
-                <th>Companies Left</th>
-            </tr>
-    """
-    
-    for student in students:
-        try:
-            html += f"""
-            <tr>
-                <td>{student.id}</td>
-                <td>{student.first_name} {student.last_name}</td>
-                <td>{student.username}</td>
-                <td>{student.phone_number}</td>
-                <td>{student.course or '-'}</td>
-                <td>{student.year or '-'}</td>
-                <td>{student.cgpa or '-'}</td>
-                <td>{student.alumni_status or '-'}</td>
-                <td>{student.no_of_companies_left}</td>
-            </tr>
-            """
-        except Exception as e:
-            print(f"Error rendering student {getattr(student, 'id', 'unknown')}: {e}")
-            continue
-    
-    html += """
-        </table>
-        <div class="footer">
-            <p>Generated on: """ + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + """</p>
-            <p>Total records: """ + str(students.count()) + """</p>
-        </div>
-    </body>
-    </html>
-    """
-    
-    response = HttpResponse(html, content_type='text/html')
-    response['Content-Disposition'] = 'attachment; filename="filtered_students_pdf.html"'
-    return response
+        # Create a file-like buffer to receive PDF data
+        buffer = BytesIO()
+        
+        # Create the PDF object using the buffer as its "file"
+        doc = SimpleDocTemplate(buffer, pagesize=landscape(A4))
+        
+        # Get the default sample styles
+        styles = getSampleStyleSheet()
+        
+        # Create title
+        title = Paragraph("Filtered Students Data", styles['Title'])
+        
+        # Add time stamp and record count
+        time_stamp = Paragraph(f"Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", styles['Normal'])
+        record_count = Paragraph(f"Total records: {students.count()}", styles['Normal'])
+        
+        # Table data
+        data = [['ID', 'Name', 'Email', 'Phone', 'Course', 'Year', 'CGPA', 'Status', 'Companies Left']]
+        
+        # Add student data
+        for student in students:
+            try:
+                data.append([
+                    str(student.id),
+                    f"{student.first_name} {student.last_name}",
+                    student.username,
+                    student.phone_number,
+                    student.course or '-',
+                    student.year or '-',
+                    student.cgpa or '-',
+                    student.alumni_status or '-',
+                    student.no_of_companies_left
+                ])
+            except Exception as e:
+                print(f"Error rendering student {getattr(student, 'id', 'unknown')}: {e}")
+                continue
+        
+        # Create table
+        student_table = Table(data, repeatRows=1)
+        
+        # Add style to table
+        table_style = TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 10),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+            ('VALIGN', (0, 1), (-1, -1), 'MIDDLE'),
+            ('ALIGN', (0, 1), (-1, -1), 'LEFT'),
+            ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+            ('FONTSIZE', (0, 1), (-1, -1), 8),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.lightgrey])
+        ])
+        student_table.setStyle(table_style)
+        
+        # Build PDF with all elements
+        elements = [title, Spacer(1, 20), time_stamp, record_count, Spacer(1, 20), student_table]
+        doc.build(elements)
+        
+        # Get the value of the BytesIO buffer and create response
+        pdf = buffer.getvalue()
+        buffer.close()
+        
+        # Create HTTP response with PDF
+        response = HttpResponse(pdf, content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="filtered_students.pdf"'
+        
+        return response
+    except ImportError:
+        # If ReportLab is not available, fall back to HTML
+        print("ReportLab not available, falling back to HTML export")
+        return filtered_export_html(students)
+    except Exception as e:
+        import traceback
+        print(f"PDF Export error: {str(e)}")
+        print(traceback.format_exc())
+        # Fall back to HTML in case of errors
+        return filtered_export_html(students)

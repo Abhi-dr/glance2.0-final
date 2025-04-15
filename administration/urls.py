@@ -15,6 +15,7 @@ urlpatterns = [
     path("shortlisted_students", views.shortlisted_students, name="shortlisted_students"),
     path("rejected_students", views.rejected_students, name="rejected_students"),
     path("add_notification", views.add_notification, name="add_notification"),
+    path("send_message_to_filtered_students", views.send_message_to_filtered_students, name="send_message_to_filtered_students"),
     
     # ======================== Applications Toggles ========================
     

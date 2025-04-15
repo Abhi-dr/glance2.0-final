@@ -687,3 +687,165 @@ def filter_page(request):
     return render(request, "administration/filter_page.html", {
         "user": user,
     })
+
+@login_required(login_url='login')
+@staff_member_required(login_url='login')
+def send_message_to_filtered_students(request):
+    """Send messages to filtered students with both email and notification"""
+    if request.method == "POST":
+        # Extract the message details
+        subject = request.POST.get("subject")
+        content = request.POST.get("content")
+        
+        # Get filter parameters from request
+        id = request.POST.get('id', '')
+        name = request.POST.get('name', '')
+        email = request.POST.get('email', '')
+        phone = request.POST.get('phone', '')
+        course = request.POST.get('course', '')
+        year = request.POST.get('year', '')
+        cgpa = request.POST.get('cgpa', '')
+        cgpa_operator = request.POST.get('cgpa_operator', '=')
+        status = request.POST.get('status', '')
+        companies_left = request.POST.get('companies_left', '')
+        companies_operator = request.POST.get('companies_operator', '=')
+        profile_score = request.POST.get('profile_score', '')
+        score_operator = request.POST.get('score_operator', '=')
+        company = request.POST.get('company', '')
+        job = request.POST.get('job', '')
+        
+        # Start with all students
+        students = Student.objects.all()
+        
+        # Apply filters
+        if id:
+            students = students.filter(id__icontains=id)
+        if name:
+            students = students.filter(Q(first_name__icontains=name) | Q(last_name__icontains=name))
+        if email:
+            students = students.filter(username__icontains=email)
+        if phone:
+            students = students.filter(phone_number__icontains=phone)
+        if course:
+            students = students.filter(course__icontains=course)
+        if year and year != 'all':
+            students = students.filter(year=year)
+        if cgpa:
+            try:
+                cgpa_value = float(cgpa)
+                if cgpa_operator == '>':
+                    students = students.filter(cgpa__gt=cgpa_value)
+                elif cgpa_operator == '<':
+                    students = students.filter(cgpa__lt=cgpa_value)
+                elif cgpa_operator == '>=':
+                    students = students.filter(cgpa__gte=cgpa_value)
+                elif cgpa_operator == '<=':
+                    students = students.filter(cgpa__lte=cgpa_value)
+                else:
+                    students = students.filter(cgpa=cgpa_value)
+            except (ValueError, TypeError):
+                pass
+        if status:
+            students = students.filter(alumni_status=status)
+        if companies_left:
+            try:
+                companies_value = int(companies_left)
+                if companies_operator == '>':
+                    students = students.filter(no_of_companies_left__gt=companies_value)
+                elif companies_operator == '<':
+                    students = students.filter(no_of_companies_left__lt=companies_value)
+                elif companies_operator == '>=':
+                    students = students.filter(no_of_companies_left__gte=companies_value)
+                elif companies_operator == '<=':
+                    students = students.filter(no_of_companies_left__lte=companies_value)
+                else:
+                    students = students.filter(no_of_companies_left=companies_value)
+            except (ValueError, TypeError):
+                pass
+                
+        # Filter by profile score if provided (profile score is calculated on the fly)
+        if profile_score:
+            try:
+                # We can't filter directly on profile_score as it's not a database field
+                # We'll fetch all students and filter in Python
+                all_students = list(students)
+                filtered_students = []
+                
+                profile_score_value = float(profile_score)
+                
+                for student in all_students:
+                    try:
+                        if hasattr(student, 'get_profile_score'):
+                            student_score = student.get_profile_score()
+                            if student_score is not None:
+                                if score_operator == '>' and student_score > profile_score_value:
+                                    filtered_students.append(student)
+                                elif score_operator == '<' and student_score < profile_score_value:
+                                    filtered_students.append(student)
+                                elif score_operator == '>=' and student_score >= profile_score_value:
+                                    filtered_students.append(student)
+                                elif score_operator == '<=' and student_score <= profile_score_value:
+                                    filtered_students.append(student)
+                                elif score_operator == '=' and student_score == profile_score_value:
+                                    filtered_students.append(student)
+                    except Exception as e:
+                        print(f"Error checking profile score for student {getattr(student, 'id', 'unknown')}: {e}")
+                        continue
+                
+                # Convert list back to a queryset
+                student_ids = [student.id for student in filtered_students]
+                students = Student.objects.filter(id__in=student_ids)
+            except (ValueError, TypeError) as e:
+                print(f"Error filtering by profile score: {e}")
+                pass
+                
+        # Filter by company and job applications if provided
+        if company:
+            # Get applications for the specified company
+            company_applications = Application.objects.filter(
+                job__company__name__icontains=company
+            ).values_list('student_id', flat=True)
+            students = students.filter(id__in=company_applications)
+            
+        if job:
+            # Get applications for the specified job
+            job_applications = Application.objects.filter(
+                job__title__icontains=job
+            ).values_list('student_id', flat=True)
+            students = students.filter(id__in=job_applications)
+        
+        # Get all student emails
+        student_emails = students.values_list('username', flat=True)
+        student_emails = list(student_emails)
+        
+        # 1. Create and save a notification
+        notification = Notification(title=subject, description=content)
+        notification.save()
+        
+        # 2. Send emails to all filtered students
+        if student_emails:
+            email_from = 'GLANCE JOB FAIR 2k24 <alumniassociation01@gla.ac.in>'
+            
+            # Send emails in batches to avoid timeout
+            batch_size = 50
+            for i in range(0, len(student_emails), batch_size):
+                batch = student_emails[i:i+batch_size]
+                try:
+                    send_mail(
+                        subject,
+                        content,
+                        email_from,
+                        bcc=batch,  # Use BCC for privacy
+                        fail_silently=False
+                    )
+                except Exception as e:
+                    print(f"Error sending email batch {i//batch_size + 1}: {e}")
+            
+            messages.success(request, f"Message sent successfully to {len(student_emails)} students.")
+        else:
+            messages.warning(request, "No students match the specified filters.")
+        
+        return redirect("filter_page")
+    
+    # If not POST, redirect back to filter page
+    return redirect("filter_page")
