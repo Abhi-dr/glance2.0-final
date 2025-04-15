@@ -950,7 +950,9 @@ $(document).ready(function() {
             cgpa_operator: $('#cgpa_operator').val() || '=',
             status: $('#status').val() || '',
             companies_left: $('#companies_left').val() || '',
-            companies_operator: $('#companies_operator').val() || '='
+            companies_operator: $('#companies_operator').val() || '=',
+            profile_score: $('#profile_score').val() || '',
+            score_operator: $('#score_operator').val() || '='
         };
     }
 
@@ -961,127 +963,70 @@ $(document).ready(function() {
         
         // Add filter parameters to URL
         Object.keys(filters).forEach(key => {
-            url += '&' + key + '=' + encodeURIComponent(filters[key] || '');
+            if (filters[key]) {
+                url += '&' + key + '=' + encodeURIComponent(filters[key]);
+            }
         });
         
         console.log("Export URL:", url);
         return url;
     }
 
-    // Direct server-side export functions with error handling
-    function exportFilteredCSV() {
+    // Improved export function with loading indicators and iframe download approach
+    function exportWithFormat(format) {
         $('#loadingOverlay').css('display', 'flex');
         
         try {
-            // Create iframe for download
-            const downloadFrame = document.createElement('iframe');
-            downloadFrame.style.display = 'none';
-            document.body.appendChild(downloadFrame);
+            // Create temporary iframe for download (better browser compatibility)
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            document.body.appendChild(iframe);
             
-            // Navigate iframe to export URL
-            downloadFrame.src = createExportUrl('csv');
+            // Set iframe source to our export URL
+            iframe.src = createExportUrl(format);
             
-            // Listen for load events
-            downloadFrame.onload = function() {
-                try {
-                    // Check if there was an error
-                    const content = downloadFrame.contentDocument.body.textContent;
-                    if (content && content.includes('Error')) {
-                        console.error("Export error:", content);
-                        alert("Export failed: " + content);
-                    }
-                } catch (e) {
-                    // Cross-origin errors are expected and can be ignored
-                    console.log("Download likely successful");
-                }
-                
-                // Remove iframe and hide loading overlay after a timeout
-                setTimeout(() => {
-                    document.body.removeChild(downloadFrame);
-                    $('#loadingOverlay').hide();
-                }, 1000);
-            };
-            
-            // Handle errors and timeouts
-            downloadFrame.onerror = function() {
-                alert("Export failed. Please try again.");
-                document.body.removeChild(downloadFrame);
-                $('#loadingOverlay').hide();
-            };
-            
-            // Set a timeout to hide the loading overlay even if the iframe doesn't trigger events
+            // Set a timeout to remove the iframe and hide loading overlay
             setTimeout(() => {
-                if (document.body.contains(downloadFrame)) {
-                    document.body.removeChild(downloadFrame);
+                if (document.body.contains(iframe)) {
+                    document.body.removeChild(iframe);
                 }
                 $('#loadingOverlay').hide();
-            }, 10000);
+            }, 3000); // Give it 3 seconds for the download to start
         } catch (e) {
             console.error("Export error:", e);
             $('#loadingOverlay').hide();
-            alert("Export failed: " + e.message);
+            alert("Export failed: " + e.message + ". Please try the direct export method at the bottom of the page.");
         }
     }
 
-    function exportFilteredHTML() {
-        $('#loadingOverlay').css('display', 'flex');
-        
-        try {
-            // Create iframe for download
-            const downloadFrame = document.createElement('iframe');
-            downloadFrame.style.display = 'none';
-            document.body.appendChild(downloadFrame);
-            
-            // Navigate iframe to export URL (using html format for PDF generation)
-            downloadFrame.src = createExportUrl('html');
-            
-            // Listen for load events
-            downloadFrame.onload = function() {
-                try {
-                    // Check if there was an error
-                    const content = downloadFrame.contentDocument.body.textContent;
-                    if (content && content.includes('Error')) {
-                        console.error("Export error:", content);
-                        alert("Export failed: " + content);
-                    }
-                } catch (e) {
-                    // Cross-origin errors are expected and can be ignored
-                    console.log("Download likely successful");
-                }
-                
-                // Remove iframe and hide loading overlay after a timeout
-                setTimeout(() => {
-                    document.body.removeChild(downloadFrame);
-                    $('#loadingOverlay').hide();
-                }, 1000);
-            };
-            
-            // Handle errors and timeouts
-            downloadFrame.onerror = function() {
-                alert("Export failed. Please try again.");
-                document.body.removeChild(downloadFrame);
-                $('#loadingOverlay').hide();
-            };
-            
-            // Set a timeout to hide the loading overlay even if the iframe doesn't trigger events
-            setTimeout(() => {
-                if (document.body.contains(downloadFrame)) {
-                    document.body.removeChild(downloadFrame);
-                }
-                $('#loadingOverlay').hide();
-            }, 10000);
-        } catch (e) {
-            console.error("Export error:", e);
-            $('#loadingOverlay').hide();
-            alert("Export failed: " + e.message);
-        }
-    }
+    // Direct server-side export functions 
+    $('#directExportCSV, #exportCSV, #filteredExportCSV').on('click', function(e) {
+        e.preventDefault();
+        exportWithFormat('csv');
+    });
+    
+    $('#directExportPDF, #exportPDF, #filteredExportPDF').on('click', function(e) {
+        e.preventDefault();
+        // Using HTML for PDF export is more reliable
+        exportWithFormat('html');
+    });
+    
+    $('#exportExcel, #filteredExportExcel').on('click', function(e) {
+        e.preventDefault();
+        exportWithFormat('csv'); // Excel can import CSV files
+    });
+    
+    $('#filteredExportHTML').on('click', function(e) {
+        e.preventDefault();
+        exportWithFormat('html');
+    });
 
-    // Alternative direct export approach using fetch
-    function fetchExport(format) {
+    // Fetch-based export as a fallback approach
+    $('#fetchExportCSV').on('click', function(e) {
+        e.preventDefault();
         $('#loadingOverlay').css('display', 'flex');
         
-        fetch(createExportUrl(format))
+        fetch(createExportUrl('csv'))
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
@@ -1089,18 +1034,13 @@ $(document).ready(function() {
                 return response.blob();
             })
             .then(blob => {
-                // Create object URL
                 const url = window.URL.createObjectURL(blob);
-                
-                // Create temporary link and click it
                 const a = document.createElement('a');
                 a.style.display = 'none';
                 a.href = url;
-                a.download = 'filtered_students.' + (format === 'html' ? 'html' : 'csv');
+                a.download = 'filtered_students.csv';
                 document.body.appendChild(a);
                 a.click();
-                
-                // Clean up
                 window.URL.revokeObjectURL(url);
                 document.body.removeChild(a);
                 $('#loadingOverlay').hide();
@@ -1110,20 +1050,37 @@ $(document).ready(function() {
                 alert('Export failed: ' + error.message);
                 $('#loadingOverlay').hide();
             });
-    }
-
-    // Update export button handlers
-    $('#exportCSV').on('click', exportFilteredCSV);
-    $('#exportPDF').on('click', exportFilteredHTML);
-    $('#exportExcel').on('click', exportFilteredCSV);  // Using CSV for Excel as it's more reliable
-
-    // Direct export button handlers
-    $('#directExportCSV').on('click', exportFilteredCSV);
-    $('#directExportPDF').on('click', exportFilteredHTML);
-
-    // Fetch-based export button handlers
-    $('#fetchExportCSV').on('click', function() { fetchExport('csv'); });
-    $('#fetchExportHTML').on('click', function() { fetchExport('html'); });
+    });
+    
+    $('#fetchExportHTML').on('click', function(e) {
+        e.preventDefault();
+        $('#loadingOverlay').css('display', 'flex');
+        
+        fetch(createExportUrl('html'))
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.blob();
+            })
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = 'filtered_students.html';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+                $('#loadingOverlay').hide();
+            })
+            .catch(error => {
+                console.error('Export error:', error);
+                alert('Export failed: ' + error.message);
+                $('#loadingOverlay').hide();
+            });
+    });
 });
 </script>
 
@@ -1131,26 +1088,29 @@ $(document).ready(function() {
     // Function to sync main filters to direct form
     function syncMainFiltersToDirectForm() {
         if ($('#syncFilters').prop('checked')) {
-            const filters = getCurrentFilters();
             const directForm = $('form[action="/administration/export_filtered_students"]');
             
             // Clear any existing hidden fields
             directForm.find('input[type="hidden"]:not([name="format"])').remove();
             
             // Add all filter values as hidden fields
-            Object.entries(filters).forEach(([key, value]) => {
-                if (value) {
-                    directForm.append(`<input type="hidden" name="${key}" value="${value}">`);
+            $('#filterForm input, #filterForm select').each(function() {
+                const input = $(this);
+                const name = input.attr('name');
+                const value = input.val();
+                
+                if (name && value) {
+                    directForm.append(`<input type="hidden" name="${name}" value="${value}">`);
                 }
             });
             
             // Update the display of active filters
-            const filterText = Object.entries(filters)
-                .filter(([_, value]) => value)
-                .map(([key, value]) => `${key}: ${value}`)
-                .join(', ');
+            const filterTexts = [];
+            $('#activeFilters .filter-badge').each(function() {
+                filterTexts.push($(this).text());
+            });
             
-            $('#directFormFilters').text(filterText || 'No filters set');
+            $('#directFormFilters').text(filterTexts.join(', ') || 'No filters set');
         }
     }
     
@@ -1158,7 +1118,12 @@ $(document).ready(function() {
     $('#syncFilters').on('change', syncMainFiltersToDirectForm);
     
     // Update filters when the main form changes
-    $('#filterForm input, #filterForm select').on('change keyup', syncMainFiltersToDirectForm);
+    $('#filterForm').on('submit', syncMainFiltersToDirectForm);
+    $('#filterForm input, #filterForm select').on('change keyup', function() {
+        // Add debounce for performance
+        clearTimeout(window.filterSyncTimeout);
+        window.filterSyncTimeout = setTimeout(syncMainFiltersToDirectForm, 500);
+    });
     
     // Sync filters once on page load
     $(document).ready(function() {
