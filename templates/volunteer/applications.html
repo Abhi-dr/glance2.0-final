@@ -1,4 +1,4 @@
-{% extends 'volunteer/base.html' %} {% load static %} {% block content %}
+{% extends 'volunteer/base.html' %} {% load static %} {% block volunteer_content %}
 <div class="row mb-4">
   <div class="col-12">
     <div class="d-sm-flex justify-content-between align-items-center">
@@ -18,19 +18,26 @@
   </div>
 </div>
 
-<!-- Filters Section -->
+<!-- Application Filters -->
 <div class="row mb-4">
   <div class="col-12">
-    <div class="card border-0 shadow-sm collapse {% if selected_date or selected_company or attendance_filter or status_filter or search_query %}show{% endif %}" id="filtersCollapse">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white py-3">
+        <h5 class="mb-0"><i class="fas fa-filter me-2 text-primary"></i>Filter Applications</h5>
+      </div>
       <div class="card-body">
-        <h5 class="card-title mb-3">
-          <i class="fas fa-filter me-2 text-primary"></i>Filter Applications
-        </h5>
-        <form method="GET" class="row g-3">
-          <div class="col-md-6 col-lg-3">
+        <form action="{% url 'volunteer_applications' %}" method="GET" class="row g-3">
+          <div class="col-md-4">
+            <div class="form-floating">
+              <input type="text" class="form-control" id="search" name="search" placeholder="Search" value="{{ search_query }}">
+              <label for="search">Search Student Name/ID</label>
+            </div>
+          </div>
+          
+          <div class="col-md-4">
             <div class="form-floating">
               <select class="form-select" id="date" name="date">
-                <option value="">All Dates</option>
+                <option value="" {% if not selected_date %}selected{% endif %}>All Dates</option>
                 {% for date in interview_dates %}
                 <option value="{{ date }}" {% if selected_date == date %}selected{% endif %}>{{ date }}</option>
                 {% endfor %}
@@ -39,10 +46,10 @@
             </div>
           </div>
           
-          <div class="col-md-6 col-lg-3">
+          <div class="col-md-4">
             <div class="form-floating">
               <select class="form-select" id="company" name="company">
-                <option value="">All Companies</option>
+                <option value="" {% if not selected_company %}selected{% endif %}>All Companies</option>
                 {% for company in companies %}
                 <option value="{{ company.id }}" {% if selected_company == company.id %}selected{% endif %}>{{ company.name }}</option>
                 {% endfor %}
@@ -51,23 +58,23 @@
             </div>
           </div>
           
-          <div class="col-md-6 col-lg-3">
+          <div class="col-md-4">
             <div class="form-floating">
               <select class="form-select" id="attendance" name="attendance">
-                <option value="">All Attendance</option>
-                <option value="marked" {% if attendance_filter == 'marked' %}selected{% endif %}>Attendance Marked</option>
+                <option value="" {% if not attendance_filter %}selected{% endif %}>All Attendance</option>
+                <option value="marked" {% if attendance_filter == 'marked' %}selected{% endif %}>Marked</option>
+                <option value="pending" {% if attendance_filter == 'pending' %}selected{% endif %}>Not Marked</option>
                 <option value="present" {% if attendance_filter == 'present' %}selected{% endif %}>Present</option>
                 <option value="absent" {% if attendance_filter == 'absent' %}selected{% endif %}>Absent</option>
-                <option value="pending" {% if attendance_filter == 'pending' %}selected{% endif %}>Pending</option>
               </select>
               <label for="attendance">Attendance Status</label>
             </div>
           </div>
           
-          <div class="col-md-6 col-lg-3">
+          <div class="col-md-4">
             <div class="form-floating">
               <select class="form-select" id="status" name="status">
-                <option value="">All Applications</option>
+                <option value="" {% if not status_filter %}selected{% endif %}>All Status</option>
                 <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
                 <option value="accepted" {% if status_filter == 'accepted' %}selected{% endif %}>Accepted</option>
                 <option value="rejected" {% if status_filter == 'rejected' %}selected{% endif %}>Rejected</option>
@@ -76,19 +83,12 @@
             </div>
           </div>
           
-          <div class="col-md-6">
-            <div class="form-floating">
-              <input type="text" class="form-control" id="search" name="search" placeholder="Name or Roll No" value="{{ search_query }}">
-              <label for="search">Search Student</label>
-            </div>
-          </div>
-          
-          <div class="col-md-6 d-flex align-items-center">
+          <div class="col-md-4 d-flex align-items-center">
             <button type="submit" class="btn btn-primary me-2">
-              <i class="fas fa-search me-1"></i> Apply Filters
+              <i class="fas fa-filter me-2"></i>Apply Filters
             </button>
             <a href="{% url 'volunteer_applications' %}" class="btn btn-outline-secondary">
-              <i class="fas fa-redo me-1"></i> Reset
+              <i class="fas fa-times me-2"></i>Clear Filters
             </a>
           </div>
         </form>
@@ -97,63 +97,66 @@
   </div>
 </div>
 
-<!-- Active Filters -->
 {% if selected_date or selected_company or attendance_filter or status_filter or search_query %}
 <div class="row mb-3">
   <div class="col-12">
-    <div class="d-flex flex-wrap gap-2 align-items-center">
-      <span class="text-muted me-2">Active filters:</span>
-      
-      {% if selected_date %}
-      <span class="badge bg-info rounded-pill">
-        <i class="fas fa-calendar-day me-1"></i> {{ selected_date }}
-        <a href="{% url 'volunteer_applications' %}?{% if selected_company %}company={{ selected_company }}{% endif %}{% if attendance_filter %}&attendance={{ attendance_filter }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="text-white ms-1"><i class="fas fa-times-circle"></i></a>
-      </span>
-      {% endif %}
-      
-      {% if selected_company %}
-      <span class="badge bg-info rounded-pill">
-        <i class="fas fa-building me-1"></i> 
-        {% for company in companies %}
-          {% if company.id == selected_company %}{{ company.name }}{% endif %}
-        {% endfor %}
-        <a href="{% url 'volunteer_applications' %}?{% if selected_date %}date={{ selected_date }}{% endif %}{% if attendance_filter %}&attendance={{ attendance_filter }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="text-white ms-1"><i class="fas fa-times-circle"></i></a>
-      </span>
-      {% endif %}
-      
-      {% if attendance_filter %}
-      <span class="badge bg-info rounded-pill">
-        <i class="fas fa-user-check me-1"></i> 
-        {% if attendance_filter == 'marked' %}Marked
-        {% elif attendance_filter == 'present' %}Present
-        {% elif attendance_filter == 'absent' %}Absent
-        {% elif attendance_filter == 'pending' %}Pending
-        {% endif %}
-        <a href="{% url 'volunteer_applications' %}?{% if selected_date %}date={{ selected_date }}{% endif %}{% if selected_company %}&company={{ selected_company }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="text-white ms-1"><i class="fas fa-times-circle"></i></a>
-      </span>
-      {% endif %}
-      
-      {% if status_filter %}
-      <span class="badge bg-info rounded-pill">
-        <i class="fas fa-clipboard-check me-1"></i> 
-        {% if status_filter == 'pending' %}Pending
-        {% elif status_filter == 'accepted' %}Accepted
-        {% elif status_filter == 'rejected' %}Rejected
-        {% endif %}
-        <a href="{% url 'volunteer_applications' %}?{% if selected_date %}date={{ selected_date }}{% endif %}{% if selected_company %}&company={{ selected_company }}{% endif %}{% if attendance_filter %}&attendance={{ attendance_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="text-white ms-1"><i class="fas fa-times-circle"></i></a>
-      </span>
-      {% endif %}
-      
-      {% if search_query %}
-      <span class="badge bg-info rounded-pill">
-        <i class="fas fa-search me-1"></i> "{{ search_query }}"
-        <a href="{% url 'volunteer_applications' %}?{% if selected_date %}date={{ selected_date }}{% endif %}{% if selected_company %}&company={{ selected_company }}{% endif %}{% if attendance_filter %}&attendance={{ attendance_filter }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}" class="text-white ms-1"><i class="fas fa-times-circle"></i></a>
-      </span>
-      {% endif %}
-      
-      <a href="{% url 'volunteer_applications' %}" class="ms-2 btn btn-sm btn-outline-secondary">
-        <i class="fas fa-times me-1"></i> Clear All
-      </a>
+    <div class="card border-0 shadow-sm">
+      <div class="card-body py-2">
+        <div class="d-flex flex-wrap gap-2 align-items-center">
+          <span class="text-muted me-2"><i class="fas fa-tag me-1"></i>Active filters:</span>
+          
+          {% if search_query %}
+          <span class="badge bg-primary rounded-pill">
+            <i class="fas fa-search me-1"></i> "{{ search_query }}"
+            <a href="{% url 'volunteer_applications' %}?{% if selected_date %}date={{ selected_date }}{% endif %}{% if selected_company %}&company={{ selected_company }}{% endif %}{% if attendance_filter %}&attendance={{ attendance_filter }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}" class="text-white ms-1"><i class="fas fa-times-circle"></i></a>
+          </span>
+          {% endif %}
+          
+          {% if selected_date %}
+          <span class="badge bg-primary rounded-pill">
+            <i class="fas fa-calendar-day me-1"></i> {{ selected_date }}
+            <a href="{% url 'volunteer_applications' %}?{% if selected_company %}company={{ selected_company }}{% endif %}{% if attendance_filter %}&attendance={{ attendance_filter }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="text-white ms-1"><i class="fas fa-times-circle"></i></a>
+          </span>
+          {% endif %}
+          
+          {% if selected_company %}
+          <span class="badge bg-primary rounded-pill">
+            <i class="fas fa-building me-1"></i> 
+            {% for company in companies %}
+              {% if company.id == selected_company %}{{ company.name }}{% endif %}
+            {% endfor %}
+            <a href="{% url 'volunteer_applications' %}?{% if selected_date %}date={{ selected_date }}{% endif %}{% if attendance_filter %}&attendance={{ attendance_filter }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="text-white ms-1"><i class="fas fa-times-circle"></i></a>
+          </span>
+          {% endif %}
+          
+          {% if attendance_filter %}
+          <span class="badge bg-primary rounded-pill">
+            <i class="fas fa-user-check me-1"></i> 
+            {% if attendance_filter == 'marked' %}Marked
+            {% elif attendance_filter == 'present' %}Present
+            {% elif attendance_filter == 'absent' %}Absent
+            {% elif attendance_filter == 'pending' %}Not Marked
+            {% endif %}
+            <a href="{% url 'volunteer_applications' %}?{% if selected_date %}date={{ selected_date }}{% endif %}{% if selected_company %}&company={{ selected_company }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="text-white ms-1"><i class="fas fa-times-circle"></i></a>
+          </span>
+          {% endif %}
+          
+          {% if status_filter %}
+          <span class="badge bg-primary rounded-pill">
+            <i class="fas fa-clipboard-check me-1"></i> 
+            {% if status_filter == 'pending' %}Pending
+            {% elif status_filter == 'accepted' %}Accepted
+            {% elif status_filter == 'rejected' %}Rejected
+            {% endif %}
+            <a href="{% url 'volunteer_applications' %}?{% if selected_date %}date={{ selected_date }}{% endif %}{% if selected_company %}&company={{ selected_company }}{% endif %}{% if attendance_filter %}&attendance={{ attendance_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="text-white ms-1"><i class="fas fa-times-circle"></i></a>
+          </span>
+          {% endif %}
+          
+          <a href="{% url 'volunteer_applications' %}" class="ms-auto btn btn-sm btn-outline-secondary">
+            <i class="fas fa-times me-1"></i> Clear All
+          </a>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -226,16 +229,28 @@
                 <td>
                   {% if application.attendance %}
                     {% if application.attendance.is_present %}
-                      <span class="badge bg-success"><i class="fas fa-check me-1"></i>Present</span>
+                      <span class="badge bg-success d-flex align-items-center gap-1 py-2 px-3">
+                        <i class="fas fa-check-circle me-1"></i>Present
+                        {% if application.attendance.notes %}
+                        <i class="fas fa-info-circle ms-1" data-bs-toggle="tooltip" title="{{ application.attendance.notes }}"></i>
+                        {% endif %}
+                      </span>
                     {% else %}
-                      <span class="badge bg-danger"><i class="fas fa-times me-1"></i>Absent</span>
+                      <span class="badge bg-danger d-flex align-items-center gap-1 py-2 px-3">
+                        <i class="fas fa-times-circle me-1"></i>Absent
+                        {% if application.attendance.notes %}
+                        <i class="fas fa-info-circle ms-1" data-bs-toggle="tooltip" title="{{ application.attendance.notes }}"></i>
+                        {% endif %}
+                      </span>
                     {% endif %}
                   {% else %}
-                    <span class="badge bg-secondary"><i class="fas fa-hourglass-half me-1"></i>Pending</span>
+                    <span class="badge bg-secondary d-flex align-items-center gap-1 py-2 px-3">
+                      <i class="fas fa-hourglass-half me-1"></i>Not Marked
+                    </span>
                   {% endif %}
                 </td>
                 <td class="text-center">
-                  {% if not application.attendance and application.status == 'accepted' %}
+                  {% if not application.attendance %}
                     <div class="btn-group btn-group-sm" role="group">
                       <a href="{% url 'mark_attendance' application_id=application.id status='present' %}" class="btn btn-success" data-bs-toggle="tooltip" title="Mark Present">
                         <i class="fas fa-check"></i>
@@ -248,8 +263,6 @@
                     <a href="{% url 'change_attendance' attendance_id=application.attendance.id %}" class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="Change Attendance Status">
                       <i class="fas fa-exchange-alt"></i>
                     </a>
-                  {% else %}
-                    <span class="badge bg-light text-muted">Not accepted</span>
                   {% endif %}
                 </td>
               </tr>

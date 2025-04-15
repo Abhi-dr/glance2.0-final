@@ -9,7 +9,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_protect
 from django.core.exceptions import PermissionDenied
-from .models import Student
+from .models import Student, Application
 import logging
 import operator
 from functools import reduce
@@ -37,6 +37,9 @@ class StudentsDataTablesView(View):
             except ValueError:
                 return JsonResponse({'error': 'Invalid parameters'}, status=400)
             
+            # Log all request parameters for debugging
+            logger.debug(f"DataTables API request: {request.GET}")
+            
             # Base queryset with optimized field selection and annotations
             queryset = Student.objects.select_related('user_ptr').annotate(
                 full_name=Concat('first_name', Value(' '), 'last_name', output_field=CharField())
@@ -61,7 +64,7 @@ class StudentsDataTablesView(View):
             # Email filter with validation
             email_filter = request.GET.get('email', '').strip()[:254]  # RFC 5321
             if email_filter:
-                filters.append(Q(email__icontains=email_filter))
+                filters.append(Q(username__icontains=email_filter))
             
             # Phone filter with sanitization
             phone_filter = ''.join(filter(str.isdigit, request.GET.get('phone', '')))[:12]
@@ -71,10 +74,10 @@ class StudentsDataTablesView(View):
             # Course and Year filters with validation
             course_filter = request.GET.get('course', '').strip()[:100]
             if course_filter:
-                filters.append(Q(course=course_filter))
+                filters.append(Q(course__icontains=course_filter))
             
             year_filter = request.GET.get('year', '').strip()[:15]
-            if year_filter:
+            if year_filter and year_filter != 'all':
                 filters.append(Q(year=year_filter))
             
             # CGPA filter with validation
@@ -95,6 +98,104 @@ class StudentsDataTablesView(View):
                 except ValueError:
                     pass
             
+            # Status filter
+            status_filter = request.GET.get('status', '').strip()[:20]
+            if status_filter:
+                filters.append(Q(alumni_status=status_filter))
+            
+            # Companies left filter
+            companies_left = request.GET.get('companies_left')
+            companies_operator = request.GET.get('companies_operator')
+            if companies_left and companies_left.strip() and companies_operator in ['>', '<', '>=', '<=', '=']:
+                try:
+                    companies_value = int(companies_left)
+                    companies_filter_map = {
+                        '>': 'no_of_companies_left__gt',
+                        '<': 'no_of_companies_left__lt',
+                        '>=': 'no_of_companies_left__gte',
+                        '<=': 'no_of_companies_left__lte',
+                        '=': 'no_of_companies_left'
+                    }
+                    filters.append(Q(**{companies_filter_map[companies_operator]: companies_value}))
+                    logger.debug(f"Applied companies_left filter: {companies_operator}{companies_value}")
+                except (ValueError, TypeError) as e:
+                    logger.warning(f"Invalid companies_left value: {companies_left}, error: {e}")
+            
+            # Company filter
+            company_filter = request.GET.get('company', '').strip()
+            if company_filter:
+                # Get student IDs who applied to the specified company
+                company_students = Application.objects.filter(
+                    job__company__name__icontains=company_filter
+                ).values_list('student_id', flat=True).distinct()
+                if company_students:
+                    filters.append(Q(id__in=company_students))
+                    logger.debug(f"Applied company filter: {company_filter}, matching students: {len(company_students)}")
+                else:
+                    # If no students match, add an impossible condition to return empty results
+                    filters.append(Q(id=-1))
+                    logger.debug(f"Applied company filter with no matches: {company_filter}")
+            
+            # Job filter
+            job_filter = request.GET.get('job', '').strip()
+            if job_filter:
+                # Get student IDs who applied to the specified job
+                job_students = Application.objects.filter(
+                    job__title__icontains=job_filter
+                ).values_list('student_id', flat=True).distinct()
+                if job_students:
+                    filters.append(Q(id__in=job_students))
+                    logger.debug(f"Applied job filter: {job_filter}, matching students: {len(job_students)}")
+                else:
+                    # If no students match, add an impossible condition to return empty results
+                    filters.append(Q(id=-1))
+                    logger.debug(f"Applied job filter with no matches: {job_filter}")
+            
+            # Attendance status filter
+            attendance_status = request.GET.get('attendance_status', '').strip()
+            if attendance_status:
+                if attendance_status == 'present':
+                    # Get student IDs who are marked present
+                    present_students = Application.objects.filter(
+                        attendance__is_present=True
+                    ).values_list('student_id', flat=True).distinct()
+                    if present_students:
+                        filters.append(Q(id__in=present_students))
+                        logger.debug(f"Applied attendance filter: present, matching students: {len(present_students)}")
+                    else:
+                        # If no students match, add an impossible condition to return empty results
+                        filters.append(Q(id=-1))
+                        logger.debug("Applied attendance filter with no matches: present")
+                elif attendance_status == 'absent':
+                    # Get student IDs who are marked absent
+                    absent_students = Application.objects.filter(
+                        attendance__is_present=False
+                    ).values_list('student_id', flat=True).distinct()
+                    if absent_students:
+                        filters.append(Q(id__in=absent_students))
+                        logger.debug(f"Applied attendance filter: absent, matching students: {len(absent_students)}")
+                    else:
+                        # If no students match, add an impossible condition to return empty results
+                        filters.append(Q(id=-1))
+                        logger.debug("Applied attendance filter with no matches: absent")
+                elif attendance_status == 'not_marked':
+                    # Get student IDs who have applications but no attendance record
+                    application_student_ids = Application.objects.values_list('student_id', flat=True).distinct()
+                    attendance_student_ids = Application.objects.filter(
+                        attendance__isnull=False
+                    ).values_list('student_id', flat=True).distinct()
+                    not_marked_student_ids = set(application_student_ids) - set(attendance_student_ids)
+                    if not_marked_student_ids:
+                        filters.append(Q(id__in=not_marked_student_ids))
+                        logger.debug(f"Applied attendance filter: not marked, matching students: {len(not_marked_student_ids)}")
+                    else:
+                        # If no students match, add an impossible condition to return empty results
+                        filters.append(Q(id=-1))
+                        logger.debug("Applied attendance filter with no matches: not marked")
+            
+            # Log filters for debugging
+            logger.debug(f"Applied filters: {filters}")
+            
             # Apply all filters
             if filters:
                 queryset = queryset.filter(reduce(operator.and_, filters))
@@ -102,6 +203,8 @@ class StudentsDataTablesView(View):
             # Get total and filtered record counts
             total_records = Student.objects.count()
             filtered_records = queryset.count()
+            
+            logger.debug(f"Total records: {total_records}, Filtered records: {filtered_records}")
             
             # Apply pagination with limits
             paginator = Paginator(queryset, length)
@@ -112,11 +215,30 @@ class StudentsDataTablesView(View):
             data = []
             for student in page_obj:
                 profile_score = min(100, max(0, student.get_profile_score()))  # Ensure valid range
+                
+                # Determine attendance status
+                attendance_status = None
+                try:
+                    # Get most recent attendance for this student
+                    attendance = Application.objects.filter(
+                        student_id=student.id,
+                        attendance__isnull=False
+                    ).select_related('attendance').order_by('-attendance__marked_at').first()
+                    
+                    if attendance:
+                        attendance_status = 'present' if attendance.attendance.is_present else 'absent'
+                    else:
+                        has_application = Application.objects.filter(student_id=student.id).exists()
+                        if has_application:
+                            attendance_status = 'not_marked'
+                except Exception as e:
+                    logger.error(f"Error getting attendance for student {student.id}: {str(e)}")
+                
                 student_data = {
                     'id': student.id,
                     'first_name': student.first_name[:50],  # Limit length
                     'last_name': student.last_name[:50],
-                    'username': student.email[:254],
+                    'username': student.username[:254],
                     'phone_number': student.phone_number[:12],
                     'course': student.course[:100] if student.course else '',
                     'year': student.year[:15] if student.year else '',
@@ -124,6 +246,7 @@ class StudentsDataTablesView(View):
                     'alumni_status': student.alumni_status[:20],
                     'no_of_companies_left': max(0, student.no_of_companies_left),  # Ensure non-negative
                     'profile_score': profile_score,
+                    'attendance_status': attendance_status,
                     'actions': f'''
                         <div class="btn-group" role="group">
                             <a href="/student/profile/{student.id}" class="btn btn-sm btn-info">

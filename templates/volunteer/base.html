@@ -1,59 +1,123 @@
 {% extends 'home/base.html' %} {% load static %} {% block title %}Volunteer Dashboard{% endblock %}
+
 {% block css %}
 <style>
   :root {
-    --sidebar-width: 260px;
-    --sidebar-bg: #222e3c;
-    --sidebar-hover: #2b3b4e;
-    --primary-color: #4e73df;
-    --success-color: #1cc88a;
-    --info-color: #36b9cc;
-    --warning-color: #f6c23e;
-    --danger-color: #e74a3b;
-    --dark-color: #5a5c69;
-    --light-color: #f8f9fc;
+    --sidebar-width: 280px;
+    --sidebar-bg: #1e293b;
+    --sidebar-hover: #334155;
+    --primary-color: #3b82f6;
+    --primary-light: #dbeafe;
+    --primary-dark: #2563eb;
+    --success-color: #10b981;
+    --info-color: #0ea5e9;
+    --warning-color: #f59e0b;
+    --danger-color: #ef4444;
+    --dark-color: #1e293b;
+    --light-color: #f8fafc;
+    --border-radius: 0.75rem;
+    --card-radius: 1rem;
+    --transition-speed: 0.3s;
   }
 
+  /* Base Styles */
   body {
-    font-family: 'Nunito', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    background-color: #f8f9fc;
+    font-family: 'Inter', 'Nunito', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: #f8fafc;
+    overflow-x: hidden;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    color: #334155;
+  }
+
+  .page-wrapper {
+    display: flex;
+    flex: 1;
+    width: 100%;
+    position: relative;
+  }
+
+  /* Header & Navigation */
+  .header {
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    height: 70px;
+    background: var(--sidebar-bg);
+    z-index: 1030;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+
+  .header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 100%;
+    padding: 0 1.5rem;
   }
 
   .navbar-brand {
     color: white !important;
     font-weight: 700;
-    font-size: 1.1rem;
+    font-size: 1.15rem;
+    display: flex;
+    align-items: center;
+    letter-spacing: 0.5px;
+  }
+
+  .navbar-brand i {
+    color: var(--primary-color);
+    margin-right: 0.75rem;
+    font-size: 1.3rem;
   }
 
   .nav-link {
+    color: rgba(255, 255, 255, 0.85) !important;
+    transition: all 0.2s;
+    padding: 0.5rem 0.85rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+  }
+  
+  .nav-link:hover {
     color: white !important;
+    background-color: rgba(255, 255, 255, 0.1);
   }
 
-  /* Dashboard Topbar */
-  .topbar {
-    height: 4.375rem;
-    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
-    background: white;
-    z-index: 1031;
+  .nav-link i {
+    margin-right: 0.5rem;
+    font-size: 1rem;
   }
 
-  .topbar .dropdown-list {
-    width: 20rem !important;
-  }
-
-  /* Offcanvas Navigation */
+  /* Sidebar */
   .sidebar {
     position: fixed;
-    top: 0;
+    width: var(--sidebar-width);
+    top: 70px;
     bottom: 0;
     left: 0;
-    z-index: 1032;
-    width: var(--sidebar-width);
-    overflow-y: auto;
+    z-index: 1029;
     background: var(--sidebar-bg);
-    transition: transform 0.3s ease;
+    overflow-y: auto;
+    transition: transform var(--transition-speed) ease;
     transform: translateX(-100%);
-    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+    box-shadow: 3px 0 10px rgba(0,0,0,0.1);
+    border-right: 1px solid rgba(255,255,255,0.05);
+  }
+
+  @media (min-width: 992px) {
+    .sidebar {
+      transform: translateX(0);
+    }
+    
+    .main-content {
+      margin-left: var(--sidebar-width);
+    }
   }
 
   .sidebar.show {
@@ -62,29 +126,28 @@
 
   .sidebar-overlay {
     position: fixed;
-    top: 0;
+    top: 70px;
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 1031;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 1028;
     display: none;
-  }
-
-  .sidebar-header {
-    padding: 1.5rem 1.5rem;
-    color: #ced4da;
-    background: var(--sidebar-bg);
+    backdrop-filter: blur(2px);
   }
 
   .sidebar-link {
-    padding: 0.825rem 1.5rem;
-    color: rgba(255, 255, 255, 0.8);
+    padding: 0.85rem 1.5rem;
+    color: rgba(255, 255, 255, 0.75);
     position: relative;
-    display: block;
+    display: flex;
+    align-items: center;
     text-decoration: none;
-    transition: all 0.12s ease-in-out;
-    border-left: 4px solid transparent;
+    transition: all 0.15s ease-in-out;
+    border-left: 3px solid transparent;
+    margin: 0.35rem 0.75rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
   }
 
   .sidebar-link:hover,
@@ -96,558 +159,170 @@
 
   .sidebar-link i {
     margin-right: 0.75rem;
-    width: 20px;
+    width: 22px;
     text-align: center;
+    font-size: 1.1rem;
+    color: var(--primary-color);
+    opacity: 0.9;
   }
 
-  .sidebar-item {
+  .sidebar-link.active i {
+    color: white;
+  }
+
+  .avatar {
     position: relative;
+    display: inline-block;
   }
 
-  .sidebar-dropdown {
-    padding-left: 1rem;
+  .avatar img {
+    object-fit: cover;
+    box-shadow: 0 0 0 4px var(--primary-dark);
   }
 
   /* Main Content Area */
-  main {
-    margin-left: 0;
-    transition: margin-left 0.3s ease;
-    padding-top: 70px;
-  }
-
-  @media (min-width: 992px) {
-    .sidebar {
-      transform: translateX(0);
-    }
-    main {
-      margin-left: var(--sidebar-width);
-    }
-    .sidebar-overlay {
-      display: none !important;
-    }
-  }
-
-  /* Responsive Sidebar Toggle */
-  .navbar-toggler {
-    border: none;
-    padding: 0.25rem;
-    border-radius: 50%;
-    width: 36px;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: rgba(255, 255, 255, 0.1);
-  }
-
-  .navbar-toggler:hover {
-    background-color: rgba(255, 255, 255, 0.2);
-  }
-
-  .navbar-toggler:focus {
-    box-shadow: none;
-  }
-
-  /* Card Styles */
-  .card {
-    margin-bottom: 1.5rem;
-    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
-    border: none;
-    border-radius: 0.35rem;
-  }
-
-  .card-header {
-    font-weight: 500;
-    background-color: #f8f9fc;
-    border-bottom: 1px solid #e3e6f0;
-  }
-
-  /* Table Styles */
-  .table-responsive {
-    overflow-x: auto;
-  }
-
-  .table th {
-    font-weight: 600;
-    background-color: #f8f9fc;
-    border-color: #e3e6f0;
-  }
-
-  .table td {
-    border-color: #e3e6f0;
-    vertical-align: middle;
-  }
-
-  /* Custom Scrollbar */
-  ::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background: #f1f1f1;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 3px;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    background: #555;
-  }
-
-  /* Stats Cards */
-  .stats-card {
-    border-radius: 0.5rem;
-    transition: transform 0.3s ease;
-    background: #fff;
-  }
-
-  .stats-card:hover {
-    transform: translateY(-5px);
-  }
-
-  .stats-icon {
-    font-size: 1.75rem;
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  /* User Profile in Sidebar */
-  .user-profile {
-    display: flex;
-    align-items: center;
-    padding: 1.5rem 1.5rem 1rem;
-    border-bottom: 1px solid rgba(206, 212, 218, 0.2);
-    margin-bottom: 1rem;
-  }
-
-  .user-avatar {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    overflow: hidden;
-    margin-right: 0.75rem;
-    border: 2px solid rgba(255, 255, 255, 0.2);
-  }
-
-  .user-avatar img {
+  .main-content {
+    flex: 1;
+    padding-top: 90px;
+    padding-bottom: 2rem;
+    transition: margin-left var(--transition-speed) ease;
     width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  .user-info {
-    overflow: hidden;
-  }
-
-  .user-name {
-    color: #fff;
-    font-weight: 600;
-    margin-bottom: 0.25rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    font-size: 1rem;
-  }
-
-  .user-role {
-    color: rgba(255, 255, 255, 0.6);
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-  }
-
-  /* Attendance Status Indicator */
-  .attendance-status {
-    display: inline-block;
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    margin-right: 5px;
-  }
-  
-  .status-present {
-    background-color: var(--success-color);
-  }
-  
-  .status-absent {
-    background-color: var(--danger-color);
-  }
-  
-  .status-pending {
-    background-color: var(--warning-color);
-  }
-
-  /* Navigation progress bar */
-  .nav-progress {
-    height: 3px;
-    background: rgba(255, 255, 255, 0.1);
+    min-height: calc(100vh - 70px);
     position: relative;
-    width: 100%;
-    margin-top: 10px;
-    border-radius: 3px;
-    overflow: hidden;
+    background-color: #f8fafc;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%233b82f6' fill-opacity='0.03'%3E%3Cpath opacity='.5' d='M96 95h4v1h-4v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+
+  .container-fluid {
+    max-width: 1500px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
   }
   
-  .nav-progress-bar {
-    position: absolute;
-    left: 0;
-    top: 0;
-    height: 100%;
-    background: var(--primary-color);
-    transition: width 0.3s ease;
-  }
-
-  /* Notification items */
-  .icon-circle {
-    height: 40px;
-    width: 40px;
-    border-radius: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1rem;
-  }
-
-  /* Badges */
-  .badge {
-    padding: 0.4em 0.65em;
-    font-weight: 600;
-    font-size: 0.75em;
-  }
-
-  /* Buttons */
-  .btn {
-    font-weight: 600;
-    padding: 0.375rem 1rem;
-  }
-
-  .btn-sm {
-    padding: 0.25rem 0.75rem;
-    font-size: 0.85rem;
-  }
-
-  /* Shadow effects */
-  .shadow-sm {
-    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
-  }
-
-  .shadow {
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
-  }
-
-  /* Loading animation */
-  .loading-spinner {
-    width: 2rem;
-    height: 2rem;
-    border: 3px solid rgba(0, 0, 0, 0.1);
-    border-radius: 50%;
-    border-top-color: var(--primary-color);
-    animation: spin 0.8s linear infinite;
-  }
-
-  @keyframes spin {
-    to { transform: rotate(360deg); }
-  }
-
-  /* For dark mode support */
-  @media (prefers-color-scheme: dark) {
-    .sidebar {
-      background: #1a2234;
-    }
-    .sidebar-link:hover,
-    .sidebar-link.active {
-      background: #242f44;
-    }
+  /* Hide the home footer in the volunteer area */
+  footer.footer {
+    display: none;
   }
 </style>
-{% endblock %} {% block body %}
-<!-- Navigation Bar -->
-<nav class="navbar navbar-expand navbar-dark bg-primary py-2 fixed-top">
-  <div class="container-fluid px-4">
-    <button
-      class="navbar-toggler me-2"
-      type="button"
-      id="sidebarToggle"
-      aria-label="Toggle navigation"
-    >
-      <i class="fas fa-bars"></i>
-    </button>
-    <a class="navbar-brand d-flex align-items-center" href="{% url 'volunteer_dashboard' %}">
-      <span class="me-2"><i class="fas fa-user-check"></i></span>
-      <span class="d-none d-sm-inline">Volunteer Dashboard</span>
-      <span class="d-inline d-sm-none">Dashboard</span>
-    </a>
-    
-    <div class="ms-auto d-flex align-items-center">
-      <!-- Notification Dropdown -->
-      <div class="dropdown me-3">
-        <a class="nav-link dropdown-toggle position-relative" href="#" id="notificationsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-          <i class="fas fa-bell fa-fw"></i>
-          <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-            3+
-            <span class="visually-hidden">unread notifications</span>
-          </span>
-        </a>
-        <div class="dropdown-menu dropdown-menu-end shadow-sm border-0 overflow-hidden" aria-labelledby="notificationsDropdown" style="width: 20rem;">
-          <h6 class="dropdown-header bg-primary text-white">
-            <i class="fas fa-bell me-2"></i> Notifications
-          </h6>
-          <a class="dropdown-item d-flex align-items-center py-3" href="#">
-            <div class="me-3">
-              <div class="icon-circle bg-primary text-white">
-                <i class="fas fa-user-plus"></i>
-              </div>
-            </div>
-            <div>
-              <div class="small text-muted">March 12, 2023</div>
-              <div>New applicants for Company XYZ</div>
-            </div>
-          </a>
-          <a class="dropdown-item d-flex align-items-center py-3" href="#">
-            <div class="me-3">
-              <div class="icon-circle bg-success text-white">
-                <i class="fas fa-check-circle"></i>
-              </div>
-            </div>
-            <div>
-              <div class="small text-muted">March 11, 2023</div>
-              <div>10 new students registered</div>
-            </div>
-          </a>
-          <a class="dropdown-item d-flex align-items-center py-3" href="#">
-            <div class="me-3">
-              <div class="icon-circle bg-warning text-white">
-                <i class="fas fa-exclamation-triangle"></i>
-              </div>
-            </div>
-            <div>
-              <div class="small text-muted">March 10, 2023</div>
-              <div>Attendance reminder: 3 days left</div>
-            </div>
-          </a>
-          <a class="dropdown-item text-center small text-muted py-2" href="#">Show All Notifications</a>
-        </div>
-      </div>
+{% endblock %}
 
-      <!-- User Dropdown -->
-      <div class="dropdown">
-        <a
-          class="nav-link dropdown-toggle d-flex align-items-center"
-          href="#"
-          id="navbarDropdown"
-          role="button"
-          data-bs-toggle="dropdown"
-          aria-expanded="false"
-        >
-          <div class="position-relative me-2 d-none d-md-block">
-            <img src="{{ user.volunteer.profile_pic.url }}" alt="User" class="rounded-circle" width="32" height="32">
-            <span class="position-absolute bottom-0 end-0 bg-success rounded-circle p-1" style="width:10px;height:10px;"></span>
-          </div>
-          <span>{{ user.first_name }}</span>
+{% block body %}
+<div class="page-wrapper">
+  <!-- Header -->
+  <header class="header">
+    <div class="header-container">
+      <div class="d-flex align-items-center">
+        <button id="sidebarToggle" class="btn btn-link text-white d-lg-none me-2">
+          <i class="fas fa-bars"></i>
+        </button>
+        <a class="navbar-brand" href="{% url 'volunteer_dashboard' %}">
+          <i class="fas fa-handshake"></i>
+          Volunteer Portal
         </a>
-        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0" aria-labelledby="navbarDropdown">
-          <li class="dropdown-header">
-            <div class="text-center mb-2">
-              <img src="{{ user.volunteer.profile_pic.url }}" alt="User" class="rounded-circle mb-2" width="60" height="60">
-              <h6 class="mb-0">{{ user.first_name }} {{ user.last_name }}</h6>
-              <span class="text-muted small">Volunteer</span>
-            </div>
-          </li>
-          <li><hr class="dropdown-divider"></li>
-          <li>
-            <a class="dropdown-item" href="#">
-              <i class="fas fa-user me-2 text-primary"></i> My Profile
-            </a>
-          </li>
-          <li>
-            <a class="dropdown-item" href="#">
-              <i class="fas fa-cog me-2 text-secondary"></i> Settings
-            </a>
-          </li>
-          <li>
-            <a class="dropdown-item" href="#">
-              <i class="fas fa-list-alt me-2 text-info"></i> Activity Log
-            </a>
-          </li>
-          <li><hr class="dropdown-divider"></li>
-          <li>
-            <a class="dropdown-item" href="{% url 'logout' %}">
-              <i class="fas fa-sign-out-alt me-2 text-danger"></i> Logout
-            </a>
-          </li>
-        </ul>
       </div>
+      
+      <ul class="nav">
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'volunteer_profile' %}">
+            <i class="fas fa-user-circle"></i>
+            Profile
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'home' %}">
+            <i class="fas fa-home"></i>
+            Home
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'logout' %}">
+            <i class="fas fa-sign-out-alt"></i>
+            Logout
+          </a>
+        </li>
+      </ul>
     </div>
-  </div>
-</nav>
+  </header>
 
-<!-- Sidebar and Main Content -->
-<div class="d-flex">
-  <!-- Sidebar Overlay -->
+  <!-- Sidebar Toggle Overlay -->
   <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
   <!-- Sidebar -->
-  <nav class="sidebar" id="sidebar">
-    <!-- User Profile -->
-    <div class="user-profile">
-      <div class="user-avatar">
-        <img src="{{ user.volunteer.profile_pic.url }}" alt="User Avatar" />
-      </div>
-      <div class="user-info">
-        <div class="user-name">{{ user.first_name }} {{ user.last_name }}</div>
-        <div class="user-role">Volunteer</div>
-      </div>
-    </div>
-
-    <!-- Sidebar Menu -->
-    <div class="pt-0">
-      <a
-        href="{% url 'volunteer_dashboard' %}"
-        class="sidebar-link {% if request.path == '/volunteer/dashboard/' %}active{% endif %}"
-      >
-        <i class="fas fa-tachometer-alt"></i> Dashboard
-        {% if request.path == '/volunteer/dashboard/' %}
-        <div class="nav-progress">
-          <div class="nav-progress-bar" style="width: 100%;"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="py-4">
+      <div class="text-center mb-4">
+        <div class="avatar mb-3">
+          <img src="{% static 'img/user.jpg' %}" alt="Profile" class="rounded-circle border border-2 border-primary shadow" width="90" height="90">
         </div>
-        {% endif %}
-      </a>
-      <a
-        href="{% url 'volunteer_applications' %}"
-        class="sidebar-link {% if '/volunteer/applications/' in request.path %}active{% endif %}"
-      >
-        <i class="fas fa-clipboard-list"></i> Applications
-        {% if '/volunteer/applications/' in request.path %}
-        <div class="nav-progress">
-          <div class="nav-progress-bar" style="width: 100%;"></div>
-        </div>
-        {% endif %}
-      </a>
-      <a
-        href="{% url 'volunteer_attendance' %}"
-        class="sidebar-link {% if '/volunteer/attendance/' in request.path %}active{% endif %}"
-      >
-        <i class="fas fa-user-check"></i> Attendance
-        {% if '/volunteer/attendance/' in request.path %}
-        <div class="nav-progress">
-          <div class="nav-progress-bar" style="width: 100%;"></div>
-        </div>
-        {% endif %}
-      </a>
-      
-      <div class="py-4 px-4 mt-4">
-        <div class="bg-primary bg-opacity-10 p-3 rounded">
-          <h6 class="text-white mb-3"><i class="fas fa-chart-line me-2"></i>Quick Stats</h6>
-          <div class="mb-3">
-            <span class="d-block text-white-50 small mb-1">Completion Rate</span>
-            <div class="progress mb-1" style="height: 6px;">
-              <div class="progress-bar bg-success" role="progressbar" style="width: 76%"></div>
-            </div>
-            <span class="small text-white-50">76% of attendance marked</span>
-          </div>
-          <div>
-            <a href="{% url 'volunteer_applications' %}?attendance=pending" class="btn btn-primary btn-sm d-block">
-              <i class="fas fa-check-circle me-1"></i> Mark Attendance
-            </a>
-          </div>
-        </div>
+        <h6 class="fw-bold text-white mb-1">{{ request.user.first_name }} {{ request.user.last_name }}</h6>
+        <span class="badge bg-primary px-3 py-2 rounded-pill">Volunteer</span>
       </div>
       
-      <div class="mt-2 px-4">
-        <a
-          href="{% url 'logout' %}"
-          class="btn btn-outline-light btn-sm d-block"
-        >
-          <i class="fas fa-sign-out-alt me-2"></i> Logout
+      <div class="px-3 mt-4">
+        <h6 class="text-uppercase text-white-50 fw-bold small px-3 mb-3">Main Menu</h6>
+        <a href="{% url 'volunteer_dashboard' %}" class="sidebar-link {% if request.resolver_match.url_name == 'volunteer_dashboard' %}active{% endif %}">
+          <i class="fas fa-tachometer-alt"></i>
+          Dashboard
+        </a>
+        <a href="{% url 'volunteer_applications' %}" class="sidebar-link {% if request.resolver_match.url_name == 'volunteer_applications' %}active{% endif %}">
+          <i class="fas fa-clipboard-list"></i>
+          Applications
+        </a>
+        <a href="{% url 'volunteer_attendance' %}" class="sidebar-link {% if request.resolver_match.url_name == 'volunteer_attendance' %}active{% endif %}">
+          <i class="fas fa-user-check"></i>
+          Attendance
+        </a>
+        
+        <h6 class="text-uppercase text-white-50 fw-bold small px-3 mb-3 mt-4">Account</h6>
+        <a href="{% url 'volunteer_profile' %}" class="sidebar-link">
+          <i class="fas fa-user-edit"></i>
+          Edit Profile
+        </a>
+        <a href="{% url 'logout' %}" class="sidebar-link">
+          <i class="fas fa-sign-out-alt"></i>
+          Logout
         </a>
       </div>
     </div>
-  </nav>
+  </aside>
 
   <!-- Main Content -->
-  <main class="flex-grow-1 pb-4">
-    <div class="container-fluid px-4">
-      {% block content %} {% endblock %}
+  <main class="main-content">
+    <div class="container-fluid py-3">
+      {% block volunteer_content %}{% endblock %}
     </div>
   </main>
 </div>
 
-<!-- JavaScript for Sidebar Toggle -->
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const sidebar = document.getElementById("sidebar");
-    const sidebarOverlay = document.getElementById("sidebarOverlay");
-    const sidebarToggle = document.getElementById("sidebarToggle");
-
-    // Toggle sidebar on button click
-    sidebarToggle.addEventListener("click", function () {
-      sidebar.classList.toggle("show");
-      
-      // Show overlay only on mobile when sidebar is open
-      if (window.innerWidth < 992) {
-        if (sidebar.classList.contains("show")) {
-          sidebarOverlay.style.display = "block";
-          document.body.style.overflow = "hidden"; // Prevent background scrolling
-        } else {
-          sidebarOverlay.style.display = "none";
-          document.body.style.overflow = "";
-        }
-      }
-    });
-
-    // Close sidebar when clicking on overlay
-    sidebarOverlay.addEventListener("click", function () {
-      sidebar.classList.remove("show");
-      sidebarOverlay.style.display = "none";
-      document.body.style.overflow = "";
-    });
-
-    // Adjust sidebar display on window resize
-    window.addEventListener("resize", function () {
-      if (window.innerWidth >= 992) {
-        sidebarOverlay.style.display = "none";
-        document.body.style.overflow = "";
-        sidebar.classList.remove("show"); // Remove 'show' class as it's always visible on desktop
+  document.addEventListener('DOMContentLoaded', function() {
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const sidebar = document.getElementById('sidebar');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    
+    // Toggle sidebar function
+    function toggleSidebar() {
+      sidebar.classList.toggle('show');
+      if (sidebar.classList.contains('show')) {
+        sidebarOverlay.style.display = 'block';
+        document.body.style.overflow = 'hidden';
       } else {
-        if (sidebar.classList.contains("show")) {
-          sidebarOverlay.style.display = "block";
-          document.body.style.overflow = "hidden";
-        }
+        sidebarOverlay.style.display = 'none';
+        document.body.style.overflow = '';
+      }
+    }
+    
+    // Event listeners
+    sidebarToggle.addEventListener('click', toggleSidebar);
+    sidebarOverlay.addEventListener('click', toggleSidebar);
+    
+    // Close sidebar on window resize if in mobile view
+    window.addEventListener('resize', function() {
+      if (window.innerWidth >= 992 && sidebar.classList.contains('show')) {
+        sidebarOverlay.style.display = 'none';
+        document.body.style.overflow = '';
       }
     });
-    
-    // Fix for icon style in dropdown items
-    const dropdownItems = document.querySelectorAll('.dropdown-item i');
-    dropdownItems.forEach(icon => {
-      icon.style.width = '16px';
-      icon.style.textAlign = 'center';
-    });
-    
-    // Add loading indicators
-    const loadingIndicator = (element) => {
-      const originalContent = element.innerHTML;
-      const spinner = '<div class="spinner-border spinner-border-sm text-light me-2" role="status"><span class="visually-hidden">Loading...</span></div>';
-      
-      element.addEventListener('click', function() {
-        if (!this.dataset.loading) {
-          this.innerHTML = spinner + originalContent;
-          this.dataset.loading = 'true';
-          setTimeout(() => {
-            this.innerHTML = originalContent;
-            delete this.dataset.loading;
-          }, 800); // Simulate loading
-        }
-      });
-    };
-    
-    // Apply loading indicators to buttons
-    document.querySelectorAll('a.btn:not([data-bs-toggle])').forEach(loadingIndicator);
   });
 </script>
-{% endblock %} 
+{% endblock %}

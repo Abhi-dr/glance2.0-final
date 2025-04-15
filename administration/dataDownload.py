@@ -1,6 +1,9 @@
 import csv
 import os
 import zipfile
+import shutil
+import tempfile
+import json
 from accounts.models import *
 
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseServerError
@@ -1296,3 +1299,276 @@ def filtered_export_pdf(students):
         print(traceback.format_exc())
         # Fall back to HTML in case of errors
         return filtered_export_html(students)
+
+def export_filtered_documents(request):
+    """
+    Export documents (resumes, marksheets) for filtered students as a ZIP file
+    """
+    try:
+        # Get filter parameters from the request
+        id = request.GET.get('id', '')
+        name = request.GET.get('name', '')
+        email = request.GET.get('email', '')
+        phone = request.GET.get('phone', '')
+        course = request.GET.get('course', '')
+        year = request.GET.get('year', '')
+        cgpa = request.GET.get('cgpa', '')
+        cgpa_operator = request.GET.get('cgpa_operator', '=')
+        status = request.GET.get('status', '')
+        companies_left = request.GET.get('companies_left', '')
+        companies_operator = request.GET.get('companies_operator', '=')
+        profile_score = request.GET.get('profile_score', '')
+        score_operator = request.GET.get('score_operator', '=')
+        company = request.GET.get('company', '')
+        job = request.GET.get('job', '')
+        attendance_status = request.GET.get('attendance_status', '')
+        export_type = request.GET.get('export_type', 'all')  # all, resume, marksheets, profile
+        
+        # Start with all students
+        students = Student.objects.all()
+        
+        # Apply filters - same logic as in views.py for consistency
+        if id:
+            students = students.filter(id__icontains=id)
+        if name:
+            students = students.filter(Q(first_name__icontains=name) | Q(last_name__icontains=name))
+        if email:
+            students = students.filter(username__icontains=email)
+        if phone:
+            students = students.filter(phone_number__icontains=phone)
+        if course:
+            students = students.filter(course__icontains=course)
+        if year and year != 'all':
+            students = students.filter(year=year)
+        if cgpa:
+            try:
+                cgpa_value = float(cgpa)
+                if cgpa_operator == '>':
+                    students = students.filter(cgpa__gt=cgpa_value)
+                elif cgpa_operator == '<':
+                    students = students.filter(cgpa__lt=cgpa_value)
+                elif cgpa_operator == '>=':
+                    students = students.filter(cgpa__gte=cgpa_value)
+                elif cgpa_operator == '<=':
+                    students = students.filter(cgpa__lte=cgpa_value)
+                else:  # default to equals
+                    students = students.filter(cgpa=cgpa_value)
+            except (ValueError, TypeError):
+                pass
+        if status:
+            students = students.filter(alumni_status=status)
+        if companies_left:
+            try:
+                companies_value = int(companies_left)
+                if companies_operator == '>':
+                    students = students.filter(no_of_companies_left__gt=companies_value)
+                elif companies_operator == '<':
+                    students = students.filter(no_of_companies_left__lt=companies_value)
+                elif companies_operator == '>=':
+                    students = students.filter(no_of_companies_left__gte=companies_value)
+                elif companies_operator == '<=':
+                    students = students.filter(no_of_companies_left__lte=companies_value)
+                else:  # default to equals
+                    students = students.filter(no_of_companies_left=companies_value)
+            except (ValueError, TypeError):
+                pass
+        
+        # Profile score filtering (calculated field) - similar to views.py
+        if profile_score:
+            try:
+                profile_score_value = float(profile_score)
+                # Since this is a calculated field, we need to filter in Python
+                all_students = list(students)
+                filtered_students = []
+                
+                for student in all_students:
+                    try:
+                        student_score = student.get_profile_score()
+                        if student_score is not None:
+                            if score_operator == '>' and student_score > profile_score_value:
+                                filtered_students.append(student)
+                            elif score_operator == '<' and student_score < profile_score_value:
+                                filtered_students.append(student)
+                            elif score_operator == '>=' and student_score >= profile_score_value:
+                                filtered_students.append(student)
+                            elif score_operator == '<=' and student_score <= profile_score_value:
+                                filtered_students.append(student)
+                            elif score_operator == '=' and student_score == profile_score_value:
+                                filtered_students.append(student)
+                    except:
+                        continue
+                        
+                student_ids = [student.id for student in filtered_students]
+                students = Student.objects.filter(id__in=student_ids)
+            except (ValueError, TypeError):
+                pass
+        
+        # Company and job filters
+        if company:
+            company_applications = Application.objects.filter(
+                job__company__name__icontains=company
+            ).values_list('student_id', flat=True)
+            students = students.filter(id__in=company_applications)
+            
+        if job:
+            job_applications = Application.objects.filter(
+                job__title__icontains=job
+            ).values_list('student_id', flat=True)
+            students = students.filter(id__in=job_applications)
+        
+        # Attendance status filter
+        if attendance_status:
+            if attendance_status == 'present':
+                # Get student IDs who are marked present
+                present_students = Application.objects.filter(
+                    attendance__is_present=True
+                ).values_list('student_id', flat=True).distinct()
+                students = students.filter(id__in=present_students)
+            elif attendance_status == 'absent':
+                # Get student IDs who are marked absent
+                absent_students = Application.objects.filter(
+                    attendance__is_present=False
+                ).values_list('student_id', flat=True).distinct()
+                students = students.filter(id__in=absent_students)
+            elif attendance_status == 'not_marked':
+                # Get student IDs who have applications but no attendance record
+                application_student_ids = Application.objects.values_list('student_id', flat=True).distinct()
+                attendance_student_ids = Application.objects.filter(
+                    attendance__isnull=False
+                ).values_list('student_id', flat=True).distinct()
+                not_marked_student_ids = set(application_student_ids) - set(attendance_student_ids)
+                students = students.filter(id__in=not_marked_student_ids)
+        
+        # Count how many students match the filters
+        student_count = students.count()
+        
+        # Create a temporary directory to store files
+        temp_dir = tempfile.mkdtemp()
+        zip_filename = 'student_documents.zip'
+        zip_file_path = os.path.join(temp_dir, zip_filename)
+        
+        # Create a ZIP file
+        with zipfile.ZipFile(zip_file_path, 'w') as zipf:
+            # Add a README file with export info
+            readme_content = (
+                f"Student Documents Export\n"
+                f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
+                f"Total students: {student_count}\n"
+                f"Filters applied: {', '.join([f for f in [id, name, email, phone, course, year, cgpa, status, companies_left, profile_score, company, job, attendance_status] if f])}\n\n"
+                f"Folder structure:\n"
+                f"- Each student has their own folder named with ID and name\n"
+                f"- Inside each folder are the student's documents\n"
+            )
+            zipf.writestr('README.txt', readme_content)
+            
+            # Iterate through each student
+            for student in students:
+                # Create a directory for this student
+                student_dir = f"{student.id}_{student.first_name}_{student.last_name}"
+                
+                # Add documents based on export_type
+                if export_type == 'all' or export_type == 'resume':
+                    # Add resume if available
+                    if student.resume:
+                        try:
+                            document_path = student.resume.path
+                            file_ext = os.path.splitext(document_path)[1]
+                            zipf.write(
+                                document_path, 
+                                f"{student_dir}/resume{file_ext}"
+                            )
+                        except Exception as e:
+                            print(f"Error adding resume for student {student.id}: {e}")
+                
+                if export_type == 'all' or export_type == 'marksheets':
+                    # Add 10th marksheet if available
+                    if student.tenth_marksheet:
+                        try:
+                            document_path = student.tenth_marksheet.path
+                            file_ext = os.path.splitext(document_path)[1]
+                            zipf.write(
+                                document_path, 
+                                f"{student_dir}/10th_marksheet{file_ext}"
+                            )
+                        except Exception as e:
+                            print(f"Error adding 10th marksheet for student {student.id}: {e}")
+                    
+                    # Add 12th marksheet if available
+                    if student.twelfth_marksheet:
+                        try:
+                            document_path = student.twelfth_marksheet.path
+                            file_ext = os.path.splitext(document_path)[1]
+                            zipf.write(
+                                document_path, 
+                                f"{student_dir}/12th_marksheet{file_ext}"
+                            )
+                        except Exception as e:
+                            print(f"Error adding 12th marksheet for student {student.id}: {e}")
+                    
+                    # Add college profile if available
+                    if student.college_profile_print:
+                        try:
+                            document_path = student.college_profile_print.path
+                            file_ext = os.path.splitext(document_path)[1]
+                            zipf.write(
+                                document_path, 
+                                f"{student_dir}/college_profile{file_ext}"
+                            )
+                        except Exception as e:
+                            print(f"Error adding college profile for student {student.id}: {e}")
+                
+                if export_type == 'all' or export_type == 'profile':
+                    # Add profile picture if available and not default
+                    if student.profile_pic and not str(student.profile_pic).endswith('default.jpg'):
+                        try:
+                            document_path = student.profile_pic.path
+                            file_ext = os.path.splitext(document_path)[1]
+                            zipf.write(
+                                document_path, 
+                                f"{student_dir}/profile_pic{file_ext}"
+                            )
+                        except Exception as e:
+                            print(f"Error adding profile picture for student {student.id}: {e}")
+                
+                # Add a JSON file with student details
+                student_info = {
+                    'id': student.id,
+                    'name': f"{student.first_name} {student.last_name}",
+                    'email': student.username,
+                    'phone': student.phone_number,
+                    'course': student.course,
+                    'year': student.year,
+                    'cgpa': float(student.cgpa) if student.cgpa else None,
+                    'status': student.alumni_status,
+                    'profile_score': student.get_profile_score(),
+                    'companies_left': student.no_of_companies_left,
+                }
+                
+                zipf.writestr(f"{student_dir}/student_info.json", json.dumps(student_info, indent=2))
+        
+        # Set up the response with the ZIP file
+        response = HttpResponse(content_type='application/zip')
+        response['Content-Disposition'] = f'attachment; filename="student_documents_{datetime.now().strftime("%Y%m%d_%H%M%S")}.zip"'
+        
+        # Add cacheing headers to prevent caching
+        response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        response['Pragma'] = 'no-cache'
+        response['Expires'] = '0'
+        
+        # Write the ZIP file to the response
+        with open(zip_file_path, 'rb') as zipf:
+            response.write(zipf.read())
+        
+        # Clean up the temporary directory
+        shutil.rmtree(temp_dir)
+        
+        return response
+        
+    except Exception as e:
+        print(f"Error exporting documents: {e}")
+        import traceback
+        traceback.print_exc()
+        
+        # Return an error response
+        response = HttpResponse(f"Error exporting documents: {str(e)}", content_type='text/plain', status=500)
+        return response

@@ -3,10 +3,11 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Q, Count, Case, When, IntegerField, F
 from django.http import HttpResponse
-import csv
+from django.contrib import messages
 from accounts.models import Student, Application, Job, Company, Attendance, Volunteer
 from django.db.models.functions import TruncDate
 from datetime import datetime
+import csv
 
 
 # Helper function to check if user is a volunteer
@@ -25,34 +26,52 @@ def volunteer_dashboard(request):
     """
     Dashboard view for volunteers showing key metrics and recent activity
     """
-    # Get statistics
+    # Get statistics with more efficient queries
     total_applications = Application.objects.count()
-    total_attendance_marked = Attendance.objects.count()
-    students_present = Attendance.objects.filter(is_present=True).count()
+    
+    # Get attendance counts with a single query using annotate
+    attendance_stats = Attendance.objects.aggregate(
+        total=Count('id'),
+        present=Count(Case(When(is_present=True, then=1), output_field=IntegerField())),
+        absent=Count(Case(When(is_present=False, then=1), output_field=IntegerField()))
+    )
+    
+    total_attendance_marked = attendance_stats['total']
+    students_present = attendance_stats['present']
+    students_absent = attendance_stats['absent']
     attendance_pending = total_applications - total_attendance_marked
+    
+    # Calculate attendance rate
+    attendance_rate = 0
+    if total_attendance_marked > 0:
+        attendance_rate = round((students_present / total_attendance_marked) * 100)
     
     # Check if there's any data
     has_data = total_applications > 0
     
-    # Get interviews by date
-    interview_dates = {}
-    for date_choice in Job._meta.get_field('interview_date').choices:
-        count = Application.objects.filter(
-            job__interview_date=date_choice[0]
-        ).count()
-        if count > 0:
-            interview_dates[date_choice[0]] = count
+    # Get interviews by date - more efficient query using values and annotate
+    interview_dates_data = Application.objects.values('job__interview_date').annotate(
+        count=Count('id')
+    ).order_by('job__interview_date')
     
-    # Get recent attendance records
+    interview_dates = {}
+    for item in interview_dates_data:
+        if item['job__interview_date'] and item['count'] > 0:
+            interview_dates[item['job__interview_date']] = item['count']
+    
+    # Get recent attendance records with select_related for efficiency
     recent_attendance = Attendance.objects.select_related(
         'application__student', 
-        'application__job__company'
+        'application__job__company',
+        'marked_by'
     ).order_by('-marked_at')[:10]
     
     context = {
         'total_applications': total_applications,
         'total_attendance_marked': total_attendance_marked,
         'students_present': students_present,
+        'students_absent': students_absent,
+        'attendance_rate': attendance_rate,
         'attendance_pending': attendance_pending,
         'interview_dates': interview_dates,
         'recent_attendance': recent_attendance,
@@ -212,31 +231,41 @@ def volunteer_attendance(request):
 @volunteer_required
 def mark_attendance(request, application_id, status):
     """
-    View to mark a student's attendance
+    View to mark a student's attendance regardless of application status
     """
     application = get_object_or_404(Application, id=application_id)
     
-    # Check if the application is accepted
-    if application.status != "accepted":
-        messages.warning(request, f"You can only mark attendance for accepted applications. This application is {application.status}.")
-        return redirect('volunteer_applications')
-    
     # Check if attendance already exists
     if hasattr(application, 'attendance'):
-        messages.warning(request, f"Attendance for {application.student.first_name} {application.student.last_name} has already been marked.")
-        return redirect('volunteer_applications')
-    
-    is_present = status == 'present'
-    
-    # Create attendance record
-    attendance = Attendance.objects.create(
-        application=application,
-        is_present=is_present,
-        marked_by=request.user.volunteer
-    )
-    
-    status_text = "present" if is_present else "absent"
-    messages.success(request, f"Marked {application.student.first_name} {application.student.last_name} as {status_text}.")
+        # Update existing attendance
+        attendance = application.attendance
+        is_present = status == 'present'
+        attendance.is_present = is_present
+        attendance.marked_by = request.user.volunteer
+        attendance.marked_at = datetime.now()
+        attendance.save()
+        
+        status_text = "present" if is_present else "absent"
+        messages.success(request, f"Updated {application.student.first_name} {application.student.last_name}'s attendance to {status_text}.")
+    else:
+        # Create new attendance record
+        is_present = status == 'present'
+        
+        notes = None
+        # Add a note if application is not accepted
+        if application.status != "accepted":
+            notes = f"Attendance marked while application was in {application.status} status."
+        
+        # Create attendance record
+        attendance = Attendance.objects.create(
+            application=application,
+            is_present=is_present,
+            marked_by=request.user.volunteer,
+            notes=notes
+        )
+        
+        status_text = "present" if is_present else "absent"
+        messages.success(request, f"Marked {application.student.first_name} {application.student.last_name} as {status_text}.")
     
     # Redirect to the referring page or applications page
     referer = request.META.get('HTTP_REFERER')
@@ -318,4 +347,38 @@ def export_attendance_csv(request):
             record.marked_at.strftime("%Y-%m-%d %H:%M:%S")
         ])
     
-    return response 
+    return response
+
+
+@login_required(login_url='login')
+@volunteer_required
+def volunteer_profile(request):
+    """
+    View for displaying the volunteer's profile with activity statistics
+    """
+    volunteer = request.user.volunteer
+    
+    # Get attendance statistics
+    from django.db.models import Count, Q
+    from datetime import timedelta
+    from django.utils import timezone
+    
+    # Count total attendance records marked by this volunteer
+    attendance_count = Attendance.objects.filter(marked_by=volunteer).count()
+    
+    # Count unique days the volunteer has been active
+    days_active = Attendance.objects.filter(marked_by=volunteer).dates('marked_at', 'day').count()
+    
+    # Count unique companies the volunteer has handled
+    companies_count = Attendance.objects.filter(marked_by=volunteer).values(
+        'application__job__company'
+    ).distinct().count()
+    
+    context = {
+        'volunteer': volunteer,
+        'attendance_count': attendance_count,
+        'days_active': days_active,
+        'companies_count': companies_count,
+    }
+    
+    return render(request, 'volunteer/profile.html', context) 

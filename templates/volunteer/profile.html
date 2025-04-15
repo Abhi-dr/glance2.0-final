@@ -1,0 +1,124 @@
+{% extends 'volunteer/base.html' %} {% load static %} {% block volunteer_content %}
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="d-sm-flex justify-content-between align-items-center">
+      <div>
+        <h2 class="mb-1">My Profile</h2>
+        <p class="text-muted">Your volunteer account information</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-4 mb-4">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body text-center">
+        <div class="my-4">
+          {% if volunteer.profile_pic %}
+            <img src="{{ volunteer.profile_pic.url }}" alt="Profile" class="rounded-circle img-thumbnail shadow" width="150" height="150">
+          {% else %}
+            <img src="{% static 'img/user.jpg' %}" alt="Profile" class="rounded-circle img-thumbnail shadow" width="150" height="150">
+          {% endif %}
+        </div>
+        <h4 class="mb-1">{{ volunteer.first_name }} {{ volunteer.last_name }}</h4>
+        <p class="text-muted mb-3">Volunteer</p>
+        <div class="d-flex justify-content-center mb-3">
+          <span class="badge bg-success rounded-pill px-3 py-2 me-2">
+            <i class="fas fa-check-circle me-1"></i> Active
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-lg-8">
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-header bg-white py-3">
+        <h5 class="mb-0">
+          <i class="fas fa-user me-2 text-primary"></i> Personal Information
+        </h5>
+      </div>
+      <div class="card-body">
+        <div class="row mb-3">
+          <div class="col-sm-4">
+            <p class="text-muted mb-0">Full Name</p>
+          </div>
+          <div class="col-sm-8">
+            <p class="mb-0">{{ volunteer.first_name }} {{ volunteer.last_name }}</p>
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-sm-4">
+            <p class="text-muted mb-0">Email</p>
+          </div>
+          <div class="col-sm-8">
+            <p class="mb-0">{{ volunteer.username }}</p>
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-sm-4">
+            <p class="text-muted mb-0">Phone</p>
+          </div>
+          <div class="col-sm-8">
+            <p class="mb-0">{{ volunteer.phone_number }}</p>
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-sm-4">
+            <p class="text-muted mb-0">Gender</p>
+          </div>
+          <div class="col-sm-8">
+            <p class="mb-0">{{ volunteer.gender|default:"Not specified" }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-header bg-white py-3">
+        <h5 class="mb-0">
+          <i class="fas fa-chart-line me-2 text-primary"></i> Volunteer Activity
+        </h5>
+      </div>
+      <div class="card-body">
+        <div class="row mb-3">
+          <div class="col-sm-6 col-md-4 mb-3 mb-md-0">
+            <div class="card bg-light border-0 h-100">
+              <div class="card-body text-center p-4">
+                <div class="mb-2">
+                  <i class="fas fa-user-check fa-2x text-primary"></i>
+                </div>
+                <h5 class="mb-0">{{ attendance_count|default:"0" }}</h5>
+                <div class="text-muted small">Attendance Records</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-md-4 mb-3 mb-md-0">
+            <div class="card bg-light border-0 h-100">
+              <div class="card-body text-center p-4">
+                <div class="mb-2">
+                  <i class="fas fa-calendar-check fa-2x text-success"></i>
+                </div>
+                <h5 class="mb-0">{{ days_active|default:"0" }}</h5>
+                <div class="text-muted small">Days Active</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-md-4">
+            <div class="card bg-light border-0 h-100">
+              <div class="card-body text-center p-4">
+                <div class="mb-2">
+                  <i class="fas fa-building fa-2x text-info"></i>
+                </div>
+                <h5 class="mb-0">{{ companies_count|default:"0" }}</h5>
+                <div class="text-muted small">Companies Covered</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} 

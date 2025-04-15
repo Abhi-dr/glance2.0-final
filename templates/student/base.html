@@ -466,18 +466,18 @@
                 background-color: var(--bs-body-bg);
                 box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
             }
-
+            
             .navbar-nav {
                 flex-direction: row;
                 align-items: center;
             }
-
+            
             .dropdown-menu {
                 position: absolute;
                 right: 0;
                 left: auto;
             }
-
+            
             .navbar-collapse {
                 position: absolute;
                 top: 100%;
@@ -490,31 +490,31 @@
                 width: auto;
                 min-width: 10rem;
             }
-
+            
             .body-wrapper {
                 padding-top: 60px;
                 /* Add padding to account for fixed header */
                 margin-bottom: 20px;
             }
-
+            
             .card {
                 margin-bottom: 1rem;
             }
-
+            
             .fs-3 {
                 font-size: 1rem !important;
             }
-
+            
             /* Fix for the theme toggle button */
             .themeToggle {
                 margin-right: 1rem;
             }
-
+            
             /* Fix for the sidebar on mobile */
             .left-sidebar {
                 z-index: 1050;
             }
-
+            
             .left-sidebar.show-menu {
                 display: block;
                 position: fixed;
@@ -524,19 +524,19 @@
                 height: 100%;
                 z-index: 1050;
             }
-
+            
             /* Adjust profile display on mobile */
             .row-cols-lg-3 {
                 display: block;
                 /* Show on mobile but with better spacing */
                 margin-top: 10px;
             }
-
+            
             /* Improve job detail page responsiveness */
             .d-md-flex {
                 flex-direction: column;
             }
-
+            
             .card-img-top {
                 width: 100% !important;
                 max-width: 250px !important;
@@ -545,18 +545,18 @@
                 float: none !important;
                 display: block;
             }
-
+            
             /* Make buttons full width on mobile */
             .mx-9 {
                 margin-left: 1rem !important;
                 margin-right: 1rem !important;
             }
-
+            
             /* Better spacing in general */
             .card-body {
                 padding: 1rem;
             }
-
+            
             /* Backdrop for sidebar */
             .sidebar-backdrop {
                 display: none;
@@ -568,19 +568,19 @@
                 background-color: rgba(0, 0, 0, 0.5);
                 z-index: 1049;
             }
-
+            
             .sidebar-backdrop.show {
                 display: block;
             }
         }
-
+        
         /* Ensure proper display on screens between mobile and desktop */
         @media (min-width: 768px) and (max-width: 991px) {
             .d-md-flex {
                 display: flex;
                 flex-direction: row;
             }
-
+            
             .card-img-top {
                 max-width: 200px !important;
                 margin-right: 20px !important;
@@ -851,8 +851,8 @@
         const toggleTheme = () => {
             const currentTheme = document.documentElement.getAttribute('data-bs-theme');
             const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-bs-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
+                    document.documentElement.setAttribute('data-bs-theme', newTheme);
+                    localStorage.setItem('theme', newTheme);
         };
 
         // Add event listener for the theme toggle button
@@ -867,7 +867,7 @@
 
             // Highlight active sidebar item
             highlightActiveMenuItem();
-
+            
             // Mobile navigation
             if (window.innerWidth < 992) {
                 // Add classes for better mobile display
@@ -875,7 +875,7 @@
                 if (navbarCollapse) {
                     navbarCollapse.classList.add('p-2');
                 }
-
+                
                 // Create backdrop for sidebar if it doesn't exist
                 let backdrop = document.querySelector('.sidebar-backdrop');
                 if (!backdrop) {
@@ -883,7 +883,7 @@
                     backdrop.classList.add('sidebar-backdrop');
                     document.body.appendChild(backdrop);
                 }
-
+                
                 // Handle navbar toggler on mobile
                 const headerCollapse = document.getElementById('headerCollapse');
                 if (headerCollapse) {
@@ -902,7 +902,7 @@
                         }
                     });
                 }
-
+                
                 // Close sidebar when clicking backdrop
                 backdrop.addEventListener('click', function () {
                     const sidebar = document.querySelector('.left-sidebar');
@@ -912,7 +912,7 @@
                         document.body.style.overflow = '';
                     }
                 });
-
+                
                 // Handle all links in sidebar to ensure it closes after navigation
                 const sidebarLinks = document.querySelectorAll('.sidebar-link');
                 sidebarLinks.forEach(link => {
@@ -928,30 +928,30 @@
                     });
                 });
             }
+        
+        // Get references to the sidebar and the toggle button
+        const sidebar = document.getElementById('sidebar');
+        const sidebarCollapse = document.getElementById('sidebarCollapse');
 
-            // Get references to the sidebar and the toggle button
-            const sidebar = document.getElementById('sidebar');
-            const sidebarCollapse = document.getElementById('sidebarCollapse');
+        // Function to close the sidebar
+        function closeSidebar() {
+            sidebar.classList.remove('show');
+        }
 
-            // Function to close the sidebar
-            function closeSidebar() {
-                sidebar.classList.remove('show');
-            }
-
-            // Event listener for clicks on the toggle button
+        // Event listener for clicks on the toggle button
             if (sidebarCollapse) {
-                sidebarCollapse.addEventListener('click', function () {
-                    sidebar.classList.toggle('show');
-                });
+        sidebarCollapse.addEventListener('click', function () {
+            sidebar.classList.toggle('show');
+        });
             }
 
-            // Event listener for clicks outside the sidebar
-            document.addEventListener('click', function (event) {
-                const target = event.target;
+        // Event listener for clicks outside the sidebar
+        document.addEventListener('click', function (event) {
+            const target = event.target;
                 if (sidebar && !sidebar.contains(target) && target !== sidebarCollapse) {
-                    closeSidebar();
-                }
-            });
+                closeSidebar();
+            }
+        });
         });
 
         // Function to highlight the active menu item based on current URL

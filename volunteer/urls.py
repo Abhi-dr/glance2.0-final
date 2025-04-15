@@ -9,4 +9,5 @@ urlpatterns = [
     path('mark-attendance/<int:application_id>/<str:status>/', views.mark_attendance, name='mark_attendance'),
     path('change-attendance/<int:attendance_id>/', views.change_attendance, name='change_attendance'),
     path('export-attendance-csv/', views.export_attendance_csv, name='export_attendance_csv'),
+    path('profile/', views.volunteer_profile, name='volunteer_profile'),
 ] 

@@ -713,23 +713,37 @@ def send_message_to_filtered_students(request):
         score_operator = request.POST.get('score_operator', '=')
         company = request.POST.get('company', '')
         job = request.POST.get('job', '')
+        attendance_status = request.POST.get('attendance_status', '')
+        
+        # Debug output
+        print(f"Message filter params: id={id}, name={name}, email={email}, phone={phone}, course={course}, year={year}")
+        print(f"Advanced filter params: cgpa={cgpa}({cgpa_operator}), status={status}, companies_left={companies_left}({companies_operator})")
+        print(f"Additional filters: profile_score={profile_score}({score_operator}), company='{company}', job='{job}', attendance='{attendance_status}'")
         
         # Start with all students
         students = Student.objects.all()
+        total_students = students.count()
+        print(f"Starting with {total_students} total students")
         
         # Apply filters
         if id:
             students = students.filter(id__icontains=id)
+            print(f"After ID filter: {students.count()} students")
         if name:
             students = students.filter(Q(first_name__icontains=name) | Q(last_name__icontains=name))
+            print(f"After name filter: {students.count()} students")
         if email:
             students = students.filter(username__icontains=email)
+            print(f"After email filter: {students.count()} students")
         if phone:
             students = students.filter(phone_number__icontains=phone)
+            print(f"After phone filter: {students.count()} students")
         if course:
             students = students.filter(course__icontains=course)
+            print(f"After course filter: {students.count()} students")
         if year and year != 'all':
             students = students.filter(year=year)
+            print(f"After year filter: {students.count()} students")
         if cgpa:
             try:
                 cgpa_value = float(cgpa)
@@ -743,10 +757,13 @@ def send_message_to_filtered_students(request):
                     students = students.filter(cgpa__lte=cgpa_value)
                 else:
                     students = students.filter(cgpa=cgpa_value)
-            except (ValueError, TypeError):
+                print(f"After CGPA filter: {students.count()} students")
+            except (ValueError, TypeError) as e:
+                print(f"Error applying CGPA filter: {e}")
                 pass
         if status:
             students = students.filter(alumni_status=status)
+            print(f"After status filter: {students.count()} students")
         if companies_left:
             try:
                 companies_value = int(companies_left)
@@ -760,7 +777,9 @@ def send_message_to_filtered_students(request):
                     students = students.filter(no_of_companies_left__lte=companies_value)
                 else:
                     students = students.filter(no_of_companies_left=companies_value)
-            except (ValueError, TypeError):
+                print(f"After companies left filter: {students.count()} students")
+            except (ValueError, TypeError) as e:
+                print(f"Error applying companies left filter: {e}")
                 pass
                 
         # Filter by profile score if provided (profile score is calculated on the fly)
@@ -795,6 +814,7 @@ def send_message_to_filtered_students(request):
                 # Convert list back to a queryset
                 student_ids = [student.id for student in filtered_students]
                 students = Student.objects.filter(id__in=student_ids)
+                print(f"After profile score filter: {students.count()} students")
             except (ValueError, TypeError) as e:
                 print(f"Error filtering by profile score: {e}")
                 pass
@@ -806,6 +826,7 @@ def send_message_to_filtered_students(request):
                 job__company__name__icontains=company
             ).values_list('student_id', flat=True)
             students = students.filter(id__in=company_applications)
+            print(f"After company filter: {students.count()} students")
             
         if job:
             # Get applications for the specified job
@@ -813,6 +834,33 @@ def send_message_to_filtered_students(request):
                 job__title__icontains=job
             ).values_list('student_id', flat=True)
             students = students.filter(id__in=job_applications)
+            print(f"After job filter: {students.count()} students")
+        
+        # Filter by attendance status if provided
+        if attendance_status:
+            if attendance_status == 'present':
+                # Get student IDs who are marked present
+                present_students = Application.objects.filter(
+                    attendance__is_present=True
+                ).values_list('student_id', flat=True).distinct()
+                students = students.filter(id__in=present_students)
+                print(f"After attendance (present) filter: {students.count()} students")
+            elif attendance_status == 'absent':
+                # Get student IDs who are marked absent
+                absent_students = Application.objects.filter(
+                    attendance__is_present=False
+                ).values_list('student_id', flat=True).distinct()
+                students = students.filter(id__in=absent_students)
+                print(f"After attendance (absent) filter: {students.count()} students")
+            elif attendance_status == 'not_marked':
+                # Get student IDs who have applications but no attendance record
+                application_student_ids = Application.objects.values_list('student_id', flat=True).distinct()
+                attendance_student_ids = Application.objects.filter(
+                    attendance__isnull=False
+                ).values_list('student_id', flat=True).distinct()
+                not_marked_student_ids = set(application_student_ids) - set(attendance_student_ids)
+                students = students.filter(id__in=not_marked_student_ids)
+                print(f"After attendance (not marked) filter: {students.count()} students")
         
         # Get all student emails
         student_emails = students.values_list('username', flat=True)
@@ -838,6 +886,7 @@ def send_message_to_filtered_students(request):
                         bcc=batch,  # Use BCC for privacy
                         fail_silently=False
                     )
+                    print(f"Successfully sent email batch {i//batch_size + 1} of {len(student_emails)//batch_size + 1}")
                 except Exception as e:
                     print(f"Error sending email batch {i//batch_size + 1}: {e}")
             
