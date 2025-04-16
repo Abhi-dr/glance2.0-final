@@ -9,6 +9,8 @@
 <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/select/1.7.0/css/select.bootstrap5.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<!-- Select2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <!-- Bootstrap CSS -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <style>
@@ -409,6 +411,11 @@
                                     <th>Actions</th>
                                 </tr>
                             </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="11" class="text-center">Loading data...</td>
+                                </tr>
+                            </tbody>
                         </table>
                     </div>
 
@@ -522,467 +529,159 @@
 <!-- Bootstrap Bundle with Popper -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- Load DataTables Core and Extensions -->
-<script type="text/javascript">
-    // Check if jQuery loaded
-    if (typeof jQuery === 'undefined') {
-        document.write('<script src="{% static "js/dashboard/libs/jquery/dist/jquery.min.js" %}"><\/script>');
-        console.warn('Local jQuery loaded as fallback');
-    }
-</script>
-<script type="text/javascript" src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
-<script type="text/javascript" src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
-<script type="text/javascript" src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
-<script type="text/javascript" src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.bootstrap5.min.js"></script>
-<script type="text/javascript" src="https://cdn.datatables.net/select/1.7.0/js/dataTables.select.min.js"></script>
+<!-- Select2 JS - Make sure it's loaded before using it -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-<!-- Export Buttons Libraries -->
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
-<script type="text/javascript" src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
-<script type="text/javascript" src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
-
-<!-- ApexCharts -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/apexcharts/4.5.0/apexcharts.min.js"></script>
-
-<!-- Custom Dashboard JS -->
-<script src="{% static 'js/dashboard/dashboard.js' %}"></script>
+<!-- Custom Dashboard JS - Do not load ApexCharts as it's causing errors -->
+<!-- <script src="{% static 'js/dashboard/dashboard.js' %}"></script> -->
 
 <script>
-    // Wait for document ready with a safety timeout
-    function initPage() {
+    // Define a global variable to store the DataTable instance
+    let dataTable;
+    
+    $(document).ready(function() {
+        // Try-catch block to handle Select2 loading issues
         try {
-            const loadingOverlay = $('#loadingOverlay');
-            
-            // Check if DataTable is available
-            if (typeof $.fn.DataTable !== 'function') {
-                console.error('DataTables library not properly loaded');
-                // Try to load it again from a different source
-                $.getScript("https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js")
-                    .done(function() {
-                        console.log("Successfully loaded DataTables from alternate source");
-                        setTimeout(initializeDataTable, 500);
-                    })
-                    .fail(function() {
-                        alert('Error: DataTables library could not be loaded. Please refresh the page or contact support.');
-                    });
-                return;
-            }
-            
-            // Check if export libraries are loaded
-            if (typeof JSZip !== 'function' || typeof pdfMake === 'undefined') {
-                console.warn('Export libraries not fully loaded, attempting to load them...');
-                // Try to load export libraries
-                $.when(
-                    $.getScript("https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"),
-                    $.getScript("https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"),
-                    $.getScript("https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"),
-                    $.getScript("https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"),
-                    $.getScript("https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js")
-                ).done(function() {
-                    console.log("Successfully loaded export libraries");
-                    setTimeout(initializeDataTable, 500);
-                }).fail(function() {
-                    console.error("Failed to load export libraries");
-                    alert('Warning: Export functionality may be limited. Please try using the direct download links instead.');
-                    initializeDataTable();
+            // Initialize Select2 for multiple select fields
+            if ($.fn.select2) {
+                $('#interview_date').select2({
+                    placeholder: "Select interview dates",
+                    allowClear: true
                 });
+                console.log("Select2 initialized successfully");
             } else {
-                initializeDataTable();
-            }
-
-            function initializeDataTable() {
-                console.log("Initializing DataTable...");
-                // Initialize DataTable with optimized settings
-                const table = $('#dataTable').DataTable({
-                    processing: true,
-                    serverSide: true,
-                    pageLength: 25,
-                    deferRender: true,
-                    searchDelay: 500,
-                    ajax: {
-                        url: '/administration/get_filtered_students',
-                        type: 'GET',
-                        data: function (d) {
-                            // Add filter parameters
-                            d.id = $('#id').val();
-                            d.name = $('#name').val();
-                            d.email = $('#email').val();
-                            d.phone = $('#phone').val();
-                            // Get all selected courses
-                            d['course[]'] = $('.course-checkbox:checked').map(function() {
-                                return $(this).val();
-                            }).get();
-                            d.year = $('#year').val();
-                            d.cgpa = $('#cgpa').val();
-                            d.cgpa_operator = $('#cgpa_operator').val();
-                            d.status = $('#status').val();
-                            d.companies_left = $('#companies_left').val();
-                            d.companies_operator = $('#companies_operator').val();
-                            d.profile_score = $('#profile_score').val();
-                            d.score_operator = $('#score_operator').val();
-                            d.company = $('#company').val();
-                            d.job = $('#job').val();
-                            d.attendance_status = $('#attendance_status').val();
-                            
-                            // Debug logging
-                            console.log('DataTables request data:', d);
-                            return d;
-                        },
-                        beforeSend: function () {
-                            loadingOverlay.css('display', 'flex');
-                        },
-                        complete: function () {
-                            loadingOverlay.hide();
-                        },
-                        error: function (xhr, error, thrown) {
-                            console.error('DataTables error:', error, thrown);
-                            loadingOverlay.hide();
-                            alert('Error loading data. Please try again.');
-                        }
-                    },
-                    columns: [
-                        { data: 'id' },
-                        {
-                            data: null,
-                            render: function (data) {
-                                return data.first_name + ' ' + data.last_name + 
-                                // Add attendance icons
-                                (data.attendance_status ? 
-                                    (data.attendance_status === 'present' ? 
-                                        ' <i class="fas fa-check-circle text-success" data-bs-toggle="tooltip" title="Present"></i>' : 
-                                        (data.attendance_status === 'absent' ? 
-                                            ' <i class="fas fa-times-circle text-danger" data-bs-toggle="tooltip" title="Absent"></i>' : 
-                                            ' <i class="fas fa-question-circle text-secondary" data-bs-toggle="tooltip" title="Not Marked"></i>')) 
-                                    : '');
-                            }
-                        },
-                        { data: 'username' },
-                        { data: 'phone_number' },
-                        { data: 'course' },
-                        { data: 'year' },
-                        {
-                            data: 'cgpa',
-                            render: function (data) {
-                                return data ? data.toFixed(2) : '-';
-                            }
-                        },
-                        { data: 'alumni_status' },
-                        { data: 'no_of_companies_left' },
-                        {
-                            data: 'profile_score',
-                            render: function (data) {
-                                return data + '%';
-                            }
-                        },
-                        {
-                            data: 'actions',
-                            orderable: false,
-                            searchable: false
-                        }
-                    ],
-                    order: [[0, 'desc']],
-                    dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>' +
-                        '<"row"<"col-sm-12"Bt>>' +
-                        '<"row"<"col-sm-12"tr>>' +
-                        '<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
-                    buttons: [
-                        {
-                            extend: 'collection',
-                            text: '<i class="fas fa-download"></i> Export',
-                            className: 'btn btn-primary',
-                            buttons: [
-                                {
-                                    extend: 'copy',
-                                    text: '<i class="fas fa-copy"></i> Copy',
-                                    className: 'btn btn-info',
-                                    exportOptions: {
-                                        columns: ':not(:last-child)'
-                                    }
-                                },
-                                {
-                                    extend: 'excel',
-                                    text: '<i class="fas fa-file-excel"></i> Excel',
-                                    className: 'btn btn-success',
-                                    exportOptions: {
-                                        columns: ':not(:last-child)'
-                                    }
-                                },
-                                {
-                                    extend: 'csv',
-                                    text: '<i class="fas fa-file-csv"></i> CSV',
-                                    className: 'btn btn-warning',
-                                    exportOptions: {
-                                        columns: ':not(:last-child)'
-                                    }
-                                },
-                                {
-                                    extend: 'pdf',
-                                    text: '<i class="fas fa-file-pdf"></i> PDF',
-                                    className: 'btn btn-danger',
-                                    exportOptions: {
-                                        columns: ':not(:last-child)'
-                                    }
-                                },
-                                {
-                                    extend: 'print',
-                                    text: '<i class="fas fa-print"></i> Print',
-                                    className: 'btn btn-dark',
-                                    exportOptions: {
-                                        columns: ':not(:last-child)'
-                                    }
-                                }
-                            ]
-                        }
-                    ]
-                });
-                
-                console.log("DataTable initialized");
-                
-                // Initialize column selection in the export modal
-                initExportOptionsModal(table);
-                
-                // Export button handlers
-                $('#exportExcel').on('click', function() {
-                    showExportOptions('excel');
-                });
-                
-                $('#exportPDF').on('click', function() {
-                    showExportOptions('pdf');
-                });
-                
-                $('#exportCSV').on('click', function() {
-                    showExportOptions('csv');
-                });
-                
-                $('#printResults').on('click', function() {
-                    showExportOptions('print');
-                });
-                
-                // Handle the actual export
-                $('#proceedExport').on('click', function() {
-                    try {
-                        const exportType = $('#proceedExport').data('exportType');
-                        const allPages = $('#exportAllPages').prop('checked');
-                        const filename = $('#exportFilename').val() || 'students_data';
-                        
-                        // Get selected columns
-                        const selectedColumns = [];
-                        $('#columnCheckboxes input:checked').each(function() {
-                            selectedColumns.push(parseInt($(this).val(), 10));
-                        });
-                        
-                        // Create export options
-                        const exportOptions = {
-                            columns: selectedColumns,
-                            modifier: {
-                                search: allPages ? 'applied' : '',
-                                page: allPages ? 'all' : 'current'
-                            }
-                        };
-                        
-                        console.log("Export type:", exportType);
-                        console.log("Export options:", exportOptions);
-                        
-                        // Check if export libraries are loaded for PDF
-                        if (exportType === 'pdf' && (typeof pdfMake === 'undefined' || typeof JSZip !== 'function')) {
-                            console.warn("PDF libraries not loaded, using direct download link");
-                            window.location.href = "{% url 'export_filtered_students_pdf' %}";
-                            $('#exportOptionsModal').modal('hide');
-                            return;
-                        }
-                        
-                        // Execute the export
-                        if (exportType === 'excel') {
-                            table.button('.buttons-excel').trigger({
-                                exportOptions: exportOptions,
-                                filename: filename
-                            });
-                        } else if (exportType === 'pdf') {
-                            // Add some extra debug info
-                            console.log("PDF export started");
-                            console.log("pdfMake available:", typeof pdfMake !== 'undefined');
-                            console.log("JSZip available:", typeof JSZip === 'function');
-                            
-                            try {
-                                table.button('.buttons-pdf').trigger({
-                                    exportOptions: exportOptions,
-                                    filename: filename
-                                });
-                            } catch (err) {
-                                console.error("PDF export error:", err);
-                                alert("There was an error generating the PDF. Using alternative download method.");
-                                window.location.href = "{% url 'export_filtered_students_pdf' %}";
-                            }
-                        } else if (exportType === 'csv') {
-                            table.button('.buttons-csv').trigger({
-                                exportOptions: exportOptions,
-                                filename: filename
-                            });
-                        } else if (exportType === 'print') {
-                            table.button('.buttons-print').trigger({
-                                exportOptions: exportOptions
-                            });
-                        }
-                        
-                        // Close the modal
-                        $('#exportOptionsModal').modal('hide');
-                    } catch (err) {
-                        console.error("Export error:", err);
-                        alert("Export failed. Please try using the direct download links at the bottom of the export options.");
-                    }
-                });
-            
-                // Handle filter form submission with debouncing
-                let filterTimeout;
-                $('#filterForm').on('submit', function (e) {
-                    e.preventDefault();
-                    clearTimeout(filterTimeout);
-                    filterTimeout = setTimeout(function () {
-                        updateActiveFilters();
-                        table.ajax.reload();
-                    }, 300);
-                });
-
-                // Handle filter input changes with debouncing
-                $('#filterForm input, #filterForm select').on('change keyup', function () {
-                    clearTimeout(filterTimeout);
-                    filterTimeout = setTimeout(function () {
-                        updateActiveFilters();
-                        table.ajax.reload();
-                    }, 300);
-                });
-
-                // Handle reset button
-                $('#resetFilters').on('click', function () {
-                    $('#filterForm')[0].reset();
-                    updateActiveFilters();
-                    table.ajax.reload();
-                });
-
-                // Update active filters display
-                function updateActiveFilters() {
-                    const activeFilters = $('#activeFilters');
-                    activeFilters.empty();
-
-                    const filters = {
-                        'ID': $('#id').val(),
-                        'Name': $('#name').val(),
-                        'Email': $('#email').val(),
-                        'Phone': $('#phone').val(),
-                        'Course': $('#course').val(),
-                        'Year': $('#year').val(),
-                        'CGPA': $('#cgpa').val() ? $('#cgpa_operator').val() + ' ' + $('#cgpa').val() : '',
-                        'Status': $('#status').val(),
-                        'Companies Left': $('#companies_left').val() ? $('#companies_operator').val() + ' ' + $('#companies_left').val() : '',
-                        'Profile Score': $('#profile_score').val() ? $('#score_operator').val() + ' ' + $('#profile_score').val() : '',
-                        'Company': $('#company').val(),
-                        'Job': $('#job').val(),
-                        'Attendance': $('#attendance_status').val() ? $('#attendance_status').val().replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()) : ''
-                    };
-
-                    for (const [key, value] of Object.entries(filters)) {
-                        if (value) {
-                            const badge = $('<span>')
-                                .addClass('badge bg-primary filter-badge')
-                                .text(`${key}: ${value}`);
-                            activeFilters.append(badge);
-                        }
-                    }
-                }
-                
-                // Function to initialize export options modal
-                function initExportOptionsModal(table) {
-                    const columnContainer = $('#columnCheckboxes');
-                    
-                    // Clear existing content
-                    columnContainer.empty();
-                    
-                    // Add checkbox for each exportable column
-                    table.columns().every(function(index) {
-                        if (index < table.columns().count() - 1) { // Skip the actions column
-                            const columnTitle = $(table.column(index).header()).text();
-                            const columnCheckbox = $(`
-                                <div class="col-md-4 mb-2">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value="${index}" id="column${index}" checked>
-                                        <label class="form-check-label" for="column${index}">
-                                            ${columnTitle}
-                                        </label>
-                                    </div>
-                                </div>
-                            `);
-                            columnContainer.append(columnCheckbox);
-                        }
-                    });
-                }
-                
-                // Function to show export options modal
-                function showExportOptions(exportType) {
-                    // Set the export type on the proceed button
-                    $('#proceedExport').data('exportType', exportType);
-                    
-                    // Set modal title based on export type
-                    let modalTitle = 'Export Options';
-                    switch(exportType) {
-                        case 'excel':
-                            modalTitle = 'Export to Excel';
-                            break;
-                        case 'pdf':
-                            modalTitle = 'Export to PDF';
-                            break;
-                        case 'csv':
-                            modalTitle = 'Export to CSV';
-                            break;
-                        case 'print':
-                            modalTitle = 'Print Data';
-                            break;
-                    }
-                    
-                    $('#exportOptionsModalLabel').text(modalTitle);
-                    
-                    // Add file extension to filename field
-                    let fileExtension = '';
-                    switch(exportType) {
-                        case 'excel':
-                            fileExtension = '.xlsx';
-                            break;
-                        case 'pdf':
-                            fileExtension = '.pdf';
-                            break;
-                        case 'csv':
-                            fileExtension = '.csv';
-                            break;
-                    }
-                    
-                    const baseFilename = 'students_data';
-                    $('#exportFilename').val(baseFilename + fileExtension);
-                    
-                    // Show the modal
-                    $('#exportOptionsModal').modal('show');
-                }
-
-                // Initialize active filters
-                updateActiveFilters();
+                console.error("Select2 plugin not loaded");
+                // Fallback to regular select
+                $('#interview_date').prop('multiple', true);
             }
         } catch (error) {
-            console.error('Error initializing DataTable:', error);
-            alert('An error occurred while initializing the page. Please refresh or contact support.');
+            console.error("Error initializing Select2:", error);
         }
-    }
 
-    // Make sure jQuery and all libraries are loaded before initializing
-    if (typeof jQuery === 'undefined') {
-        window.addEventListener('load', function() {
-            setTimeout(initPage, 500);
+        // Test direct API access through a simple AJAX call
+        console.log('Testing direct API access...');
+        
+        // Perform a simple test to check if jQuery AJAX is working
+        $.ajax({
+            url: '/administration/all_students',
+            type: 'GET',
+            dataType: 'html',
+            success: function(response) {
+                console.log('Successfully connected to server!');
+                // Now try the actual data fetch
+                fetchStudentData();
+            },
+            error: function(xhr, status, error) {
+                console.error('Connection test failed:', error);
+                $('#dataTable tbody').html('<tr><td colspan="11" class="text-center">Error connecting to server. Check console for details.</td></tr>');
+            }
         });
-    } else {
-        $(document).ready(function() {
-            // Add a small delay to ensure all libraries are fully loaded
-            setTimeout(initPage, 200);
+        
+        function fetchStudentData() {
+            console.log('Fetching student data...');
+            $('#loadingOverlay').css('display', 'flex');
+            
+            // Add a timestamp to prevent caching
+            var timestamp = new Date().getTime();
+            
+            $.ajax({
+                url: '/administration/all_students',
+                type: 'GET',
+                data: { 
+                    '_': timestamp 
+                },
+                dataType: 'html',
+                success: function(response) {
+                    $('#loadingOverlay').hide();
+                    console.log('Data fetch successful');
+                    
+                    // Extract student data from the HTML response
+                    var tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = response;
+                    
+                    var students = [];
+                    $(tempDiv).find('table tr:not(:first-child)').each(function() {
+                        var cells = $(this).find('td');
+                        if (cells.length > 1) {
+                            students.push({
+                                id: $(cells[0]).text().trim(),
+                                name: $(cells[1]).text().trim(),
+                                email: $(cells[2]).text().trim(),
+                                phone: $(cells[3]).text().trim(),
+                                course: $(cells[4]).text().trim(),
+                                year: $(cells[5]).text().trim(),
+                                cgpa: $(cells[6]).text().trim(),
+                                actions: $(cells[7]).html() || ''
+                            });
+                        }
+                    });
+                    
+                    // Display the data in our table
+                    renderStudentTable(students);
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error fetching student data:', error);
+                    $('#loadingOverlay').hide();
+                    $('#dataTable tbody').html('<tr><td colspan="11" class="text-center">Error fetching student data. Check console for details.</td></tr>');
+                }
+            });
+        }
+        
+        function renderStudentTable(students) {
+            if (students && students.length > 0) {
+                // Render the table manually
+                let html = '';
+                students.forEach(function(student) {
+                    html += '<tr>';
+                    html += '<td>' + (student.id || '') + '</td>';
+                    html += '<td>' + (student.name || '') + '</td>';
+                    html += '<td>' + (student.email || '') + '</td>';
+                    html += '<td>' + (student.phone || '') + '</td>';
+                    html += '<td>' + (student.course || '') + '</td>';
+                    html += '<td>' + (student.year || '') + '</td>';
+                    html += '<td>' + (student.cgpa || '-') + '</td>';
+                    html += '<td>' + (student.year || '') + '</td>';
+                    html += '<td>-</td>';
+                    html += '<td>-</td>';
+                    html += '<td>' + (student.actions || '<a href="#" class="btn btn-sm btn-primary"><i class="fas fa-eye"></i></a>') + '</td>';
+                    html += '</tr>';
+                });
+                $('#dataTable tbody').html(html);
+            } else {
+                $('#dataTable tbody').html('<tr><td colspan="11" class="text-center">No student data available.</td></tr>');
+            }
+        }
+        
+        // Handle form submission with direct AJAX
+        $('#filterForm').on('submit', function(e) {
+            e.preventDefault();
+            fetchStudentData();
         });
-    }
+        
+        // Simplified reset function
+        $('#resetFilters').on('click', function() {
+            $('#filterForm')[0].reset();
+            $('.course-checkbox').prop('checked', false);
+            $('.company-checkbox').prop('checked', false);
+            $('.job-checkbox').prop('checked', false);
+            $('.job-option').hide();
+            
+            // Reset Select2 elements
+            try {
+                if ($.fn.select2) {
+                    $('#interview_date').val(null).trigger('change');
+                }
+            } catch (e) {
+                console.error("Error resetting Select2:", e);
+            }
+            
+            // Clear active filters
+            $('#activeFilters').empty();
+            
+            // Fetch data with no filters
+            fetchStudentData();
+        });
+    });
 </script>
 
 <script>
@@ -1272,52 +971,6 @@ $(document).ready(function() {
             });
         });
     });
-</script>
-
-<script>
-// Add this to your existing JavaScript
-document.addEventListener('DOMContentLoaded', function() {
-    // Function to update hidden course field with selected values
-    function updateCourseField() {
-        const selectedCourses = Array.from(document.querySelectorAll('.course-checkbox:checked'))
-            .map(checkbox => checkbox.value)
-            .join(',');
-        
-        // Update the hidden field for form submission
-        const hiddenCourseField = document.createElement('input');
-        hiddenCourseField.type = 'hidden';
-        hiddenCourseField.name = 'courses';
-        hiddenCourseField.value = selectedCourses;
-        
-        // Remove any existing hidden course field
-        const existingField = document.querySelector('input[name="courses"]');
-        if (existingField) {
-            existingField.remove();
-        }
-        
-        // Add the new hidden field to the form
-        document.querySelector('form').appendChild(hiddenCourseField);
-    }
-    
-    // Add event listeners to all course checkboxes
-    document.querySelectorAll('.course-checkbox').forEach(checkbox => {
-        checkbox.addEventListener('change', updateCourseField);
-    });
-    
-    // Update on form submission
-    document.querySelector('form').addEventListener('submit', function(e) {
-        updateCourseField();
-    });
-});
-</script>
-
-<script>
-// Add event listener for course checkboxes to refresh table
-$(document).ready(function() {
-    $('.course-checkbox').on('change', function() {
-        $('#dataTable').DataTable().ajax.reload();
-    });
-});
 </script>
 
 <script>

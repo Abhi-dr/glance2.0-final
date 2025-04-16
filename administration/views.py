@@ -360,6 +360,13 @@ def all_students(request):
     user = User.objects.get(id = request.user.id)
     students = Student.objects.all()
     
+    # Debug: Print all students for troubleshooting
+    print(f"============ ALL STUDENTS ============")
+    print(f"Found {students.count()} students.")
+    for student in students:
+        print(f"Student ID: {student.id}, Name: {student.first_name} {student.last_name}, Email: {student.email}")
+    print("====================================")
+    
     # sort the students based on the number of jobs they have applied for
     students = sorted(students, key=lambda x: x.application_set.count(), reverse=True)
     
@@ -735,156 +742,289 @@ def get_filtered_students(request):
     """
     AJAX view to handle filtering students based on various criteria
     """
-    students = Student.objects.all()
+    import json
+    import traceback
     
-    # Basic filters
-    student_id = request.GET.get('id')
-    name = request.GET.get('name')
-    email = request.GET.get('email')
-    phone = request.GET.get('phone')
+    # Debug output at the start
+    print("="*50)
+    print("get_filtered_students called")
+    print("="*50)
     
-    # Course filter (multiple selection)
-    courses = request.GET.getlist('course[]')  # Changed to match frontend parameter name
-    
-    # Company and job filters (multiple selection)
-    company_ids = request.GET.getlist('companies[]')  # Changed to match frontend parameter name
-    job_ids = request.GET.getlist('jobs[]')  # Changed to match frontend parameter name
-    
-    # Interview date filter (multiple selection)
-    interview_dates = request.GET.getlist('interview_date[]')  # Changed to match frontend parameter name
-    
-    # Other filters
-    year = request.GET.get('year')
-    cgpa = request.GET.get('cgpa')
-    cgpa_operator = request.GET.get('cgpa_operator', '=')
-    status = request.GET.get('status')
-    companies_left = request.GET.get('companies_left')
-    companies_operator = request.GET.get('companies_operator', '=')
-    profile_score = request.GET.get('profile_score')
-    score_operator = request.GET.get('score_operator', '=')
-    attendance_status = request.GET.get('attendance_status')
-    
-    # Apply basic filters
-    if student_id:
-        students = students.filter(id=student_id)
-    if name:
-        students = students.filter(Q(first_name__icontains=name) | Q(last_name__icontains=name))
-    if email:
-        students = students.filter(email__icontains=email)
-    if phone:
-        students = students.filter(phone_number__icontains=phone)
-    
-    # Apply course filter
-    if courses:
-        students = students.filter(course__in=courses)
-    
-    # Apply company filter
-    if company_ids:
-        # Get students who have applied to any of the selected companies
-        students = students.filter(application__job__company_id__in=company_ids).distinct()
-    
-    # Apply job filter
-    if job_ids:
-        # Get students who have applied to any of the selected jobs
-        students = students.filter(application__job_id__in=job_ids).distinct()
-    
-    # Apply interview date filter
-    if interview_dates:
-        # Get students who have applied to jobs with the selected interview dates
-        students = students.filter(application__job__interview_date__in=interview_dates).distinct()
-    
-    # Apply year filter
-    if year:
-        students = students.filter(year=year)
-    
-    # Apply CGPA filter
-    if cgpa:
-        try:
-            cgpa_value = float(cgpa)
-            if cgpa_operator == '>':
-                students = students.filter(cgpa__gt=cgpa_value)
-            elif cgpa_operator == '<':
-                students = students.filter(cgpa__lt=cgpa_value)
-            elif cgpa_operator == '>=':
-                students = students.filter(cgpa__gte=cgpa_value)
-            elif cgpa_operator == '<=':
-                students = students.filter(cgpa__lte=cgpa_value)
-            else:
-                students = students.filter(cgpa=cgpa_value)
-        except (ValueError, TypeError):
-            pass
-    
-    # Apply status filter
-    if status:
-        students = students.filter(alumni_status=status)
-    
-    # Apply companies left filter
-    if companies_left:
-        try:
-            companies_value = int(companies_left)
-            if companies_operator == '>':
-                students = students.filter(no_of_companies_left__gt=companies_value)
-            elif companies_operator == '<':
-                students = students.filter(no_of_companies_left__lt=companies_value)
-            elif companies_operator == '>=':
-                students = students.filter(no_of_companies_left__gte=companies_value)
-            elif companies_operator == '<=':
-                students = students.filter(no_of_companies_left__lte=companies_value)
-            else:
-                students = students.filter(no_of_companies_left=companies_value)
-        except (ValueError, TypeError):
-            pass
-    
-    # Apply profile score filter
-    if profile_score:
-        try:
-            score_value = float(profile_score)
-            if score_operator == '>':
-                students = students.filter(profile_score__gt=score_value)
-            elif score_operator == '<':
-                students = students.filter(profile_score__lt=score_value)
-            elif score_operator == '>=':
-                students = students.filter(profile_score__gte=score_value)
-            elif score_operator == '<=':
-                students = students.filter(profile_score__lte=score_value)
-            else:
-                students = students.filter(profile_score=score_value)
-        except (ValueError, TypeError):
-            pass
-    
-    # Apply attendance status filter
-    if attendance_status:
-        if attendance_status == 'present':
-            students = students.filter(application__attendance_status='present')
-        elif attendance_status == 'absent':
-            students = students.filter(application__attendance_status='absent')
-        elif attendance_status == 'not_marked':
-            students = students.filter(application__attendance_status='not_marked')
-    
-    # Prepare data for DataTables
-    data = []
-    for student in students:
-        data.append({
-            'id': student.id,
-            'first_name': student.first_name,
-            'last_name': student.last_name,
-            'username': student.email,
-            'phone_number': student.phone_number,
-            'course': student.course,
-            'year': student.year,
-            'cgpa': student.cgpa,
-            'alumni_status': student.alumni_status,
-            'no_of_companies_left': student.no_of_companies_left,
-            'profile_score': student.profile_score,
-            'actions': f'<a href="/administration/student/{student.id}" class="btn btn-sm btn-primary"><i class="fas fa-eye"></i></a>'
+    try:
+        # Get all students first to check if database has data
+        all_students = Student.objects.all()
+        total_students = all_students.count()
+        print(f"Total students in database: {total_students}")
+        
+        # If no students in database, return empty response
+        if total_students == 0:
+            print("No students found in database!")
+            return JsonResponse({
+                'draw': int(request.GET.get('draw', 1)),
+                'recordsTotal': 0,
+                'recordsFiltered': 0,
+                'data': [],
+                'message': 'No students found in database'
+            })
+            
+        # Start with all students for filtering
+        students = all_students
+        print(f"Initial student count: {students.count()}")
+        
+        # Get DrawTable parameters - these are sent by DataTables
+        draw = int(request.GET.get('draw', 1))
+        start = int(request.GET.get('start', 0))
+        length = int(request.GET.get('length', 25))
+        
+        # Print all request parameters for debugging
+        print("Request GET parameters:")
+        for key, value in request.GET.items():
+            print(f"  {key}: {value}")
+        
+        # Basic filters
+        student_id = request.GET.get('id')
+        name = request.GET.get('name')
+        email = request.GET.get('email')
+        phone = request.GET.get('phone')
+        
+        # Course filter (multiple selection)
+        courses = request.GET.getlist('course')
+        print(f"Courses from request: {courses}")
+        
+        # Company and job filters (multiple selection)
+        company_ids = request.GET.getlist('companies')
+        job_ids = request.GET.getlist('jobs')
+        
+        # Interview date filter (multiple selection)
+        interview_dates = request.GET.getlist('interview_date')
+        
+        # Other filters
+        year = request.GET.get('year')
+        cgpa = request.GET.get('cgpa')
+        cgpa_operator = request.GET.get('cgpa_operator', '=')
+        status = request.GET.get('status')
+        companies_left = request.GET.get('companies_left')
+        companies_operator = request.GET.get('companies_operator', '=')
+        profile_score = request.GET.get('profile_score')
+        score_operator = request.GET.get('score_operator', '=')
+        attendance_status = request.GET.get('attendance_status')
+        
+        # Apply basic filters
+        if student_id:
+            students = students.filter(id=student_id)
+            print(f"After ID filter: {students.count()} students")
+        if name:
+            students = students.filter(Q(first_name__icontains=name) | Q(last_name__icontains=name))
+            print(f"After name filter: {students.count()} students")
+        if email:
+            students = students.filter(email__icontains=email)
+            print(f"After email filter: {students.count()} students")
+        if phone:
+            students = students.filter(phone_number__icontains=phone)
+            print(f"After phone filter: {students.count()} students")
+        
+        # Apply course filter
+        if courses:
+            print(f"Filtering by courses: {courses}")
+            students = students.filter(course__in=courses)
+            print(f"After course filter: {students.count()} students")
+        
+        # Apply company filter
+        if company_ids:
+            print(f"Filtering by company IDs: {company_ids}")
+            students = students.filter(application__job__company_id__in=company_ids).distinct()
+            print(f"After company filter: {students.count()} students")
+        
+        # Apply job filter
+        if job_ids:
+            print(f"Filtering by job IDs: {job_ids}")
+            students = students.filter(application__job_id__in=job_ids).distinct()
+            print(f"After job filter: {students.count()} students")
+        
+        # Apply interview date filter
+        if interview_dates:
+            print(f"Filtering by interview dates: {interview_dates}")
+            students = students.filter(application__job__interview_date__in=interview_dates).distinct()
+            print(f"After interview date filter: {students.count()} students")
+        
+        # Apply year filter
+        if year:
+            students = students.filter(year=year)
+            print(f"After year filter: {students.count()} students")
+        
+        # Apply CGPA filter
+        if cgpa:
+            try:
+                cgpa_value = float(cgpa)
+                if cgpa_operator == '>':
+                    students = students.filter(cgpa__gt=cgpa_value)
+                elif cgpa_operator == '<':
+                    students = students.filter(cgpa__lt=cgpa_value)
+                elif cgpa_operator == '>=':
+                    students = students.filter(cgpa__gte=cgpa_value)
+                elif cgpa_operator == '<=':
+                    students = students.filter(cgpa__lte=cgpa_value)
+                else:
+                    students = students.filter(cgpa=cgpa_value)
+                print(f"After CGPA filter: {students.count()} students")
+            except (ValueError, TypeError):
+                print("Invalid CGPA value:", cgpa)
+        
+        # Apply status filter
+        if status:
+            students = students.filter(alumni_status=status)
+            print(f"After status filter: {students.count()} students")
+        
+        # Apply companies left filter
+        if companies_left:
+            try:
+                companies_value = int(companies_left)
+                if companies_operator == '>':
+                    students = students.filter(no_of_companies_left__gt=companies_value)
+                elif companies_operator == '<':
+                    students = students.filter(no_of_companies_left__lt=companies_value)
+                elif companies_operator == '>=':
+                    students = students.filter(no_of_companies_left__gte=companies_value)
+                elif companies_operator == '<=':
+                    students = students.filter(no_of_companies_left__lte=companies_value)
+                else:
+                    students = students.filter(no_of_companies_left=companies_value)
+                print(f"After companies left filter: {students.count()} students")
+            except (ValueError, TypeError):
+                print("Invalid companies left value:", companies_left)
+        
+        # Apply profile score filter
+        if profile_score:
+            try:
+                # We can't filter directly on profile_score as it's not a database field
+                # We'll fetch all students and filter in Python
+                all_students = list(students)
+                filtered_students = []
+                
+                profile_score_value = float(profile_score)
+                
+                for student in all_students:
+                    try:
+                        if hasattr(student, 'get_profile_score'):
+                            student_score = student.get_profile_score()
+                            if student_score is not None:
+                                if score_operator == '>' and student_score > profile_score_value:
+                                    filtered_students.append(student)
+                                elif score_operator == '<' and student_score < profile_score_value:
+                                    filtered_students.append(student)
+                                elif score_operator == '>=' and student_score >= profile_score_value:
+                                    filtered_students.append(student)
+                                elif score_operator == '<=' and student_score <= profile_score_value:
+                                    filtered_students.append(student)
+                                elif score_operator == '=' and student_score == profile_score_value:
+                                    filtered_students.append(student)
+                    except Exception as e:
+                        print(f"Error checking profile score for student {getattr(student, 'id', 'unknown')}: {e}")
+                        continue
+                
+                # Convert list back to a queryset
+                student_ids = [student.id for student in filtered_students]
+                students = Student.objects.filter(id__in=student_ids)
+                print(f"After profile score filter: {students.count()} students")
+            except (ValueError, TypeError) as e:
+                print(f"Error filtering by profile score: {e}")
+                pass
+                
+        # Filter by company and job applications if provided
+        if company_ids:
+            # Get applications for the specified companies
+            company_applications = Application.objects.filter(
+                job__company_id__in=company_ids
+            ).values_list('student_id', flat=True)
+            students = students.filter(id__in=company_applications)
+            print(f"After company filter: {students.count()} students")
+        
+        # Filter by job applications if provided
+        if job_ids:
+            # Get applications for the specified jobs
+            job_applications = Application.objects.filter(
+                job_id__in=job_ids
+            ).values_list('student_id', flat=True)
+            students = students.filter(id__in=job_applications)
+            print(f"After job filter: {students.count()} students")
+        
+        # Filter by attendance status if provided
+        if attendance_status:
+            if attendance_status == 'present':
+                # Get student IDs who are marked present
+                present_students = Application.objects.filter(
+                    attendance__is_present=True
+                ).values_list('student_id', flat=True).distinct()
+                students = students.filter(id__in=present_students)
+                print(f"After attendance (present) filter: {students.count()} students")
+            elif attendance_status == 'absent':
+                # Get student IDs who are marked absent
+                absent_students = Application.objects.filter(
+                    attendance__is_present=False
+                ).values_list('student_id', flat=True).distinct()
+                students = students.filter(id__in=absent_students)
+                print(f"After attendance (absent) filter: {students.count()} students")
+            elif attendance_status == 'not_marked':
+                # Get student IDs who have applications but no attendance record
+                application_student_ids = Application.objects.values_list('student_id', flat=True).distinct()
+                attendance_student_ids = Application.objects.filter(
+                    attendance__isnull=False
+                ).values_list('student_id', flat=True).distinct()
+                not_marked_student_ids = set(application_student_ids) - set(attendance_student_ids)
+                students = students.filter(id__in=not_marked_student_ids)
+                print(f"After attendance (not marked) filter: {students.count()} students")
+        
+        # Apply pagination for better performance
+        if start is not None and length is not None:
+            end = start + length
+            paginated_students = students[start:end]
+        else:
+            paginated_students = students
+            
+        print(f"Paginated students: {len(paginated_students)}")
+        
+        # Prepare data for DataTables
+        data = []
+        
+        for student in paginated_students:
+            try:
+                data.append({
+                    'id': student.id,
+                    'first_name': student.first_name or '',
+                    'last_name': student.last_name or '',
+                    'username': student.email or '',
+                    'phone_number': student.phone_number or '',
+                    'course': student.course or '',
+                    'year': student.year or '',
+                    'cgpa': float(student.cgpa) if student.cgpa else 0,
+                    'alumni_status': student.alumni_status or '',
+                    'no_of_companies_left': student.no_of_companies_left or 0,
+                    'profile_score': student.profile_score or 0,
+                    'actions': f'<a href="/administration/student/{student.id}" class="btn btn-sm btn-primary"><i class="fas fa-eye"></i></a>'
+                })
+            except Exception as e:
+                print(f"Error processing student {student.id}: {e}")
+                continue
+        
+        # Create response for DataTables
+        response = {
+            'draw': draw,
+            'recordsTotal': total_students,
+            'recordsFiltered': students.count(),
+            'data': data
+        }
+        print(f"Returning {len(data)} students to DataTable")
+        return JsonResponse(response)
+    except Exception as e:
+        print(f"Error in get_filtered_students: {e}")
+        print(traceback.format_exc())
+        return JsonResponse({
+            'draw': int(request.GET.get('draw', 1)),
+            'recordsTotal': 0,
+            'recordsFiltered': 0,
+            'data': [],
+            'error': str(e)
         })
-    
-    return JsonResponse({
-        'draw': int(request.GET.get('draw', 1)),
-        'recordsTotal': students.count(),
-        'recordsFiltered': students.count(),
-        'data': data
-    })
 
 @login_required(login_url='login')
 @staff_member_required(login_url='login')
@@ -1452,3 +1592,43 @@ def download_whatsapp_csv_template(request):
     writer.writerow(['+919876543212', 'Robert Johnson'])
     
     return response
+
+@login_required(login_url='login')
+@staff_member_required(login_url='login')
+def test_student_data(request):
+    """
+    Simple test view to return student data as JSON
+    Used to verify data access is working correctly
+    """
+    try:
+        students = Student.objects.all()
+        
+        # Debug output
+        print(f"test_student_data: Found {students.count()} students")
+        for student in students:
+            print(f"Student: {student.id} - {student.first_name} {student.last_name} - {student.email}")
+        
+        data = []
+        for student in students:
+            data.append({
+                'id': student.id,
+                'name': f"{student.first_name} {student.last_name}",
+                'email': student.email,
+                'phone': student.phone_number,
+                'course': student.course,
+                'cgpa': student.cgpa
+            })
+        
+        return JsonResponse({
+            'success': True,
+            'count': len(data),
+            'data': data
+        })
+    except Exception as e:
+        import traceback
+        print("Error in test_student_data:", str(e))
+        print(traceback.format_exc())
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        })
