@@ -223,10 +223,10 @@ Student - Edit Profile
                                 <!-- File input with custom styling -->
                                 <div class="mb-3">
                                     <label for="formFile" class="custom-file-upload">
-                                        <i class="fa fa-cloud-upload"></i> Choose Profile Picture
-                                    </label>
+                                    <i class="fa fa-cloud-upload"></i> Choose Profile Picture
+                                </label>
                                     <input class="form-control d-none" type="file" id="formFile" name="profile_pic"
-                                        accept=".webp, .png, .jpg, .jpeg" required />
+                                    accept=".webp, .png, .jpg, .jpeg" required />
                                     <div class="invalid-feedback">Please select a valid image file (required).</div>
                                 </div>
                                 
@@ -290,16 +290,15 @@ Student - Edit Profile
                                             After setting a value, it cannot be changed. Please contact support for any
                                             changes if needed.
                                         </div>
+                                        </div>
                                     </div>
-                                </div>
 
                                 <!-- Course and Backlogs -->
                                 <div class="form-section-header d-md-none">Educational Information</div>
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
                                         <label for="course" class="small mb-1">* Course</label>
-                                        <select class="form-select" id="course" name="course" 
-                                            {% if student.course %}disabled{% endif %} required>
+                                        <select class="form-select" name="course" id="course" required>
                                             <option value="" {% if not student.course %}selected{% endif %}>Select Course</option>
                                             <option value="B.Tech Computer Science" {% if student.course == 'B.Tech Computer Science' %}selected{% endif %}>B.Tech Computer Science</option>
                                             <option value="B.Tech Information Technology" {% if student.course == 'B.Tech Information Technology' %}selected{% endif %}>B.Tech Information Technology</option>
@@ -308,24 +307,23 @@ Student - Edit Profile
                                             <option value="B.Tech Civil" {% if student.course == 'B.Tech Civil' %}selected{% endif %}>B.Tech Civil</option>
                                             <option value="B.Tech Electrical" {% if student.course == 'B.Tech Electrical' %}selected{% endif %}>B.Tech Electrical</option>
                                             <option value="B.Tech Mechanical" {% if student.course == 'B.Tech Mechanical' %}selected{% endif %}>B.Tech Mechanical</option>
-                                            <option value="LLB" {% if student.course == 'LLB' %}selected{% endif %}>LLB</option>
                                             <option value="BCA" {% if student.course == 'BCA' %}selected{% endif %}>BCA</option>
                                             <option value="MCA" {% if student.course == 'MCA' %}selected{% endif %}>MCA</option>
                                             <option value="M.Tech Computer Science" {% if student.course == 'M.Tech Computer Science' %}selected{% endif %}>M.Tech Computer Science</option>
                                             <option value="M.Tech Information Technology" {% if student.course == 'M.Tech Information Technology' %}selected{% endif %}>M.Tech Information Technology</option>
                                             <option value="MBA" {% if student.course == 'MBA' %}selected{% endif %}>MBA</option>
-                                            <option value="Diploma" {% if student.course == 'Diploma' %}selected{% endif %}>Diploma</option>
                                             <option value="B.Com" {% if student.course == 'B.Com' %}selected{% endif %}>B.Com</option>
                                             <option value="M.Com" {% if student.course == 'M.Com' %}selected{% endif %}>M.Com</option>
                                             <option value="BBA" {% if student.course == 'BBA' %}selected{% endif %}>BBA</option>
+                                            <option value="LLB" {% if student.course == 'LLB' %}selected{% endif %}>LLB</option>
                                         </select>
-                                        <div class="invalid-feedback">Please select a course.</div>
+                                        <div class="invalid-feedback">Please select your course.</div>
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label class="small mb-1" for="inputBacklogs">* Backlogs</label>
                                         <input class="form-control" id="inputBacklogs" type="number" name="backlog"
                                             value="{{ student.backlog }}" min="0" max="15"
-                                            placeholder="Enter number of backlogs" 
+                                            placeholder="Enter number of backlogs"
                                             {% if student.backlog >= 0 %}disabled{% endif %} required>
                                         <div class="invalid-feedback">Please enter a number between 0 and 15.</div>
                                     </div>
@@ -391,7 +389,7 @@ Student - Edit Profile
                                         <label class="small mb-1" for="inputHighschool">Highschool</label>
                                         <input class="form-control" id="inputHighschool" type="text"
                                             placeholder="Highschool Percentage %" name="tenth"
-                                            value="{% if student.tenth %}{{ student.tenth }}{% endif %}" 
+                                            value="{% if student.tenth %}{{ student.tenth }}{% endif %}"
                                             {% if student.tenth %}disabled{% endif %}
                                             pattern="^([0-9]{1,2}(\.[0-9]{1,2})?|100(\.0{1,2})?)$" required>
                                         <small class="text-muted">Enter percentage without % symbol</small>
@@ -401,7 +399,7 @@ Student - Edit Profile
                                         <label class="small mb-1" for="inputIntermediate">Intermediate</label>
                                         <input class="form-control" id="inputIntermediate" type="text"
                                             placeholder="Intermediate Percentage %" name="twelfth"
-                                            value="{% if student.twelfth %}{{ student.twelfth }}{% endif %}" 
+                                            value="{% if student.twelfth %}{{ student.twelfth }}{% endif %}"
                                             {% if student.twelfth %}disabled{% endif %}
                                             pattern="^([0-9]{1,2}(\.[0-9]{1,2})?|100(\.0{1,2})?)$" required>
                                         <small class="text-muted">Enter percentage without % symbol</small>
@@ -411,7 +409,7 @@ Student - Edit Profile
                                         <label class="small mb-1" for="inputCGPA">Current CGPA</label>
                                         <input class="form-control" id="inputCGPA" type="text"
                                             placeholder="Current CGPA (out of 10)" name="cgpa"
-                                            value="{% if student.cgpa %}{{ student.cgpa }}{% endif %}" 
+                                            value="{% if student.cgpa %}{{ student.cgpa }}{% endif %}"
                                             {% if student.cgpa %}disabled{% endif %}
                                             pattern="^([0-9](\.[0-9]{1,2})?|10(\.0{1,2})?)$" required>
                                         <small class="text-muted">Enter CGPA value</small>
@@ -425,7 +423,7 @@ Student - Edit Profile
                                     <label class="small mb-1" for="inputLinkedIn">LinkedIn</label>
                                     <div class="input-group social-input-group">
                                         <span class="input-group-text"><i class="fab fa-linkedin"></i></span>
-                                        <input class="form-control" id="inputLinkedIn" type="text" name="linkedin_id"
+                                    <input class="form-control" id="inputLinkedIn" type="text" name="linkedin_id"
                                             value="{% if student.linkedin_id %}{{ student.linkedin_id }}{% elif student.linkedin_id == '' %}N/A{% endif %}"
                                             placeholder="Enter your LinkedIn profile URL or N/A if not available"
                                             pattern="https?://(www\.)?linkedin\.com/in/[\w\d-]+/?.*|N/A" required>
@@ -437,14 +435,14 @@ Student - Edit Profile
                                     <label class="small mb-1" for="inputGitHub">GitHub</label>
                                     <div class="input-group social-input-group">
                                         <span class="input-group-text"><i class="fab fa-github"></i></span>
-                                        <input class="form-control" id="inputGitHub" type="text" name="github_id"
+                                    <input class="form-control" id="inputGitHub" type="text" name="github_id"
                                             value="{% if student.github_id %}{{ student.github_id }}{% elif student.github_id == '' %}N/A{% endif %}"
                                             placeholder="Enter your GitHub profile URL or N/A if not available"
                                             pattern="https?://(www\.)?github\.com/[\w\d-]+/?.*|N/A" required>
                                         <div class="invalid-feedback">Please enter a valid GitHub URL (e.g., https://github.com/username) or "N/A".</div>
                                     </div>
                                 </div>
-                                
+
                                 <div class="mb-3">
                                     <label class="small mb-1" for="inputInstagram">Instagram</label>
                                     <div class="input-group social-input-group">
@@ -477,7 +475,7 @@ Student - Edit Profile
                                             value="{{ student.date_joined }}" disabled>
                                     </div>
                                 </div>
-
+                                
                                 <!-- Save Button -->
                                 <button class="btn btn-success w-100 py-2" type="submit">
                                     <i class="fas fa-save me-2"></i>Save Changes

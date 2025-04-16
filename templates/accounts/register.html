@@ -137,8 +137,8 @@
     width: 100%;
     height: 100%;
     background: linear-gradient(90deg,
-        transparent,
-        rgba(255, 255, 255, 0.2),
+      transparent,
+      rgba(255, 255, 255, 0.2),
         transparent);
     transition: 0.5s;
   }
@@ -706,20 +706,20 @@
       password,
       confirmPassword
     ];
-
+    
     // Basic real-time validation
     inputs.forEach((input) => {
       input.addEventListener("input", function () {
         validateInput(this);
       });
     });
-
+    
     // Simple validation function
     function validateInput(input) {
       const container = input.parentElement;
       const validationMessage = container.querySelector('.validation-message');
       const isValid = input.checkValidity() && input.value.trim() !== "";
-
+      
       if (isValid) {
         container.classList.add("valid");
         container.classList.remove("invalid");
@@ -879,7 +879,7 @@
         validationMessage.style.display = 'none';
       }
     }); */
-
+    
     // Password requirements validation
     password.addEventListener("input", function () {
       const val = this.value;
@@ -928,18 +928,18 @@
           container.classList.remove("invalid");
         }
       }
-
+      
       // Also validate confirm password if it has a value
       if (confirmPassword.value) {
         validatePasswordMatch();
       }
     });
-
+    
     // Password matching validation
     function validatePasswordMatch() {
       const container = confirmPassword.parentElement;
       const validationMessage = container.querySelector('.validation-message');
-
+      
       if (confirmPassword.value === "") {
         container.classList.remove("valid", "invalid");
         validationMessage.style.display = 'none';
@@ -953,14 +953,14 @@
         validationMessage.style.display = 'none';
       }
     }
-
+    
     confirmPassword.addEventListener("input", validatePasswordMatch);
-
+    
     // Handle form submission
     form.addEventListener("submit", function (e) {
       let hasError = false;
       let errorMessages = [];
-
+      
       // Validate all inputs
       inputs.forEach((input) => {
         if (!input.checkValidity() || input.value.trim() === "") {
@@ -1006,13 +1006,13 @@
       if (mobileContainer.classList.contains('invalid')) {
         hasError = true;
       }
-
+      
       // Validate password match
       if (password.value !== confirmPassword.value) {
         confirmPassword.parentElement.classList.add("invalid");
         hasError = true;
       }
-
+      
       // Check terms
       if (!termsCheckbox.checked) {
         // Create a custom validation message for terms
@@ -1033,7 +1033,7 @@
 
         // Only show alert on desktop
         if (window.innerWidth > 480) {
-          alert("You must agree to the Terms and Conditions");
+        alert("You must agree to the Terms and Conditions");
         }
         hasError = true;
       }
@@ -1041,7 +1041,7 @@
       // Log validation state for debugging
       console.log("Form validation error:", hasError);
       console.log("Error messages:", errorMessages);
-
+      
       // Prevent submission if there are errors
       if (hasError) {
         e.preventDefault();

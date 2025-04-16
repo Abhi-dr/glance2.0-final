@@ -34,8 +34,8 @@ def edit_profile(request):
         student.last_name = last_name
         student.gender = gender
         
-        # Educational details
-        course = request.POST.get('course', '')
+        # Educational details - handle single course selection
+        course = request.POST.get('course', '')  # Get single course
         tenth = request.POST.get('tenth', '')
         twelfth = request.POST.get('twelfth', '')
         cgpa = request.POST.get('cgpa', '')
@@ -55,7 +55,7 @@ def edit_profile(request):
         
         # Update educational details - only if they haven't been set before
         if course and not student.course:
-            student.course = course
+            student.course = course  # Set single course
             messages.success(request, "Course has been set and cannot be changed later.")
             
         if year and not student.year:

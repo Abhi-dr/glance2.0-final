@@ -2,50 +2,50 @@
 {%block css %}
 
 <style>
-  .auth-buttons .btn {
-    margin-left: 10px;
-    font-weight: 500;
-  }
-
-  .welcome-alert {
-    position: fixed;
-    top: 80px;
-    right: 20px;
-    z-index: 1000;
-    animation: fadeInOut 5s forwards;
-  }
-
-  @keyframes fadeInOut {
-    0% {
-      opacity: 0;
-      transform: translateY(-20px);
+    .auth-buttons .btn {
+        margin-left: 10px;
+        font-weight: 500;
     }
 
-    10% {
-      opacity: 1;
-      transform: translateY(0);
+    .welcome-alert {
+        position: fixed;
+        top: 80px;
+        right: 20px;
+        z-index: 1000;
+        animation: fadeInOut 5s forwards;
     }
 
-    80% {
-      opacity: 1;
-      transform: translateY(0);
+    @keyframes fadeInOut {
+        0% {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+
+        10% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        80% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        100% {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
     }
 
-    100% {
-      opacity: 0;
-      transform: translateY(-20px);
-    }
-  }
-
-  /* Companies Section Styles */
-  .companies-grid {
-    display: grid;
+    /* Companies Section Styles */
+    .companies-grid {
+        display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 2rem;
+        gap: 2rem;
     margin-top: 1.5rem;
-  }
+    }
 
-  .company-card {
+    .company-card {
     background: rgba(255, 255, 255, 0.08);
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
@@ -184,13 +184,13 @@
   }
   
   .coming-soon-box {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border-radius: 15px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-radius: 15px;
     padding: 3rem;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
     color: white;
     max-width: 800px;
     margin: 0 auto;
@@ -288,9 +288,9 @@
     transform: perspective(1000px) rotateX(0deg);
     height: 170px;
     position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     overflow: hidden;
   }
   
@@ -316,20 +316,20 @@
   
   .company-card:hover::before {
     opacity: 1;
-  }
-  
-  .company-logo {
-    height: 100px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    }
+
+    .company-logo {
+        height: 100px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     width: 100%;
     z-index: 1;
-  }
-  
-  .company-logo img {
-    max-height: 100%;
-    max-width: 100%;
+    }
+
+    .company-logo img {
+        max-height: 100%;
+        max-width: 100%;
     filter: brightness(1) drop-shadow(0 8px 24px rgba(0, 0, 0, 0.15));
     transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
     transform-origin: center;
@@ -350,37 +350,37 @@
       padding: 1.8rem;
       height: 150px;
     }
-  }
-  
-  @media (max-width: 768px) {
+    }
+
+    @media (max-width: 768px) {
     .companies-showcase {
       grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-      gap: 1.5rem;
-    }
-    
-    .company-card {
-      padding: 1.5rem;
+            gap: 1.5rem;
+        }
+
+        .company-card {
+            padding: 1.5rem;
       height: 130px;
+        }
+
+        .company-logo {
+            height: 80px;
+        }
     }
-    
-    .company-logo {
-      height: 80px;
-    }
-  }
-  
-  @media (max-width: 480px) {
+
+    @media (max-width: 480px) {
     .companies-showcase {
       grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-      gap: 1rem;
-    }
-    
-    .company-card {
+            gap: 1rem;
+        }
+
+        .company-card {
       padding: 1.2rem;
       height: 110px;
       border-radius: 18px;
-    }
-    
-    .company-logo {
+        }
+
+        .company-logo {
       height: 70px;
     }
   }
@@ -507,69 +507,69 @@
 {% endblock %} {% block body %}
 
 <section id="home" class="hero-section">
-  <div class="container">
-    <div class="row">
-      <div class="col-lg-8 hero-content">
-        <h1 class="hero-title">Glance Job Fair 2.0</h1>
-        <h2 class="hero-subtitle">Your Gateway to Career Excellence</h2>
-        <div class="d-flex flex-wrap gap-3">
-          <a href="{% url 'register' %}" class="btn btn-primary">Sign Up</a>
-          <a href="#about" class="btn btn-outline-light">Learn More</a>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 hero-content">
+                <h1 class="hero-title">Glance Job Fair 2.0</h1>
+                <h2 class="hero-subtitle">Your Gateway to Career Excellence</h2>
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="{% url 'register' %}" class="btn btn-primary">Sign Up</a>
+                    <a href="#about" class="btn btn-outline-light">Learn More</a>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
 </section>
 
 <!-- About Section -->
 <section id="about" class="section section-bg">
-  <div class="container">
-    <h2 class="section-title">About Glance 2.0</h2>
-    <p class="section-subtitle">The Premier Job Fair at GLA University</p>
+    <div class="container">
+        <h2 class="section-title">About Glance 2.0</h2>
+        <p class="section-subtitle">The Premier Job Fair at GLA University</p>
 
-    <div class="row align-items-center">
-      <div class="col-lg-6">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
         <p class="lead">
           Glance Job Fair 2.0 is GLA University's premier recruitment event
           connecting talented students with top companies across various
           industries.
         </p>
-        <p>This year's event features:</p>
-        <ul class="feature-list">
-          <li><i class="fas fa-check-circle"></i> 30+ Leading Companies</li>
-          <li><i class="fas fa-check-circle"></i> On-the-spot Interviews</li>
-          <li><i class="fas fa-check-circle"></i> Resume Building Workshops</li>
-          <li><i class="fas fa-check-circle"></i> Industry Expert Sessions</li>
-          <li><i class="fas fa-check-circle"></i> Networking Opportunities</li>
-        </ul>
-        <div class="stats-container">
-          <div class="stat-item">
-            <span class="stat-number">2000+</span>
-            <span class="stat-label">Students</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-number">30+</span>
-            <span class="stat-label">Companies</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-number">800+</span>
-            <span class="stat-label">Opportunities</span>
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-6">
-        <div class="ratio ratio-16x9">
+                <p>This year's event features:</p>
+                <ul class="feature-list">
+                    <li><i class="fas fa-check-circle"></i> 30+ Leading Companies</li>
+                    <li><i class="fas fa-check-circle"></i> On-the-spot Interviews</li>
+                    <li><i class="fas fa-check-circle"></i> Resume Building Workshops</li>
+                    <li><i class="fas fa-check-circle"></i> Industry Expert Sessions</li>
+                    <li><i class="fas fa-check-circle"></i> Networking Opportunities</li>
+                </ul>
+                <div class="stats-container">
+                    <div class="stat-item">
+                        <span class="stat-number">2000+</span>
+                        <span class="stat-label">Students</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">30+</span>
+                        <span class="stat-label">Companies</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">800+</span>
+                        <span class="stat-label">Opportunities</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="ratio ratio-16x9">
           <iframe src="https://www.youtube.com/embed/UZQZSZMWegE" title="About Glance 2.0" allowfullscreen></iframe>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
 </section>
 
 <!-- Companies Section -->
 <section id="companies" class="section">
-  <div class="container">
-    <h2 class="section-title">Participating Companies</h2>
+    <div class="container">
+        <h2 class="section-title">Participating Companies</h2>
     <p class="section-subtitle">Connect with industry leaders at Glance 2.0</p>
     
     <!-- New Company-container with scrolling animation -->
@@ -577,54 +577,54 @@
         <div class="Company">
             <div class="card">
                 <img src="{% static 'img/home/company/company1.jpeg' %}" alt="Company Image">
-            </div>
+                </div>
             <div class="card">
                 <img src="{% static 'img/home/company/company5.jpeg' %}" alt="Company Image">
             </div>
             <div class="card">
                 <img src="{% static 'img/home/company/company6.png' %}" alt="Company Image">
-            </div>
+                </div>
             <div class="card">
                 <img src="{% static 'img/home/company/company7.png' %}" alt="Company Image">
             </div>
             <div class="card">
                 <img src="{% static 'img/home/company/company8.png' %}" alt="Company Image">
-            </div>
+                </div>
             <div class="card">
                 <img src="{% static 'img/home/company/company9.png' %}" alt="Company Image">
             </div>
            
             <div class="card">
                 <img src="{% static 'img/home/company/company10.png' %}" alt="Company Image">
-            </div>
+                </div>
             <!-- Duplicate cards for seamless scrolling -->
             <div class="card">
                 <img src="{% static 'img/home/company/company11.jpg' %}" alt="Company Image">
             </div>
             <div class="card">
                 <img src="{% static 'img/home/company/company12.jpeg' %}" alt="Company Image">
-            </div>
+                </div>
             <div class="card">
                 <img src="{% static 'img/home/company/company13.jpeg' %}" alt="Company Image">
             </div>
             <div class="card">
                 <img src="{% static 'img/home/company/company14.jpeg' %}" alt="Company Image">
-            </div>
+                </div>
             <div class="card">
                 <img src="{% static 'img/home/company/company15.jpeg' %}" alt="Company Image">
             </div>
             <div class="card">
                 <img src="{% static 'img/home/company/company16.png' %}" alt="Company Image">
-            </div>
+                </div>
             <div class="card">
                 <img src="{% static 'img/home/company/company17.jpeg' %}" alt="Company Image">
             </div>
             <div class="card">
                 <img src="{% static 'img/home/company/company18.jpeg' %}" alt="Company Image">
-            </div>
+                </div>
         </div>
-    </div>
-    
+        </div>
+
     {% if user.is_superuser %}
     <div class="text-center mt-4">
       <a href="{% url 'administration' %}" class="btn btn-primary">
@@ -632,92 +632,92 @@
       </a>
     </div>
     {% elif not user.is_authenticated %}
-    <div class="text-center mt-5">
+        <div class="text-center mt-5">
       <p class="mb-3 register-prompt">Register to see all 30+ participating companies and their opportunities!</p>
       <a href="{% url 'register' %}" class="btn btn-primary btn-lg">
         <i class="fas fa-user-plus me-2"></i> Register Now
       </a>
-    </div>
+        </div>
     {% endif %}
-  </div>
+    </div>
 </section>
 
 <!-- Schedule Section -->
-    <section id="schedule" class="section section-bg">
-      <div class="container">
+<section id="schedule" class="section section-bg">
+    <div class="container">
         <h2 class="section-title">Event Schedule</h2>
         <p class="section-subtitle"></p>
 
         <div class="row">
-          <div class="col-lg-6">
-            <div class="schedule-card">
-              <div class="schedule-date">Day 1: April 17, 2025</div>
-              <div class="schedule-event">
-                <div class="event-time">9:00 AM - 10:00 AM</div>
-                <div class="event-title">Opening Ceremony</div>
+            <div class="col-lg-6">
+                <div class="schedule-card">
+                    <div class="schedule-date">Day 1: April 17, 2025</div>
+                    <div class="schedule-event">
+                        <div class="event-time">9:00 AM - 10:00 AM</div>
+                        <div class="event-title">Opening Ceremony</div>
                 <div class="event-location">
                   <i class="fas fa-map-marker-alt"></i> CSED
                 </div>
-              </div>
-              <div class="schedule-event">
-                <div class="event-time">10:00 AM - 12:00 PM</div>
-                <div class="event-title">Company Registrations</div>
+                    </div>
+                    <div class="schedule-event">
+                        <div class="event-time">10:00 AM - 12:00 PM</div>
+                        <div class="event-title">Company Registrations</div>
                 <div class="event-location">
                   <i class="fas fa-map-marker-alt"></i> CSED
                 </div>
-              </div>
-              <!-- <div class="schedule-event">
+                    </div>
+                  <!-- <div class="schedule-event">
                         <div class="event-time">12:00 PM - 1:00 PM</div>
                         <div class="event-title">Lunch Break</div>
                         <div class="event-location"><i class="fas fa-map-marker-alt"></i> Food Court</div>
-                    </div>-->
-              <div class="schedule-event">
-                <div class="event-time">12:00 PM - 5:00 PM</div>
-                <div class="event-title">Interview Sessions (Round 1)</div>
+                    </div>--> 
+                    <div class="schedule-event">
+                        <div class="event-time">12:00 PM - 5:00 PM</div>
+                        <div class="event-title">Interview Sessions (Round 1)</div>
                 <div class="event-location">
                   <i class="fas fa-map-marker-alt"></i> Interview Booths
                 </div>
-              </div>
+                    </div>
+                </div>
             </div>
-          </div>
-          <div class="col-lg-6">
-            <div class="schedule-card">
-              <div class="schedule-date">Day 2: April 18, 2025</div>
-              <div class="schedule-event">
-                <div class="event-time">9:00 AM - 11:00 AM</div>
-                <div class="event-title">Company Registrations</div>
+            <div class="col-lg-6">
+                <div class="schedule-card">
+                    <div class="schedule-date">Day 2: April 18, 2025</div>
+                    <div class="schedule-event">
+                        <div class="event-time">9:00 AM - 11:00 AM</div>
+                        <div class="event-title">Company Registrations</div>
                 <div class="event-location">
                   <i class="fas fa-map-marker-alt"></i>CSED
                 </div>
-              </div>
-              <!-- <div class="schedule-event">
+                    </div>
+                   <!-- <div class="schedule-event">
                         <div class="event-time">11:00 AM - 1:00 PM</div>
                         <div class="event-title">Panel Discussion: Industry Trends</div>
                         <div class="event-location"><i class="fas fa-map-marker-alt"></i> Main Auditorium</div>
                     </div>-->
-              <div class="schedule-event">
-                <div class="event-time">11:00 AM - 2:00 PM</div>
-                <div class="event-title">Interview Sessions (Round 2)</div>
+                    <div class="schedule-event">
+                        <div class="event-time">11:00 AM - 2:00 PM</div>
+                        <div class="event-title">Interview Sessions (Round 2)</div>
                 <div class="event-location">
                   <i class="fas fa-map-marker-alt"></i> Acamedic Block XI
                 </div>
-              </div>
-              <div class="schedule-event">
-                <div class="event-time">2:00 PM - 5:00 PM</div>
-                <div class="event-title">Interview Sessions (Final Round)</div>
+                    </div>
+                    <div class="schedule-event">
+                        <div class="event-time">2:00 PM - 5:00 PM</div>
+                        <div class="event-title">Interview Sessions (Final Round)</div>
                 <div class="event-location">
                   <i class="fas fa-map-marker-alt"></i> CSED
                 </div>
-              </div>
+                    </div>
+                </div>
             </div>
-          </div>
         </div>
-      </div>
-    </section>
+    </div>
+</section>
 
-    <!-- Glimpses of Glance 1.0 Gallery Section -->
-    <section id="gallery" class="section">
-      <div class="container">
+<!-- Glimpses of Glance 1.0 Gallery Section -->
+<section id="gallery" class="section">
+    <div class="container">
         <h2 class="section-title">Glimpses of Glance 1.0</h2>
         <p class="section-subtitle">
           Relive the memories from our previous event
@@ -742,198 +742,198 @@
         </div>
 
         <div class="row g-4 gallery-container">
-          <div class="col-md-4 col-sm-6 gallery-item" data-category="inauguration">
-            <div class="gallery-card">
+            <div class="col-md-4 col-sm-6 gallery-item" data-category="inauguration">
+                <div class="gallery-card">
               <img src="{% static 'img/home/i1.jpg' %}" alt="Inauguration Ceremony" class="img-fluid" />
-              <div class="gallery-overlay">
-                <div class="gallery-info">
-                  <h5>Inauguration Ceremony</h5>
-                  <p>Opening of Glance 1.0 by the University Director</p>
+                    <div class="gallery-overlay">
+                        <div class="gallery-info">
+                            <h5>Inauguration Ceremony</h5>
+                            <p>Opening of Glance 1.0 by the University Director</p>
                   <a href="{% static 'img/home/i1.jpg' %}" class="gallery-popup">
-                    <i class="fas fa-search-plus"></i>
-                  </a>
+                                <i class="fas fa-search-plus"></i>
+                            </a>
+                        </div>
+                    </div>
                 </div>
-              </div>
             </div>
-          </div>
 
-          <div class="col-md-4 col-sm-6 gallery-item" data-category="interviews">
-            <div class="gallery-card">
+            <div class="col-md-4 col-sm-6 gallery-item" data-category="interviews">
+                <div class="gallery-card">
               <img src="{% static 'img/home/inv.jpg' %}" alt="Interview Sessions" class="img-fluid" />
-              <div class="gallery-overlay">
-                <div class="gallery-info">
-                  <h5>Interview Sessions</h5>
-                  <p>Students participating in on-the-spot interviews</p>
+                    <div class="gallery-overlay">
+                        <div class="gallery-info">
+                            <h5>Interview Sessions</h5>
+                            <p>Students participating in on-the-spot interviews</p>
                   <a href="{% static 'img/home/inv.jpg' %}" class="gallery-popup">
-                    <i class="fas fa-search-plus"></i>
-                  </a>
+                                <i class="fas fa-search-plus"></i>
+                            </a>
+                        </div>
+                    </div>
                 </div>
-              </div>
             </div>
-          </div>
 
-          <div class="col-md-4 col-sm-6 gallery-item" data-category="workshops">
-            <div class="gallery-card">
+            <div class="col-md-4 col-sm-6 gallery-item" data-category="workshops">
+                <div class="gallery-card">
               <img src="{% static 'img/home/w.jpg' %}" alt="Technical Workshop" class="img-fluid" />
-              <div class="gallery-overlay">
-                <div class="gallery-info">
-                  <h5>Technical Workshop</h5>
-                  <p>Industry experts conducting technical workshops</p>
+                    <div class="gallery-overlay">
+                        <div class="gallery-info">
+                            <h5>Technical Workshop</h5>
+                            <p>Industry experts conducting technical workshops</p>
                   <a href="{% static 'img/home/w.jpg' %}" class="gallery-popup">
-                    <i class="fas fa-search-plus"></i>
-                  </a>
+                                <i class="fas fa-search-plus"></i>
+                            </a>
+                        </div>
+                    </div>
                 </div>
-              </div>
             </div>
-          </div>
 
-          <div class="col-md-4 col-sm-6 gallery-item" data-category="Team">
-            <div class="gallery-card">
+            <div class="col-md-4 col-sm-6 gallery-item" data-category="Team">
+                <div class="gallery-card">
               <img src="{% static 'img/home/workshop.jpg' %}" alt="Team Performance" class="img-fluid" />
-              <div class="gallery-overlay">
-                <div class="gallery-info">
-                  <h5>Team Performance</h5>
-                  <p>Students showcasing their talents during the event</p>
+                    <div class="gallery-overlay">
+                        <div class="gallery-info">
+                            <h5>Team Performance</h5>
+                            <p>Students showcasing their talents during the event</p>
                   <a href="{% static 'img/home/workshop.jpg' %}" class="gallery-popup">
-                    <i class="fas fa-search-plus"></i>
-                  </a>
+                                <i class="fas fa-search-plus"></i>
+                            </a>
+                        </div>
+                    </div>
                 </div>
-              </div>
             </div>
-          </div>
 
-          <div class="col-md-4 col-sm-6 gallery-item" data-category="interviews">
-            <div class="gallery-card">
+            <div class="col-md-4 col-sm-6 gallery-item" data-category="interviews">
+                <div class="gallery-card">
               <img src="{% static 'img/home/inv1.jpg' %}" alt="Company Booth" class="img-fluid" />
-              <div class="gallery-overlay">
-                <div class="gallery-info">
-                  <h5>Company Booth</h5>
-                  <p>Students interacting with company representatives</p>
+                    <div class="gallery-overlay">
+                        <div class="gallery-info">
+                            <h5>Company Booth</h5>
+                            <p>Students interacting with company representatives</p>
                   <a href="{% static 'img/home/inv1.jpg' %}" class="gallery-popup">
-                    <i class="fas fa-search-plus"></i>
-                  </a>
+                                <i class="fas fa-search-plus"></i>
+                            </a>
+                        </div>
+                    </div>
                 </div>
-              </div>
             </div>
-          </div>
 
-          <div class="col-md-4 col-sm-6 gallery-item" data-category="workshops">
-            <div class="gallery-card">
+            <div class="col-md-4 col-sm-6 gallery-item" data-category="workshops">
+                <div class="gallery-card">
               <img src="{% static 'img/home/w1.jpg' %}" alt="Resume Building Workshop" class="img-fluid" />
-              <div class="gallery-overlay">
-                <div class="gallery-info">
-                  <h5>Resume Building Workshop</h5>
-                  <p>Students learning how to create effective resumes</p>
+                    <div class="gallery-overlay">
+                        <div class="gallery-info">
+                            <h5>Resume Building Workshop</h5>
+                            <p>Students learning how to create effective resumes</p>
                   <a href="{% static 'img/home/w1.jpg' %}" class="gallery-popup">
-                    <i class="fas fa-search-plus"></i>
-                  </a>
+                                <i class="fas fa-search-plus"></i>
+                            </a>
+                        </div>
+                    </div>
                 </div>
-              </div>
             </div>
-          </div>
 
-          <div class="col-md-4 col-sm-6 gallery-item" data-category="inauguration">
-            <div class="gallery-card">
+            <div class="col-md-4 col-sm-6 gallery-item" data-category="inauguration">
+                <div class="gallery-card">
               <img src="{% static 'img/home/i.jpg' %}" alt="Ribbon Cutting" class="img-fluid" />
-              <div class="gallery-overlay">
-                <div class="gallery-info">
-                  <h5>Inauguration Ceremony</h5>
-                  <p>Official inauguration of Glance 1.0</p>
+                    <div class="gallery-overlay">
+                        <div class="gallery-info">
+                            <h5>Inauguration Ceremony</h5>
+                            <p>Official inauguration of Glance 1.0</p>
                   <a href="{% static 'img/home/i.jpg' %}" class="gallery-popup">
-                    <i class="fas fa-search-plus"></i>
-                  </a>
+                                <i class="fas fa-search-plus"></i>
+                            </a>
+                        </div>
+                    </div>
                 </div>
-              </div>
             </div>
-          </div>
 
-          <div class="col-md-4 col-sm-6 gallery-item" data-category="Team">
-            <div class="gallery-card">
+            <div class="col-md-4 col-sm-6 gallery-item" data-category="Team">
+                <div class="gallery-card">
               <img src="{% static 'img/home/t.jpg' %}" alt="Award Ceremony" class="img-fluid" />
-              <div class="gallery-overlay">
-                <div class="gallery-info">
-                  <h5></h5>
-                  <p>Team of Glance 1.0</p>
+                    <div class="gallery-overlay">
+                        <div class="gallery-info">
+                            <h5></h5>
+                            <p>Team of Glance 1.0</p>
                   <a href="{% static 'img/home/t.jpg' %}" class="gallery-popup">
-                    <i class="fas fa-search-plus"></i>
-                  </a>
+                                <i class="fas fa-search-plus"></i>
+                            </a>
+                        </div>
+                    </div>
                 </div>
-              </div>
             </div>
-          </div>
 
-          <div class="col-md-4 col-sm-6 gallery-item" data-category="interviews">
-            <div class="gallery-card">
+            <div class="col-md-4 col-sm-6 gallery-item" data-category="interviews">
+                <div class="gallery-card">
               <img src="{% static 'img/home/inv4.jpg' %}" alt="Group Discussion" class="img-fluid" />
-              <div class="gallery-overlay">
-                <div class="gallery-info">
-                  <h5>Group Discussion</h5>
-                  <p>Students participating in group discussion rounds</p>
+                    <div class="gallery-overlay">
+                        <div class="gallery-info">
+                            <h5>Group Discussion</h5>
+                            <p>Students participating in group discussion rounds</p>
                   <a href="{% static 'img/home/inv4.jpg' %}" class="gallery-popup">
-                    <i class="fas fa-search-plus"></i>
-                  </a>
+                                <i class="fas fa-search-plus"></i>
+                            </a>
+                        </div>
+                    </div>
                 </div>
-              </div>
             </div>
-          </div>
         </div>
 
         <div class="text-center mt-5">
-          <!--  <a href="#" class="btn btn-primary">View More Photos</a>-->
+            <!--  <a href="#" class="btn btn-primary">View More Photos</a>-->
         </div>
-      </div>
-    </section>
+    </div>
+</section>
 
-    <!-- Team Section -->
-    <section id="team" class="section section-bg">
-      <div class="container">
+<!-- Team Section -->
+<section id="team" class="section section-bg">
+    <div class="container">
         <h2 class="section-title">Meet Our Team</h2>
         <p class="section-subtitle">
           The dedicated individuals behind Glance 2.0
         </p>
 
         <div class="row g-4 justify-content-center">
-          <!-- Team Member 1 -->
-          <div class="col-lg-3 col-md-6">
-            <div class="team-card">
-              <div class="team-img">
+            <!-- Team Member 1 -->
+            <div class="col-lg-3 col-md-6">
+                <div class="team-card">
+                    <div class="team-img">
                 <img src="{% static 'img/home/team/pv.jpg' %}" alt="Paras Mittal" class="img-fluid" />
-              </div>
-              <div class="team-info">
+                    </div>
+                    <div class="team-info">
                 <h4>Dr.Prince Vohra</h4>
                 <p class="team-position">Vice President</p>
-                <p class="team-desc"></p>
-              </div>
+                        <p class="team-desc"></p>
+                    </div>
+                </div>
             </div>
-          </div>
 
-          <!-- Team Member 2 -->
-          <div class="col-lg-3 col-md-6">
-            <div class="team-card">
-              <div class="team-img">
+            <!-- Team Member 2 -->
+            <div class="col-lg-3 col-md-6">
+                <div class="team-card">
+                    <div class="team-img">
                 <img src="{% static 'img/home/team/nk.jpg' %}" alt="Mr. Nishant Kumar" class="img-fluid" />
-              </div>
-              <div class="team-info">
+                    </div>
+                    <div class="team-info">
                 <h4>Mr.Nishant Kumar</h4>
-                <p class="team-position">Senior Executive</p>
-                <p class="team-desc"></p>
-              </div>
+                        <p class="team-position">Senior Executive</p>
+                        <p class="team-desc"></p>
+                    </div>
+                </div>
             </div>
-          </div>
 
-          <!-- Team Member 2 -->
-          <div class="col-lg-3 col-md-6">
-            <div class="team-card">
-              <div class="team-img">
+            <!-- Team Member 2 -->
+            <div class="col-lg-3 col-md-6">
+                <div class="team-card">
+                    <div class="team-img">
                 <img src="{% static 'img/home/team/db.jpg' %}" alt="DK" class="img-fluid" />
-              </div>
-              <div class="team-info">
+                    </div>
+                    <div class="team-info">
                 <h4>Ms.Divyanshee Badyal</h4>
-                <p class="team-position">Executive</p>
+                        <p class="team-position">Executive</p>
                 <p class="team-desc">(For Greater Noida Campus)</p>
-              </div>
+                    </div>
+                </div>
             </div>
-          </div>
         </div>
       </div>
     </section>
@@ -996,99 +996,99 @@
       </div>
     </section>
 
-    <!--special thanks -->
-    <section id="special-thanks" class="section">
-      <div class="container">
-        <h2 class="section-title">Special Thanks</h2>
-        <p class="section-subtitle"></p>
-
-        <div class="row justify-content-center">
-          <div class="col-lg-6">
-            <div class="special-thanks-card">
+            <!--special thanks -->  
+            <section id="special-thanks" class="section">
+                <div class="container">
+                    <h2 class="section-title">Special Thanks</h2>
+                    <p class="section-subtitle"></p>
+            
+                    <div class="row justify-content-center">
+                        <div class="col-lg-6">
+                            <div class="special-thanks-card">
               <div class="special-thanks-img text-center">
                 <img src="{% static 'img/home/team/as.jpg' %}" alt="Anshy Sir"
                   class="img-fluid rounded-circle mx-auto d-block" style="max-width: 200px" />
-              </div>
-              <div class="special-thanks-info text-center mt-4">
-                <h3>Dr. Anshy Singh</h3>
-                <p class="special-thanks-position">Associate Professor</p>
+                                </div>
+                                <div class="special-thanks-info text-center mt-4">
+                                    <h3>Dr. Anshy Singh</h3>
+                                    <p class="special-thanks-position">Associate Professor</p>
                 <p class="special-thanks-desc">
                   We extend our deepest gratitude to Dr. Anshy Singh and his
                   team for their unwavering support.
                 </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-    <!-- Contact Section -->
-    <section id="contact" class="section">
-      <div class="container">
-        <h2 class="section-title">Contact Us</h2>
-        <p class="section-subtitle">Get in touch with our team</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- Contact Section -->
+            <section id="contact" class="section">
+                <div class="container">
+                    <h2 class="section-title">Contact Us</h2>
+                    <p class="section-subtitle">Get in touch with our team</p>
 
-        <div class="row">
-          <div class="col-lg-5">
-            <div class="contact-info">
-              <div class="contact-item">
-                <div class="contact-icon">
-                  <i class="fas fa-map-marker-alt"></i>
-                </div>
-                <div class="contact-details">
-                  <h4>Location</h4>
-                  <p>GLA University, Mathura</p>
-                  <p>NH-2, Mathura-Delhi Highway</p>
-                  <p>P.O. Chaumuhan, Mathura, Uttar Pradesh - 281406</p>
-                </div>
-              </div>
-              <div class="contact-item">
-                <div class="contact-icon">
-                  <i class="fas fa-phone"></i>
-                </div>
-                <div class="contact-details">
-                  <h4>Phone</h4>
+                    <div class="row">
+                        <div class="col-lg-5">
+                            <div class="contact-info">
+                                <div class="contact-item">
+                                    <div class="contact-icon">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                    </div>
+                                    <div class="contact-details">
+                                        <h4>Location</h4>
+                                        <p>GLA University, Mathura</p>
+                                        <p>NH-2, Mathura-Delhi Highway</p>
+                                        <p>P.O. Chaumuhan, Mathura, Uttar Pradesh - 281406</p>
+                                    </div>
+                                </div>
+                                <div class="contact-item">
+                                    <div class="contact-icon">
+                                        <i class="fas fa-phone"></i>
+                                    </div>
+                                    <div class="contact-details">
+                                        <h4>Phone</h4>
                   <p>+91 9068405049</p>
-                </div>
-              </div>
-              <div class="contact-item">
-                <div class="contact-icon">
-                  <i class="fas fa-envelope"></i>
-                </div>
-                <div class="contact-details">
-                  <h4>Email</h4>
-                  <p>alumniassociation@gla.ac.in</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-lg-7">
-            <form class="contact-form">
-              <div class="row">
-                <div class="col-md-6">
+                                    </div>
+                                </div>
+                                <div class="contact-item">
+                                    <div class="contact-icon">
+                                        <i class="fas fa-envelope"></i>
+                                    </div>
+                                    <div class="contact-details">
+                                        <h4>Email</h4>
+                                        <p>alumniassociation@gla.ac.in</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-7">
+                            <form class="contact-form">
+                                <div class="row">
+                                    <div class="col-md-6">
                   <input type="text" class="form-control" placeholder="Your Name" required />
-                </div>
-                <div class="col-md-6">
+                                    </div>
+                                    <div class="col-md-6">
                   <input type="email" class="form-control" placeholder="Your Email" required />
-                </div>
-                <div class="col-12">
+                                    </div>
+                                    <div class="col-12">
                   <input type="text" class="form-control" placeholder="Subject" required />
-                </div>
-                <div class="col-12">
+                                    </div>
+                                    <div class="col-12">
                   <textarea class="form-control" rows="5" placeholder="Your Message" required></textarea>
-                </div>
-                <div class="col-12">
+                                    </div>
+                                    <div class="col-12">
                   <button type="submit" class="btn btn-primary">
                     Send Message
                   </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-    </section>
-  </div>
+            </section>
+    </div>
 </section>
 
 <script>

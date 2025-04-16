@@ -85,9 +85,16 @@ class StudentsDataTablesView(View):
                 filters.append(Q(phone_number__icontains=phone_filter))
             
             # Course and Year filters with validation
-            course_filter = request.GET.get('course', '').strip()[:100]
-            if course_filter:
-                filters.append(Q(course__icontains=course_filter))
+            course_filters = request.GET.getlist('course[]')  # Get all selected courses
+            if course_filters:
+                course_query = Q()
+                for course in course_filters:
+                    course = course.strip()[:100]  # Sanitize and limit length
+                    if course:
+                        course_query |= Q(course__icontains=course)
+                if course_query:
+                    filters.append(course_query)
+                    logger.debug(f"Applied course filters: {course_filters}")
             
             year_filter = request.GET.get('year', '').strip()[:15]
             if year_filter and year_filter != 'all':

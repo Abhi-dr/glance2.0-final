@@ -147,22 +147,103 @@
                             </div>
                             <div class="col-md-3">
                                 <label for="course" class="form-label">Course</label>
-                                <select class="form-select" id="course" name="course">
-                                    <option value="">All Courses</option>
-                                    <option value="B.Tech">B.Tech</option>
-                                    <option value="BBA">BBA</option>
-                                    <option value="BCA">BCA</option>
-                                    <option value="MBA">MBA</option>
-                                    <option value="MCA">MCA</option>
-                                    <option value="M.Tech">M.Tech</option>
-                                    <option value="B.Sc">B.Sc</option>
-                                    <option value="M.Sc">M.Sc</option>
-                                    <option value="B.Com">B.Com</option>
-                                    <option value="M.Com">M.Com</option>
-                                    <option value="B.A">B.A</option>
-                                    <option value="M.A">M.A</option>
-                                    <option value="Ph.D">Ph.D</option>
+                                <div class="course-checkbox-group border rounded p-3" style="max-height: 200px; overflow-y: auto;">
+                                    <div class="form-check">
+                                        <input class="form-check-input course-checkbox" type="checkbox" name="course" value="B.Tech Computer Science" id="filter_cs">
+                                        <label class="form-check-label" for="filter_cs">B.Tech Computer Science</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input course-checkbox" type="checkbox" name="course" value="B.Tech Information Technology" id="filter_it">
+                                        <label class="form-check-label" for="filter_it">B.Tech Information Technology</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input course-checkbox" type="checkbox" name="course" value="B.Tech Electronics" id="filter_ec">
+                                        <label class="form-check-label" for="filter_ec">B.Tech Electronics</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input course-checkbox" type="checkbox" name="course" value="B.Tech Biotech" id="filter_bt">
+                                        <label class="form-check-label" for="filter_bt">B.Tech Biotech</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input course-checkbox" type="checkbox" name="course" value="B.Tech Civil" id="filter_ce">
+                                        <label class="form-check-label" for="filter_ce">B.Tech Civil</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input course-checkbox" type="checkbox" name="course" value="B.Tech Electrical" id="filter_ee">
+                                        <label class="form-check-label" for="filter_ee">B.Tech Electrical</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input course-checkbox" type="checkbox" name="course" value="B.Tech Mechanical" id="filter_me">
+                                        <label class="form-check-label" for="filter_me">B.Tech Mechanical</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input course-checkbox" type="checkbox" name="course" value="BCA" id="filter_bca">
+                                        <label class="form-check-label" for="filter_bca">BCA</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input course-checkbox" type="checkbox" name="course" value="MCA" id="filter_mca">
+                                        <label class="form-check-label" for="filter_mca">MCA</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input course-checkbox" type="checkbox" name="course" value="M.Tech Computer Science" id="filter_mcs">
+                                        <label class="form-check-label" for="filter_mcs">M.Tech Computer Science</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input course-checkbox" type="checkbox" name="course" value="M.Tech Information Technology" id="filter_mit">
+                                        <label class="form-check-label" for="filter_mit">M.Tech Information Technology</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input course-checkbox" type="checkbox" name="course" value="MBA" id="filter_mba">
+                                        <label class="form-check-label" for="filter_mba">MBA</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input course-checkbox" type="checkbox" name="course" value="B.Com" id="filter_bcom">
+                                        <label class="form-check-label" for="filter_bcom">B.Com</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input course-checkbox" type="checkbox" name="course" value="M.Com" id="filter_mcom">
+                                        <label class="form-check-label" for="filter_mcom">M.Com</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input course-checkbox" type="checkbox" name="course" value="BBA" id="filter_bba">
+                                        <label class="form-check-label" for="filter_bba">BBA</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input course-checkbox" type="checkbox" name="course" value="LLB" id="filter_llb">
+                                        <label class="form-check-label" for="filter_llb">LLB</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="companies" class="form-label">Companies</label>
+                                <div class="companies-checkbox-group border rounded p-3" style="max-height: 200px; overflow-y: auto;">
+                                    {% for company in companies %}
+                                    <div class="form-check">
+                                        <input class="form-check-input company-checkbox" type="checkbox" name="companies" value="{{ company.id }}" id="company_{{ company.id }}">
+                                        <label class="form-check-label" for="company_{{ company.id }}">{{ company.name }}</label>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="jobs" class="form-label">Jobs</label>
+                                <div class="jobs-checkbox-group border rounded p-3" style="max-height: 200px; overflow-y: auto;">
+                                    {% for job in jobs %}
+                                    <div class="form-check job-option" data-company-id="{{ job.company.id }}">
+                                        <input class="form-check-input job-checkbox" type="checkbox" name="jobs" value="{{ job.id }}" id="job_{{ job.id }}">
+                                        <label class="form-check-label" for="job_{{ job.id }}">{{ job.title }} ({{ job.company.name }})</label>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="interview_date" class="form-label">Interview Date</label>
+                                <select class="form-select" id="interview_date" name="interview_date" multiple>
+                                    <option value="17th April, 2025">17th April, 2025</option>
+                                    <option value="18th April, 2025">18th April, 2025</option>
+                                    <option value="19th April, 2025">19th April, 2025</option>
                                 </select>
+                                <small class="text-muted">Hold Ctrl/Cmd to select multiple dates</small>
                             </div>
                             <div class="col-md-3">
                                 <label for="year" class="form-label">Year</label>
@@ -229,13 +310,21 @@
                             </div>
                             <div class="col-md-3">
                                 <label for="company" class="form-label">Applied to Company</label>
-                                <input type="text" class="form-control" id="company" name="company" 
-                                    placeholder="Company name...">
+                                <select class="form-select" id="company" name="company">
+                                    <option value="">All Companies</option>
+                                    {% for company in companies %}
+                                    <option value="{{ company.name }}" data-company-id="{{ company.id }}">{{ company.name }}</option>
+                                    {% endfor %}
+                                </select>
                             </div>
                             <div class="col-md-3">
                                 <label for="job" class="form-label">Applied to Job</label>
-                                <input type="text" class="form-control" id="job" name="job"
-                                    placeholder="Job title...">
+                                <select class="form-select" id="job" name="job" disabled>
+                                    <option value="">All Jobs</option>
+                                    {% for job in jobs %}
+                                    <option value="{{ job.title }}" data-company-id="{{ job.company.id }}" class="job-option">{{ job.title }} ({{ job.company.name }})</option>
+                                    {% endfor %}
+                                </select>
                             </div>
                             <div class="col-md-3">
                                 <label for="attendance_status" class="form-label">Attendance Status</label>
@@ -513,7 +602,7 @@
                     deferRender: true,
                     searchDelay: 500,
                     ajax: {
-                        url: '/accounts/api/datatables/students/',
+                        url: '/administration/get_filtered_students',
                         type: 'GET',
                         data: function (d) {
                             // Add filter parameters
@@ -521,7 +610,10 @@
                             d.name = $('#name').val();
                             d.email = $('#email').val();
                             d.phone = $('#phone').val();
-                            d.course = $('#course').val();
+                            // Get all selected courses
+                            d['course[]'] = $('.course-checkbox:checked').map(function() {
+                                return $(this).val();
+                            }).get();
                             d.year = $('#year').val();
                             d.cgpa = $('#cgpa').val();
                             d.cgpa_operator = $('#cgpa_operator').val();
@@ -535,16 +627,7 @@
                             d.attendance_status = $('#attendance_status').val();
                             
                             // Debug logging
-                            console.log("DataTable request parameters:", {
-                                id: d.id,
-                                name: d.name,
-                                email: d.email,
-                                companies_left: d.companies_left,
-                                companies_operator: d.companies_operator,
-                                company: d.company,
-                                job: d.job,
-                                attendance_status: d.attendance_status
-                            });
+                            console.log('DataTables request data:', d);
                             return d;
                         },
                         beforeSend: function () {
@@ -1189,5 +1272,178 @@ $(document).ready(function() {
             });
         });
     });
+</script>
+
+<script>
+// Add this to your existing JavaScript
+document.addEventListener('DOMContentLoaded', function() {
+    // Function to update hidden course field with selected values
+    function updateCourseField() {
+        const selectedCourses = Array.from(document.querySelectorAll('.course-checkbox:checked'))
+            .map(checkbox => checkbox.value)
+            .join(',');
+        
+        // Update the hidden field for form submission
+        const hiddenCourseField = document.createElement('input');
+        hiddenCourseField.type = 'hidden';
+        hiddenCourseField.name = 'courses';
+        hiddenCourseField.value = selectedCourses;
+        
+        // Remove any existing hidden course field
+        const existingField = document.querySelector('input[name="courses"]');
+        if (existingField) {
+            existingField.remove();
+        }
+        
+        // Add the new hidden field to the form
+        document.querySelector('form').appendChild(hiddenCourseField);
+    }
+    
+    // Add event listeners to all course checkboxes
+    document.querySelectorAll('.course-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', updateCourseField);
+    });
+    
+    // Update on form submission
+    document.querySelector('form').addEventListener('submit', function(e) {
+        updateCourseField();
+    });
+});
+</script>
+
+<script>
+// Add event listener for course checkboxes to refresh table
+$(document).ready(function() {
+    $('.course-checkbox').on('change', function() {
+        $('#dataTable').DataTable().ajax.reload();
+    });
+});
+</script>
+
+<script>
+    // Initialize company-job filter relationship
+    $(document).ready(function() {
+        // Hide all job options initially
+        $('.job-option').hide();
+        
+        // Handle company selection change
+        $('#company').on('change', function() {
+            const selectedCompanyName = $(this).val();
+            const jobSelect = $('#job');
+            
+            // Reset job dropdown
+            jobSelect.val('');
+            
+            if (selectedCompanyName) {
+                // Enable job dropdown and show only jobs for selected company
+                jobSelect.prop('disabled', false);
+                $('.job-option').each(function() {
+                    const jobCompanyName = $(this).text().match(/\((.*?)\)$/)[1];
+                    if (jobCompanyName === selectedCompanyName) {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                    }
+                });
+            } else {
+                // If no company selected, disable and reset job dropdown
+                jobSelect.prop('disabled', true);
+                $('.job-option').hide();
+            }
+        });
+        
+        // Handle form reset
+        $('#resetFilters').on('click', function() {
+            const jobSelect = $('#job');
+            jobSelect.prop('disabled', true);
+            $('.job-option').hide();
+        });
+    });
+</script>
+
+<script>
+// Handle company and job selection
+$(document).ready(function() {
+    // Initially hide all job options
+    $('.job-option').hide();
+    
+    // When companies are selected, show their jobs
+    $('.company-checkbox').on('change', function() {
+        const selectedCompanies = $('.company-checkbox:checked').map(function() {
+            return $(this).val();
+        }).get();
+        
+        if (selectedCompanies.length === 0) {
+            // If no companies selected, hide all jobs
+            $('.job-option').hide();
+            $('.job-checkbox').prop('checked', false);
+        } else {
+            // Show jobs for selected companies
+            $('.job-option').each(function() {
+                const companyId = $(this).data('company-id');
+                if (selectedCompanies.includes(companyId.toString())) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                    $(this).find('.job-checkbox').prop('checked', false);
+                }
+            });
+        }
+    });
+    
+    // Initialize multiple select for interview dates
+    $('#interview_date').select2({
+        placeholder: "Select interview dates",
+        allowClear: true
+    });
+    
+    // Update active filters display
+    function updateActiveFilters() {
+        const activeFilters = [];
+        
+        // Add selected courses
+        const selectedCourses = $('.course-checkbox:checked').map(function() {
+            return $(this).val();
+        }).get();
+        if (selectedCourses.length > 0) {
+            activeFilters.push(`Courses: ${selectedCourses.join(', ')}`);
+        }
+        
+        // Add selected companies
+        const selectedCompanies = $('.company-checkbox:checked').map(function() {
+            return $(this).next('label').text();
+        }).get();
+        if (selectedCompanies.length > 0) {
+            activeFilters.push(`Companies: ${selectedCompanies.join(', ')}`);
+        }
+        
+        // Add selected jobs
+        const selectedJobs = $('.job-checkbox:checked').map(function() {
+            return $(this).next('label').text();
+        }).get();
+        if (selectedJobs.length > 0) {
+            activeFilters.push(`Jobs: ${selectedJobs.join(', ')}`);
+        }
+        
+        // Add selected interview dates
+        const selectedDates = $('#interview_date').val();
+        if (selectedDates && selectedDates.length > 0) {
+            activeFilters.push(`Interview Dates: ${selectedDates.join(', ')}`);
+        }
+        
+        // Update the display
+        const activeFiltersHtml = activeFilters.map(filter => 
+            `<span class="badge bg-primary filter-badge">${filter}</span>`
+        ).join('');
+        
+        $('#activeFilters').html(activeFiltersHtml);
+    }
+    
+    // Update active filters when selections change
+    $('.course-checkbox, .company-checkbox, .job-checkbox, #interview_date').on('change', updateActiveFilters);
+    
+    // Initial update of active filters
+    updateActiveFilters();
+});
 </script>
 {% endblock %}

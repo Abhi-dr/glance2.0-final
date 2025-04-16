@@ -27,8 +27,8 @@ class Student(User):
         
     passout_year = models.CharField(max_length=4, blank=True, null=True)
 
-    
-    course = models.CharField(max_length=100, blank=True, null=True)
+    # Updated course field to store multiple courses as comma-separated values
+    course = models.CharField(max_length=500, blank=True, null=True, help_text="Comma-separated list of courses")
     
     year = models.CharField(max_length=15, blank=True, null=True)
     cgpa = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)

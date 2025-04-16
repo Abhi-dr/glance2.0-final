@@ -719,8 +719,171 @@ def filter_page(request):
     """
     user = User.objects.get(id=request.user.id)
     
+    # Get all companies and jobs for dropdowns
+    companies = Company.objects.all().order_by('name')
+    jobs = Job.objects.all().order_by('title')
+    
     return render(request, "administration/filter_page.html", {
         "user": user,
+        "companies": companies,
+        "jobs": jobs,
+    })
+
+@login_required(login_url='login')
+@staff_member_required(login_url='login')
+def get_filtered_students(request):
+    """
+    AJAX view to handle filtering students based on various criteria
+    """
+    students = Student.objects.all()
+    
+    # Basic filters
+    student_id = request.GET.get('id')
+    name = request.GET.get('name')
+    email = request.GET.get('email')
+    phone = request.GET.get('phone')
+    
+    # Course filter (multiple selection)
+    courses = request.GET.getlist('course[]')  # Changed to match frontend parameter name
+    
+    # Company and job filters (multiple selection)
+    company_ids = request.GET.getlist('companies[]')  # Changed to match frontend parameter name
+    job_ids = request.GET.getlist('jobs[]')  # Changed to match frontend parameter name
+    
+    # Interview date filter (multiple selection)
+    interview_dates = request.GET.getlist('interview_date[]')  # Changed to match frontend parameter name
+    
+    # Other filters
+    year = request.GET.get('year')
+    cgpa = request.GET.get('cgpa')
+    cgpa_operator = request.GET.get('cgpa_operator', '=')
+    status = request.GET.get('status')
+    companies_left = request.GET.get('companies_left')
+    companies_operator = request.GET.get('companies_operator', '=')
+    profile_score = request.GET.get('profile_score')
+    score_operator = request.GET.get('score_operator', '=')
+    attendance_status = request.GET.get('attendance_status')
+    
+    # Apply basic filters
+    if student_id:
+        students = students.filter(id=student_id)
+    if name:
+        students = students.filter(Q(first_name__icontains=name) | Q(last_name__icontains=name))
+    if email:
+        students = students.filter(email__icontains=email)
+    if phone:
+        students = students.filter(phone_number__icontains=phone)
+    
+    # Apply course filter
+    if courses:
+        students = students.filter(course__in=courses)
+    
+    # Apply company filter
+    if company_ids:
+        # Get students who have applied to any of the selected companies
+        students = students.filter(application__job__company_id__in=company_ids).distinct()
+    
+    # Apply job filter
+    if job_ids:
+        # Get students who have applied to any of the selected jobs
+        students = students.filter(application__job_id__in=job_ids).distinct()
+    
+    # Apply interview date filter
+    if interview_dates:
+        # Get students who have applied to jobs with the selected interview dates
+        students = students.filter(application__job__interview_date__in=interview_dates).distinct()
+    
+    # Apply year filter
+    if year:
+        students = students.filter(year=year)
+    
+    # Apply CGPA filter
+    if cgpa:
+        try:
+            cgpa_value = float(cgpa)
+            if cgpa_operator == '>':
+                students = students.filter(cgpa__gt=cgpa_value)
+            elif cgpa_operator == '<':
+                students = students.filter(cgpa__lt=cgpa_value)
+            elif cgpa_operator == '>=':
+                students = students.filter(cgpa__gte=cgpa_value)
+            elif cgpa_operator == '<=':
+                students = students.filter(cgpa__lte=cgpa_value)
+            else:
+                students = students.filter(cgpa=cgpa_value)
+        except (ValueError, TypeError):
+            pass
+    
+    # Apply status filter
+    if status:
+        students = students.filter(alumni_status=status)
+    
+    # Apply companies left filter
+    if companies_left:
+        try:
+            companies_value = int(companies_left)
+            if companies_operator == '>':
+                students = students.filter(no_of_companies_left__gt=companies_value)
+            elif companies_operator == '<':
+                students = students.filter(no_of_companies_left__lt=companies_value)
+            elif companies_operator == '>=':
+                students = students.filter(no_of_companies_left__gte=companies_value)
+            elif companies_operator == '<=':
+                students = students.filter(no_of_companies_left__lte=companies_value)
+            else:
+                students = students.filter(no_of_companies_left=companies_value)
+        except (ValueError, TypeError):
+            pass
+    
+    # Apply profile score filter
+    if profile_score:
+        try:
+            score_value = float(profile_score)
+            if score_operator == '>':
+                students = students.filter(profile_score__gt=score_value)
+            elif score_operator == '<':
+                students = students.filter(profile_score__lt=score_value)
+            elif score_operator == '>=':
+                students = students.filter(profile_score__gte=score_value)
+            elif score_operator == '<=':
+                students = students.filter(profile_score__lte=score_value)
+            else:
+                students = students.filter(profile_score=score_value)
+        except (ValueError, TypeError):
+            pass
+    
+    # Apply attendance status filter
+    if attendance_status:
+        if attendance_status == 'present':
+            students = students.filter(application__attendance_status='present')
+        elif attendance_status == 'absent':
+            students = students.filter(application__attendance_status='absent')
+        elif attendance_status == 'not_marked':
+            students = students.filter(application__attendance_status='not_marked')
+    
+    # Prepare data for DataTables
+    data = []
+    for student in students:
+        data.append({
+            'id': student.id,
+            'first_name': student.first_name,
+            'last_name': student.last_name,
+            'username': student.email,
+            'phone_number': student.phone_number,
+            'course': student.course,
+            'year': student.year,
+            'cgpa': student.cgpa,
+            'alumni_status': student.alumni_status,
+            'no_of_companies_left': student.no_of_companies_left,
+            'profile_score': student.profile_score,
+            'actions': f'<a href="/administration/student/{student.id}" class="btn btn-sm btn-primary"><i class="fas fa-eye"></i></a>'
+        })
+    
+    return JsonResponse({
+        'draw': int(request.GET.get('draw', 1)),
+        'recordsTotal': students.count(),
+        'recordsFiltered': students.count(),
+        'data': data
     })
 
 @login_required(login_url='login')
@@ -737,7 +900,7 @@ def send_message_to_filtered_students(request):
         name = request.POST.get('name', '')
         email = request.POST.get('email', '')
         phone = request.POST.get('phone', '')
-        course = request.POST.get('course', '')
+        courses = request.POST.getlist('course')  # Get all selected courses
         year = request.POST.get('year', '')
         cgpa = request.POST.get('cgpa', '')
         cgpa_operator = request.POST.get('cgpa_operator', '=')
@@ -751,7 +914,7 @@ def send_message_to_filtered_students(request):
         attendance_status = request.POST.get('attendance_status', '')
         
         # Debug output
-        print(f"Message filter params: id={id}, name={name}, email={email}, phone={phone}, course={course}, year={year}")
+        print(f"Message filter params: id={id}, name={name}, email={email}, phone={phone}, courses={courses}, year={year}")
         print(f"Advanced filter params: cgpa={cgpa}({cgpa_operator}), status={status}, companies_left={companies_left}({companies_operator})")
         print(f"Additional filters: profile_score={profile_score}({score_operator}), company='{company}', job='{job}', attendance='{attendance_status}'")
         
@@ -773,8 +936,12 @@ def send_message_to_filtered_students(request):
         if phone:
             students = students.filter(phone_number__icontains=phone)
             print(f"After phone filter: {students.count()} students")
-        if course:
-            students = students.filter(course__icontains=course)
+        if courses:
+            # Filter students who have any of the selected courses
+            course_query = Q()
+            for course in courses:
+                course_query |= Q(course__icontains=course)
+            students = students.filter(course_query)
             print(f"After course filter: {students.count()} students")
         if year and year != 'all':
             students = students.filter(year=year)
@@ -988,14 +1155,14 @@ def send_whatsapp_to_filtered_students(request):
         name = request.POST.get('name', '')
         email = request.POST.get('email', '')
         phone = request.POST.get('phone', '')
-        course = request.POST.get('course', '')
+        courses = request.POST.getlist('course')  # Get all selected courses
         year = request.POST.get('year', '')
         attendance_status = request.POST.get('attendance_status', '')
         company = request.POST.get('company', '')
         
         # Debug output
         print(f"WhatsApp filter params: id={id}, name={name}, email={email}, phone={phone}")
-        print(f"Other filters: course={course}, year={year}, attendance_status={attendance_status}, company={company}")
+        print(f"Other filters: courses={courses}, year={year}, attendance_status={attendance_status}, company={company}")
         
         # Start with all students
         students = Student.objects.all()
@@ -1015,8 +1182,12 @@ def send_whatsapp_to_filtered_students(request):
         if phone:
             students = students.filter(phone_number__icontains=phone)
             print(f"After phone filter: {students.count()} students")
-        if course:
-            students = students.filter(course__icontains=course)
+        if courses:
+            # Filter students who have any of the selected courses
+            course_query = Q()
+            for course in courses:
+                course_query |= Q(course__icontains=course)
+            students = students.filter(course_query)
             print(f"After course filter: {students.count()} students")
         if year and year != 'all':
             students = students.filter(year=year)
