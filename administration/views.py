@@ -131,17 +131,50 @@ def all_registrations(request):
 @login_required(login_url='login')
 @staff_member_required(login_url='login')
 def company(request, id):
-    
-    user = User.objects.get(id = request.user.id)
-    
+    user = User.objects.get(id=request.user.id)
     company = Company.objects.get(id=id)
-    jobs = Job.objects.filter(company=company)
     
+    # Get all jobs for the company with their applications
+    jobs = Job.objects.filter(company=company).prefetch_related('applications')
+    
+    # Calculate statistics
+    total_applications = sum(job.applications.count() for job in jobs)
+    
+    # Calculate status counts
+    pending_count = 0
+    accepted_count = 0
+    rejected_count = 0
+    
+    for job in jobs:
+        for application in job.applications.all():
+            if application.status == 'pending':
+                pending_count += 1
+            elif application.status == 'accepted':
+                accepted_count += 1
+            elif application.status == 'rejected':
+                rejected_count += 1
+    
+    # Get job-wise statistics
+    job_stats = []
+    for job in jobs:
+        job_applications = job.applications.all()
+        job_stats.append({
+            'title': job.title,
+            'total': len(job_applications),
+            'pending': sum(1 for a in job_applications if a.status == 'pending'),
+            'accepted': sum(1 for a in job_applications if a.status == 'accepted'),
+            'rejected': sum(1 for a in job_applications if a.status == 'rejected'),
+        })
     
     parameters = {
         "user": user,
         "company": company,
-        "jobs": jobs
+        "jobs": jobs,
+        "total_applications": total_applications,
+        "pending_count": pending_count,
+        "accepted_count": accepted_count,
+        "rejected_count": rejected_count,
+        "job_stats": job_stats,
     }
     
     return render(request, "administration/company.html", parameters)

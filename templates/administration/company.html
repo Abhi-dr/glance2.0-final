@@ -19,6 +19,53 @@ Administration -> {{ company.name|title }}
     right: 16px;
     /* Adjust horizontal position as needed */
   }
+
+  .stats-card {
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1.5rem;
+  }
+
+  .stats-header {
+    background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+    color: white;
+    padding: 1.25rem;
+    border-radius: 10px 10px 0 0;
+  }
+
+  .stats-body {
+    padding: 1.25rem;
+  }
+
+  .stat-item {
+    padding: 1rem;
+    border-bottom: 1px solid #eee;
+  }
+
+  .stat-item:last-child {
+    border-bottom: none;
+  }
+
+  .stat-label {
+    font-weight: 500;
+    color: #344767;
+    margin-bottom: 0.5rem;
+  }
+
+  .stat-value {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #4e73df;
+  }
+
+  .stat-badge {
+    display: inline-block;
+    padding: 0.35rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    background: rgba(78, 115, 223, 0.1);
+    color: #4e73df;
+  }
 </style>
 
 {% endblock %}
@@ -40,9 +87,104 @@ Administration -> {{ company.name|title }}
     <div class="card-body">
       <h5 class="card-title fw-semibold mb-4">{{ company.name }}</h5>
       <p class="mb-0">Here are the jobs from <strong>{{ company.name }}</strong> </p>
-      <a href="{% url 'add_job' company.id %}" class="btn btn-primary button mt-2 mx-2">Add Job</a>
+      <div class="d-flex gap-2 mt-3">
+        <a href="{% url 'add_job' company.id %}" class="btn btn-primary">Add Job</a>
+        <button type="button" class="btn btn-info text-white" data-bs-toggle="modal" data-bs-target="#statsModal">
+          <i class="ti ti-chart-bar me-1"></i> View Statistics
+        </button>
+      </div>
     </div>
     
+  </div>
+  
+  <!-- Statistics Modal -->
+  <div class="modal fade" id="statsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header bg-info text-white">
+          <h5 class="modal-title">{{ company.name }} Statistics</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="stats-card">
+                <div class="stats-header">
+                  <h6 class="mb-0"><i class="ti ti-briefcase me-2"></i>Jobs Overview</h6>
+                </div>
+                <div class="stats-body">
+                  <div class="stat-item">
+                    <div class="stat-label">Total Jobs Posted</div>
+                    <div class="stat-value">{{ jobs.count }}</div>
+                  </div>
+                  <div class="stat-item">
+                    <div class="stat-label">Total Applications</div>
+                    <div class="stat-value">{{ total_applications }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="stats-card">
+                <div class="stats-header">
+                  <h6 class="mb-0"><i class="ti ti-users me-2"></i>Applications by Status</h6>
+                </div>
+                <div class="stats-body">
+                  <div class="stat-item">
+                    <div class="stat-label">Status Breakdown</div>
+                    <div class="d-flex gap-2 flex-wrap mt-2">
+                      <span class="stat-badge bg-warning text-dark">
+                        Pending: {{ pending_count }}
+                      </span>
+                      <span class="stat-badge bg-success text-white">
+                        Accepted: {{ accepted_count }}
+                      </span>
+                      <span class="stat-badge bg-danger text-white">
+                        Rejected: {{ rejected_count }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="stats-card mt-3">
+            <div class="stats-header">
+              <h6 class="mb-0"><i class="ti ti-list me-2"></i>Job-wise Applications</h6>
+            </div>
+            <div class="stats-body">
+              <div class="table-responsive">
+                <table class="table table-hover">
+                  <thead>
+                    <tr>
+                      <th>Job Title</th>
+                      <th>Total Applications</th>
+                      <th>Status Breakdown</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for stat in job_stats %}
+                    <tr>
+                      <td>{{ stat.title }}</td>
+                      <td>{{ stat.total }}</td>
+                      <td>
+                        <div class="d-flex gap-2 flex-wrap">
+                          <span class="stat-badge bg-warning text-dark">P: {{ stat.pending }}</span>
+                          <span class="stat-badge bg-success text-white">A: {{ stat.accepted }}</span>
+                          <span class="stat-badge bg-danger text-white">R: {{ stat.rejected }}</span>
+                        </div>
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
   
   <div class="row">
