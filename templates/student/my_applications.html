@@ -8,163 +8,310 @@ Student -> My Applications
 {% block extra_css %}
 <style>
     .application-card {
-        border: none;
-        border-radius: 12px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        transition: all 0.3s ease;
-        margin-bottom: 1.5rem;
-    }
-    
-    .application-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
-    }
-    
-    .card-header {
-        border-radius: 12px 12px 0 0 !important;
-        padding: 1rem;
-    }
-    
-    .company-logo {
-        width: 60px;
-        height: 60px;
-        object-fit: contain;
-        background: white;
-        padding: 0.5rem;
+        background: #fff;
         border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 1rem;
+        overflow: hidden;
     }
-    
-    .status-badge {
-        padding: 0.5rem 1rem;
-        border-radius: 20px;
+
+    .company-section {
+        background: #4e73df;
+        color: white;
+        padding: 1.25rem;
+        position: relative;
+    }
+
+    .company-name {
+        font-size: 1.25rem;
         font-weight: 600;
+        margin-bottom: 0.5rem;
+        word-break: break-word;
     }
-    
-    .action-btn {
-        padding: 0.5rem 1.5rem;
-        border-radius: 8px;
-        font-weight: 500;
-        transition: all 0.3s ease;
+
+    .status-badge {
+        display: inline-block;
+        padding: 0.35rem 1rem;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        background: rgba(255, 255, 255, 0.2);
+        margin-top: 0.5rem;
     }
-    
-    .action-btn:hover {
-        transform: translateY(-2px);
+
+    .details-section {
+        padding: 1.25rem;
     }
-    
-    .detail-item {
-        margin-bottom: 0.75rem;
-        padding-bottom: 0.75rem;
+
+    .detail-row {
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
         border-bottom: 1px solid #eee;
     }
-    
-    .detail-item:last-child {
-        border-bottom: none;
+
+    .detail-row:last-child {
         margin-bottom: 0;
         padding-bottom: 0;
+        border-bottom: none;
     }
-    
+
     .detail-label {
         font-weight: 600;
-        color: #666;
+        color: #444;
         margin-bottom: 0.25rem;
     }
-    
+
     .detail-value {
-        color: #333;
+        color: #666;
+        word-break: break-word;
+    }
+
+    .withdraw-btn {
+        width: 100%;
+        padding: 0.75rem;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+        margin-top: 1rem;
+        font-size: 1rem;
+    }
+
+    .withdraw-btn:hover {
+        transform: translateY(-2px);
+    }
+
+    /* Modal Styles */
+    .modal-content {
+        border-radius: 12px;
+        border: none;
+        margin: 1rem;
+    }
+
+    .modal-header {
+        background: #f8f9fa;
+        border-bottom: 1px solid #eee;
+        padding: 1rem;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+    }
+
+    .modal-footer {
+        border-top: 1px solid #eee;
+        padding: 1rem;
+        flex-wrap: nowrap;
+    }
+
+    .warning-icon {
+        font-size: 3rem;
+        color: #dc3545;
+        margin-bottom: 1rem;
+    }
+
+    /* Mobile Styles */
+    @media (max-width: 768px) {
+        .container-fluid {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+
+        .card {
+            margin-bottom: 1rem;
+        }
+
+        .card-body {
+            padding: 1rem;
+        }
+
+        .company-section {
+            padding: 1rem;
+        }
+
+        .company-name {
+            font-size: 1.1rem;
+            line-height: 1.3;
+        }
+
+        .details-section {
+            padding: 1rem;
+        }
+
+        .detail-row {
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.75rem;
+        }
+
+        .detail-label {
+            font-size: 0.9rem;
+        }
+
+        .detail-value {
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .status-badge {
+            font-size: 0.8rem;
+            padding: 0.25rem 0.75rem;
+        }
+
+        .withdraw-btn {
+            padding: 0.625rem;
+            font-size: 0.9rem;
+            margin-top: 0.75rem;
+        }
+
+        /* Modal Mobile Styles */
+        .modal-dialog {
+            margin: 0.5rem;
+        }
+
+        .modal-content {
+            margin: 0;
+        }
+
+        .modal-header {
+            padding: 0.75rem 1rem;
+        }
+
+        .modal-body {
+            padding: 1rem;
+        }
+
+        .modal-footer {
+            padding: 0.75rem 1rem;
+        }
+
+        .modal-footer .btn {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        .warning-icon {
+            font-size: 2.5rem;
+        }
+
+        /* Pagination Mobile Styles */
+        .pagination {
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .page-link {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.9rem;
+        }
+    }
+
+    /* Small Mobile Styles */
+    @media (max-width: 375px) {
+        .container-fluid {
+            padding-left: 0.75rem;
+            padding-right: 0.75rem;
+        }
+
+        .company-name {
+            font-size: 1rem;
+        }
+
+        .detail-label, 
+        .detail-value {
+            font-size: 0.85rem;
+        }
+
+        .status-badge {
+            font-size: 0.75rem;
+            padding: 0.2rem 0.6rem;
+        }
+
+        .withdraw-btn {
+            padding: 0.5rem;
+            font-size: 0.85rem;
+        }
     }
 </style>
 {% endblock %}
 
 {% block body %}
 <div class="container-fluid">
-    {% for message in messages %}
-    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-        {{ message }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-    {% endfor %}
-
     <div class="card mb-4">
         <div class="card-body">
-            <h5 class="card-title fw-semibold mb-3">My Applications</h5>
-            <p class="mb-0">Track and manage your job applications</p>
+            <h5 class="card-title fw-semibold">My Applications</h5>
+            <p class="text-muted mb-0">Good to see you here!</p>
         </div>
     </div>
 
     {% if applications %}
     <div class="row">
         {% for application in applications %}
-        <div class="col-lg-6 mb-4">
-            <div class="card application-card">
-                <div class="card-header d-flex justify-content-between align-items-center bg-primary text-white">
-                    <div class="d-flex align-items-center">
-                        {% if application.job.company.logo %}
-                        <img src="{{ application.job.company.logo.url }}" class="company-logo me-3" alt="{{ application.job.company.name }} logo">
-                        {% else %}
-                        <img src="{% static 'img/user.jpg' %}" class="company-logo me-3" alt="{{ application.job.company.name }} logo">
-                        {% endif %}
-                        <div>
-                            <h5 class="m-0">{{ application.job.title|title }}</h5>
-                            <small>{{ application.job.company.name|title }}</small>
-                        </div>
-                    </div>
-                    <span class="status-badge 
-                        {% if application.status == 'Applied' %}bg-info
-                        {% elif application.status == 'In Review' %}bg-warning
-                        {% elif application.status == 'Selected' %}bg-success
-                        {% elif application.status == 'Rejected' %}bg-danger
-                        {% else %}bg-secondary{% endif %}">
-                        {{ application.status }}
-                    </span>
+        <div class="col-12">
+            <div class="application-card">
+                <div class="company-section">
+                    <h2 class="company-name">{{ application.job.company.name }}</h2>
+                    <span class="status-badge">{{ application.status }}</span>
                 </div>
-                <div class="card-body">
-                    <div class="detail-item">
-                        <div class="detail-label">Applied On</div>
+                <div class="details-section">
+                    <div class="detail-row">
+                        <div class="detail-label">Applied On:</div>
                         <div class="detail-value">{{ application.application_date|date:"d M Y" }}</div>
                     </div>
                     
-                    <div class="detail-item">
-                        <div class="detail-label">Interview Date</div>
-                        <div class="detail-value text-primary">{{ application.job.interview_date }}</div>
+                    <div class="detail-row">
+                        <div class="detail-label">Description:</div>
+                        <div class="detail-value">{{ application.job.description|default:"Not provided"|truncatewords:30 }}</div>
                     </div>
                     
-                    <div class="detail-item">
-                        <div class="detail-label">Job Description</div>
-                        <div class="detail-value">{{ application.job.description|truncatewords:30 }}</div>
+                    <div class="detail-row">
+                        <div class="detail-label">Skills Required:</div>
+                        <div class="detail-value">{{ application.job.skills_required|default:"Not specified" }}</div>
                     </div>
                     
-                    <div class="detail-item">
-                        <div class="detail-label">Skills Required</div>
-                        <div class="detail-value">{{ application.job.skills_required }}</div>
+                    <div class="detail-row">
+                        <div class="detail-label">Job Type:</div>
+                        <div class="detail-value">{{ application.job.job_type|title }}</div>
                     </div>
                     
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="detail-item">
-                                <div class="detail-label">Job Type</div>
-                                <div class="detail-value">{{ application.job.job_type|title }}</div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="detail-item">
-                                <div class="detail-label">Location</div>
-                                <div class="detail-value">{{ application.job.location|title }}</div>
-                            </div>
-                        </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Location:</div>
+                        <div class="detail-value">{{ application.job.location|default:"Not specified" }}</div>
                     </div>
                     
-                    <div class="detail-item">
-                        <div class="detail-label">Salary</div>
+                    <div class="detail-row">
+                        <div class="detail-label">Salary:</div>
                         <div class="detail-value">₹{{ application.job.salary_range }}</div>
                     </div>
-                    
-                    <div class="d-flex justify-content-between mt-4">
-                        <a href="{% url 'applied_job' application.job.slug %}" class="btn btn-primary action-btn">
-                            <i class="ti ti-eye me-2"></i>View Details
-                        </a>
-                        <a href="{% url 'withdraw_application' application.job.slug %}" class="btn btn-danger action-btn">
-                            <i class="ti ti-trash me-2"></i>Withdraw
-                        </a>
+
+                    <button class="btn btn-danger withdraw-btn" 
+                            data-bs-toggle="modal" 
+                            data-bs-target="#withdrawModal{{ application.id }}"
+                            data-company="{{ application.job.company.name }}">
+                        Withdraw Application
+                    </button>
+                </div>
+            </div>
+
+            <!-- Withdraw Confirmation Modal -->
+            <div class="modal fade" id="withdrawModal{{ application.id }}" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Confirm Withdrawal</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body text-center">
+                            <i class="ti ti-alert-triangle warning-icon"></i>
+                            <h4 class="mb-3">Are you sure?</h4>
+                            <p class="text-muted">
+                                You are about to withdraw your application from <strong>{{ application.job.company.name }}</strong>. 
+                                This action cannot be undone, but you will be able to apply to other companies.
+                            </p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <a href="{% url 'withdraw_application' application.job.slug %}" class="btn btn-danger">
+                                Yes, Withdraw
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -172,86 +319,64 @@ Student -> My Applications
         {% endfor %}
     </div>
 
-    <!-- Pagination -->
     {% if applications.has_other_pages %}
-    <div class="row mt-4">
-        <div class="col-12">
-            <nav aria-label="Page navigation">
-                <ul class="pagination justify-content-center">
-                    {% if applications.has_previous %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page=1" aria-label="First">
-                            <span aria-hidden="true">&laquo;&laquo;</span>
-                        </a>
+    <div class="d-flex justify-content-center mt-4">
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                <li class="page-item {% if not applications.has_previous %}disabled{% endif %}">
+                    <a class="page-link" href="{% if applications.has_previous %}?page={{ applications.previous_page_number }}{% else %}#{% endif %}">
+                        <span>&laquo;</span>
+                    </a>
+                </li>
+                
+                {% for i in applications.paginator.page_range %}
+                    <li class="page-item {% if applications.number == i %}active{% endif %}">
+                        <a class="page-link" href="?page={{ i }}">{{ i }}</a>
                     </li>
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ applications.previous_page_number }}" aria-label="Previous">
-                            <span aria-hidden="true">&laquo;</span>
-                        </a>
-                    </li>
-                    {% else %}
-                    <li class="page-item disabled">
-                        <a class="page-link" href="#" aria-label="First">
-                            <span aria-hidden="true">&laquo;&laquo;</span>
-                        </a>
-                    </li>
-                    <li class="page-item disabled">
-                        <a class="page-link" href="#" aria-label="Previous">
-                            <span aria-hidden="true">&laquo;</span>
-                        </a>
-                    </li>
-                    {% endif %}
-                    
-                    {% for i in applications.paginator.page_range %}
-                    {% if applications.number == i %}
-                    <li class="page-item active"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
-                    {% elif i > applications.number|add:'-3' and i < applications.number|add:'3' %}
-                    <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
-                    {% endif %}
-                    {% endfor %}
-                    
-                    {% if applications.has_next %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ applications.next_page_number }}" aria-label="Next">
-                            <span aria-hidden="true">&raquo;</span>
-                        </a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ applications.paginator.num_pages }}" aria-label="Last">
-                            <span aria-hidden="true">&raquo;&raquo;</span>
-                        </a>
-                    </li>
-                    {% else %}
-                    <li class="page-item disabled">
-                        <a class="page-link" href="#" aria-label="Next">
-                            <span aria-hidden="true">&raquo;</span>
-                        </a>
-                    </li>
-                    <li class="page-item disabled">
-                        <a class="page-link" href="#" aria-label="Last">
-                            <span aria-hidden="true">&raquo;&raquo;</span>
-                        </a>
-                    </li>
-                    {% endif %}
-                </ul>
-            </nav>
-        </div>
+                {% endfor %}
+                
+                <li class="page-item {% if not applications.has_next %}disabled{% endif %}">
+                    <a class="page-link" href="{% if applications.has_next %}?page={{ applications.next_page_number }}{% else %}#{% endif %}">
+                        <span>&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
     </div>
     {% endif %}
 
     {% else %}
-    <div class="col-lg-12">
+    <div class="col-12">
         <div class="card">
             <div class="card-body text-center py-5">
-                <i class="ti ti-briefcase-off text-muted mb-3" style="font-size: 48px;"></i>
-                <h5 class="card-title fs-6 fw-semibold mb-3 text-danger">No Applications Found!</h5>
-                <p class="text-muted mb-4">Start applying to companies to see your applications here.</p>
-                <a href="{% url 'all_jobs' %}" class="btn btn-primary btn-lg">
-                    <i class="ti ti-search me-2"></i>Browse Jobs
-                </a>
+                <h5 class="text-danger mb-3">NO APPLICATION FOUND! Apply SOON!</h5>
+                <a href="{% url 'all_jobs' %}" class="btn btn-primary">Apply Now</a>
             </div>
         </div>
     </div>
     {% endif %}
 </div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle modal data
+    const withdrawModals = document.querySelectorAll('[data-bs-target^="#withdrawModal"]');
+    withdrawModals.forEach(button => {
+        button.addEventListener('click', function() {
+            const company = this.getAttribute('data-company');
+            const modalId = this.getAttribute('data-bs-target');
+            const modal = document.querySelector(modalId);
+            
+            // Update modal content with company name
+            const companyNameElement = modal.querySelector('strong');
+            if (companyNameElement) {
+                companyNameElement.textContent = company;
+            }
+        });
+    });
+});
+</script>
+{% endblock %}
+
 {% endblock %}
