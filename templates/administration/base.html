@@ -124,7 +124,6 @@
                             </a>
                         </li>
 
-
                         <li class="sidebar-item">
                             <a class="sidebar-link" href="{% url 'add_notification' %}" aria-expanded="false">
                                 <span>
@@ -134,9 +133,15 @@
                             </a>
                         </li>
 
-
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="{% url 'whatsapp_message' %}" aria-expanded="false">
+                                <span>
+                                    <i class="ti ti-brand-whatsapp"></i>
+                                </span>
+                                <span class="hide-menu">WhatsApp Messages</span>
+                            </a>
+                        </li>
                         
-
                         {% comment %}
                         <!-- <li class="nav-small-cap">
                             <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
@@ -220,6 +225,8 @@
         <!--  Header End -->
 
         {% block body %}
+            {% block content %}
+            {% endblock %}
         {% endblock %}
 
     </div>

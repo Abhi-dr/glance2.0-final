@@ -1,0 +1,88 @@
+{% extends 'administration/base.html' %}
+{% load static %}
+
+{% block title %}WhatsApp Test{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>WhatsApp Test Send</h5>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                    <div class="mb-3">
+                        {% for message in messages %}
+                        <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %}" role="alert">
+                            {{ message }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    
+                    <form method="POST" action="{% url 'whatsapp_test' %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="phone" class="form-label">Phone Number (with country code, e.g., 918XXXXXXXXX)</label>
+                            <input type="text" class="form-control" id="phone" name="phone" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="message" class="form-label">Message</label>
+                            <textarea class="form-control" id="message" name="message" rows="3" required>This is a test message from Glance.</textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Send Test Message</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>API Connection Test</h5>
+                </div>
+                <div class="card-body">
+                    <p>Test if the WhatsApp API connection is working:</p>
+                    <button id="testApiBtn" class="btn btn-info">Test API Connection</button>
+                    <div id="apiResult" class="mt-3"></div>
+                </div>
+            </div>
+            
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5>Instructions</h5>
+                </div>
+                <div class="card-body">
+                    <ul>
+                        <li>The WhatsApp test feature allows you to test sending messages without affecting real data.</li>
+                        <li>All test messages are logged but do not affect reporting or statistics.</li>
+                        <li>Use the API Connection Test to verify if the WhatsApp API is accessible.</li>
+                        <li>Make sure to use a valid WhatsApp number for testing (with country code).</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('testApiBtn').addEventListener('click', function() {
+        const resultDiv = document.getElementById('apiResult');
+        resultDiv.innerHTML = '<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>';
+        
+        fetch('{% url "api_test" %}')
+            .then(response => response.json())
+            .then(data => {
+                if(data.success) {
+                    resultDiv.innerHTML = '<div class="alert alert-success">API connection successful!</div>';
+                } else {
+                    resultDiv.innerHTML = '<div class="alert alert-danger">API connection failed: ' + data.message + '</div>';
+                }
+            })
+            .catch(error => {
+                resultDiv.innerHTML = '<div class="alert alert-danger">Error testing API: ' + error.message + '</div>';
+            });
+    });
+</script>
+{% endblock %} 

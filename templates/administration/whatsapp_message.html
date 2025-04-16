@@ -1,0 +1,154 @@
+{% extends 'administration/base.html' %}
+{% load static %}
+
+{% block title %}WhatsApp Messaging{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">WhatsApp Bulk Messaging</h5>
+                    <p class="card-text">Send WhatsApp messages to students.</p>
+                    
+                    <div class="alert alert-info">
+                        <strong>Note:</strong> The full WhatsApp integration requires additional setup. 
+                        Please make sure you have installed all requirements and set up Chrome correctly.
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-12 mb-4">
+                            <div class="card bg-light">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Debug Information</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p><strong>Template Rendering:</strong> {% if True %}Working correctly{% else %}Not working{% endif %}</p>
+                                    <p><strong>Current Time:</strong> <span id="currentTime"></span></p>
+                                    <p><strong>User:</strong> {{ user.username }} / {{ user.first_name }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-primary text-white">
+                                    <h5 class="mb-0">Basic WhatsApp Message</h5>
+                                </div>
+                                <div class="card-body">
+                                    <form action="{% url 'send_whatsapp_to_filtered_students' %}" method="post">
+                                        {% csrf_token %}
+                                        <div class="mb-3">
+                                            <label for="recipient" class="form-label">Recipient Phone (with country code)</label>
+                                            <input type="text" class="form-control" id="recipient" name="recipient" placeholder="+919876543210" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="content" class="form-label">Message</label>
+                                            <textarea class="form-control" id="content" name="content" rows="4" placeholder="Type your message here..." required></textarea>
+                                        </div>
+                                        <button type="submit" class="btn btn-success">
+                                            <i class="fa-brands fa-whatsapp me-2"></i>Send WhatsApp Message
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-info text-white">
+                                    <h5 class="mb-0">Command Line Usage</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p>You can also use the command line to send bulk messages:</p>
+                                    <pre class="bg-light p-3">python manage.py send_whatsapp_bulk \
+    --message "Hello {{name}}, this is a test." \
+    --test-mode</pre>
+                                    <p class="mt-3">More options:</p>
+                                    <ul>
+                                        <li><code>--csv students.csv</code> - Use CSV file with recipients</li>
+                                        <li><code>--course "B.Tech"</code> - Filter by course</li>
+                                        <li><code>--delay-min 10 --delay-max 30</code> - Set delay range</li>
+                                        <li><code>--limit 10</code> - Limit number of messages</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- New CSV Upload Section -->
+                    <div class="row mt-4">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header bg-success text-white">
+                                    <h5 class="mb-0">Bulk WhatsApp Messaging via CSV</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="alert alert-warning">
+                                        <strong>Important:</strong> Your CSV file should have the following columns: <code>phone</code>, <code>name</code> (optional). 
+                                        The phone numbers should include country code (e.g., +91XXXXXXXXXX).
+                                        <a href="{% url 'download_whatsapp_csv_template' %}" class="btn btn-sm btn-outline-primary ms-2">
+                                            <i class="fas fa-download me-1"></i>Download Sample CSV
+                                        </a>
+                                    </div>
+                                    
+                                    <form action="{% url 'send_whatsapp_bulk_csv' %}" method="post" enctype="multipart/form-data">
+                                        {% csrf_token %}
+                                        <div class="mb-3">
+                                            <label for="csv_file" class="form-label">Upload CSV File</label>
+                                            <input type="file" class="form-control" id="csv_file" name="csv_file" accept=".csv" required>
+                                            <div class="form-text">Upload a CSV file with recipient data</div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="bulk_message" class="form-label">Message Template</label>
+                                            <textarea class="form-control" id="bulk_message" name="bulk_message" rows="4" placeholder="Type your message here... Use {{name}} to include recipient's name" required></textarea>
+                                            <div class="form-text">Use {{name}} to include the recipient's name in the message</div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label for="delay_min" class="form-label">Minimum Delay (seconds)</label>
+                                                    <input type="number" class="form-control" id="delay_min" name="delay_min" value="10" min="5" max="60">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label for="delay_max" class="form-label">Maximum Delay (seconds)</label>
+                                                    <input type="number" class="form-control" id="delay_max" name="delay_max" value="30" min="10" max="120">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="limit" class="form-label">Message Limit (optional)</label>
+                                            <input type="number" class="form-control" id="limit" name="limit" placeholder="Leave empty for no limit">
+                                            <div class="form-text">Maximum number of messages to send</div>
+                                        </div>
+                                        <div class="mb-3 form-check">
+                                            <input type="checkbox" class="form-check-input" id="test_mode" name="test_mode">
+                                            <label class="form-check-label" for="test_mode">Test Mode (only preview, don't send)</label>
+                                        </div>
+                                        <button type="submit" class="btn btn-success">
+                                            <i class="fa-brands fa-whatsapp me-2"></i>Send Bulk WhatsApp Messages
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block myjs %}
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Update current time
+    document.getElementById('currentTime').textContent = new Date().toLocaleString();
+});
+</script>
+{% endblock %} 

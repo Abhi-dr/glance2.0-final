@@ -117,13 +117,12 @@ Student -> All Jobs
   <div class="card w-100 mb-4">
     <div class="card-body p-4">
       <!-- <h5 class="card-title fw-semibold mb-4">Search Applicants 🔍</h5> -->
-      <form method="post" class="mb-0">
+      <form method="get" class="mb-0">
         {% csrf_token %}
         <div class="input-group">
           <input type="text" class="form-control" placeholder="Search by Company Name, Job Role, Tags"
             aria-label="Search by Company Name, Job Role, Tags" aria-describedby="button-addon2" name="query">
           <button class="btn btn-primary" type="submit" id="button-addon2">Search</button>
-          <!-- make a button to clear the search -->
           <a href="{% url 'all_jobs' %}" class="btn btn-danger">Clear</a>
         </div>
       </form>

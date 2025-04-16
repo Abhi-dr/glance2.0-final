@@ -6,205 +6,196 @@ Student -> {{ job.company.name }}
 {% endblock %}
 
 {% block extra_css %}
-
 <style>
-    .button {
+    .job-header {
+        background: linear-gradient(135deg, #5d87ff 0%, #3f66cc 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+    }
+    
+    .company-logo {
+        max-width: 150px;
+        max-height: 150px;
+        object-fit: contain;
+        background: white;
+        padding: 1rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .job-details {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+    
+    .detail-item {
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .detail-item:last-child {
+        border-bottom: none;
+    }
+    
+    .detail-label {
+        font-weight: 600;
+        color: #666;
+        margin-bottom: 0.5rem;
+    }
+    
+    .detail-value {
+        color: #333;
+        font-size: 1.1rem;
+    }
+    
+    .action-buttons {
+        text-align: center;
+        margin-top: 2rem;
+    }
+    
+    .action-btn {
+        padding: 0.75rem 2rem;
+        font-size: 1.1rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+    
+    .action-btn:hover {
+        transform: translateY(-2px);
+    }
+    
+    .eligibility-badge {
         display: inline-block;
-        font-size: 16px;
-        width: 250px;
-        /* Adjust width as needed */
-        position: absolute;
-        top: 16px;
-        /* Adjust vertical position as needed */
-        right: 16px;
-        /* Adjust horizontal position as needed */
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+    
+    .eligible {
+        background-color: #d1fae5;
+        color: #065f46;
+    }
+    
+    .not-eligible {
+        background-color: #fee2e2;
+        color: #991b1b;
     }
 </style>
-
 {% endblock %}
 
 {% block body %}
-
 <div class="container-fluid">
-    <div class="card">
-        <div class="card-body mb-n9">
-            <div class="row">
-                <div class="col-md-8">
-                    <h5 class="card-title d-block mb-2 fw-semibold">{{ job.title|title }} @{{ job.company.name|title }}</h5>
-                </div>
+    <div class="job-header">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h2 class="mb-2">{{ job.title|title }}</h2>
+                <h4 class="mb-0">{{ job.company.name|title }}</h4>
             </div>
-
-            <!-- <div class="col-md-5">
-                {% if student.resume and student.no_of_companies_left != 0 %}
-                <a href="{% url 'confirm_application' job.slug %}" class="btn btn-success button">Apply now</a>
-                {% elif student.no_of_companies_left == 0 %}
-                <a href="#" class="btn btn-dark button">Max. Applications Reached!</a>
+            <div class="col-md-4 text-center">
+                {% if job.company.logo %}
+                <img src="{{ job.company.logo.url }}" class="company-logo" alt="{{ job.company.name }} logo">
                 {% else %}
-                <a href="{% url 'upload_resume' %}" class="btn btn-danger button">Upload Resume First</a>
+                <img src="{% static 'img/user.jpg' %}" class="company-logo" alt="{{ job.company.name }} logo">
                 {% endif %}
-            </div> -->
-            <!-- <a href="#" class="btn btn-primary">Apply Now</a> -->
-        </div>
-        <div class="position-relative">
-
-            <div class="card-body">
-                <h5 class="card-title fw-semibold mb-0">Offer Details</h5>
-                <div class="row">
-                    <div class="col-md-4 text-center mb-4">
-                        {% if job.company.logo %}
-                        <img src="{{ job.company.logo.url }}" class="img-fluid rounded mt-2" 
-                            style="max-width: 100%; height: auto; max-height: 200px;" alt="{{ job.company.name }} logo">
-                        {% else %}
-                        <img src="{% static 'img/user.jpg' %}" class="img-fluid rounded mt-2" 
-                            style="max-width: 100%; height: auto; max-height: 200px;" alt="{{ job.company.name }} logo">
-                        {% endif %}
-                    </div>
-
-                    <div class="col-md-8">
-                        <div class="card-body p-0">
-                            <p class="mb-0 text-wrap">{{ job.description|linebreaks }}</p>
-
-                            <p class="mb-1 fw-semibold fs-5">Date of Arrival:
-                                <span style="color: rgb(255, 137, 27);">{{ job.interview_date }}</span>
-                            </p>
-                            <p class="mb-1 fw-semibold fs-5">Role:
-                                <span style="color: rgb(255, 195, 65);">{{ job.role|title }}</span>
-                            </p>
-
-                            <p class="mb-1 fw-semibold fs-5">Job Type:
-                                <span style="color: green;">{{ job.job_type }}</span>
-                            </p>
-
-                            <p class="mb-1 fw-semibold fs-5">Salary Range:
-                                <span style="color: green;">{{ job.salary_range }}</span>
-                            </p>
-
-                            <p class="mb-1 fw-semibold fs-5">Location Flexibility:
-                                <span style="color: green;">{{ job.location_flexibility|title }}</span>
-                            </p>
-
-                            <p class="mb-1 fw-semibold fs-5">Training Period:
-                                <span style="color: green;">{{ job.training_period }}</span>
-                            </p>
-
-                            <p class="mb-1 fw-semibold fs-5">Bond Timing:
-                                <span style="color: green;">{{ job.bond_timing }}</span>
-                            </p>
-                            <p class="mb-1 fw-semibold fs-5">Interview Mode:
-                                <span style="color: green;">{{ job.interview_mode }}</span>
-                            </p>
-
-                            <p class="mb-1 fw-bolder fs-5">Deadline to Apply:
-                                <span style="color: rgb(255, 95, 27);">{{ job.deadline }}</span>
-                            </p>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
-
-        <div class="card-body text-center">
-            {% if job in applications %}
-            <a href="#" class="btn btn-danger btn-lg px-5 mb-3">Withdraw Application</a>
-    
-            {% else %}
-    
-            {% if student.resume and student.tenth_marksheet and student.twelfth_marksheet and student.college_profile_print and student.no_of_companies_left != 0 %}
-            <a href="{% url 'confirm_application' job.slug %}" class="btn btn-success btn-lg px-5 mb-3">Apply now</a>
-            {% elif student.no_of_companies_left == 0 %}
-            <a href="#" class="btn btn-dark btn-lg px-5 mb-3">Max. Applications Reached!</a>
-            {% else %}
-            <a href="{% url 'upload_resume' %}" class="btn btn-danger btn-lg px-5 mb-3">Upload Documents First</a>
-            {% endif %}
-    
-            {% endif %}
-        </div>
-
-        <!-- <div class="card-body">
-            <div class="card-body">
-                <h5 class="card-title fw-semibold mb-4">This Batch Includes</h5>
-                <div class="d-md-flex align-items-center my-md-4">
-                    <div class="d-flex ms-4 my-4">
-                        <div class="border-right border-2 px-5 d-flex flex-column align-items-center">
-                            <span class="fw-semibold fs-6">300+</span>
-                            <span class="fw-semibold fs-6">Lecture Hours</span>
-                        </div>
-                        <div class="border-right border-2 px-5 d-flex flex-column align-items-center">
-                            <span class="fw-semibold fs-6">30+</span>
-                            <span class="fw-semibold fs-6">PDFs And DPPs</span>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-            <div class="card-body">
-                <h5 class="card-title fw-semibold mb-4">Course Validation:</h5>
-                <p class="mb-0">This course is valid till 31st March 2022</p>
-
-            </div>
-            <div class="card-body">
-                <h5 class="card-title fw-semibold mb-4">Subjects:</h5>
-                <p class="mb-0">
-
-                <ul>
-                    {% for subject in subjects %}
-                    <li>
-                        -> <a href="">{{ subject.title }}</a>
-                    </li>
-                    {% endfor %}
-                </ul>
-
-                </p>
-            </div>
-            <div class="card-body">
-                <h5 class="card-title fw-semibold mb-4">Faculties </h5>
-                <div class="row row-cols-1 row-cols-md-3 g-4">
-                    <div class="col-md-2">
-                        <div class="card">
-                            <img src="../static/images/profile/user-1.jpg" class="card-img-top" alt="...">
-                            <div class="card-body">
-                                <h5 class="card-title">Maths</h5>
-                                <p class="card-text">Akash Sir</p>
-
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-2">
-                        <div class="card">
-                            <img src="../static/images/profile/user-1.jpg" class="card-img-top" alt="...">
-                            <div class="card-body">
-                                <h5 class="card-title">Biology</h5>
-                                <p class="card-text">Abhishek Sir</p>
-
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-2">
-                        <div class="card">
-                            <img src="../static/images/profile/user-1.jpg" class="card-img-top" alt="...">
-                            <div class="card-body">
-                                <h5 class="card-title">Physics</h5>
-                                <p class="card-text">Sachin Sir</p>
-
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-2">
-                        <div class="card">
-                            <img src="../static/images/profile/user-1.jpg" class="card-img-top" alt="...">
-                            <div class="card-body">
-                                <h5 class="card-title">English</h5>
-                                <p class="card-text">Akash Sir</p>
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </div> -->
-        <!-- <a href="" class="btn btn-primary m-9">Apply Now</a> -->
-
     </div>
 
-    {% endblock %}
+    <div class="job-details">
+        {% if is_eligible %}
+        <div class="eligibility-badge eligible">
+            <i class="ti ti-check me-2"></i>You are eligible for this position
+        </div>
+        {% else %}
+        <div class="eligibility-badge not-eligible">
+            <i class="ti ti-x me-2"></i>You are not eligible for this position
+        </div>
+        {% endif %}
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="detail-item">
+                    <div class="detail-label">Job Description</div>
+                    <div class="detail-value">{{ job.description|linebreaks }}</div>
+                </div>
+                
+                <div class="detail-item">
+                    <div class="detail-label">Role</div>
+                    <div class="detail-value">{{ job.role|title }}</div>
+                </div>
+                
+                <div class="detail-item">
+                    <div class="detail-label">Job Type</div>
+                    <div class="detail-value">{{ job.job_type|title }}</div>
+                </div>
+                
+                <div class="detail-item">
+                    <div class="detail-label">Salary Range</div>
+                    <div class="detail-value">{{ job.salary_range }}</div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="detail-item">
+                    <div class="detail-label">Interview Date</div>
+                    <div class="detail-value text-primary">{{ job.interview_date }}</div>
+                </div>
+                
+                <div class="detail-item">
+                    <div class="detail-label">Interview Mode</div>
+                    <div class="detail-value">{{ job.interview_mode|title }}</div>
+                </div>
+                
+                <div class="detail-item">
+                    <div class="detail-label">Location Flexibility</div>
+                    <div class="detail-value">{{ job.location_flexibility|title }}</div>
+                </div>
+                
+                <div class="detail-item">
+                    <div class="detail-label">Training Period</div>
+                    <div class="detail-value">{{ job.training_period }}</div>
+                </div>
+                
+                <div class="detail-item">
+                    <div class="detail-label">Bond Duration</div>
+                    <div class="detail-value">{{ job.bond_timing }}</div>
+                </div>
+                
+                <div class="detail-item">
+                    <div class="detail-label">Application Deadline</div>
+                    <div class="detail-value text-danger">{{ job.deadline }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="action-buttons">
+        {% if has_applied %}
+        <a href="{% url 'withdraw_application' job.slug %}" class="btn btn-danger action-btn">
+            <i class="ti ti-trash me-2"></i>Withdraw Application
+        </a>
+        {% else %}
+            {% if student.resume and student.tenth_marksheet and student.twelfth_marksheet and student.college_profile_print and student.no_of_companies_left != 0 and is_eligible %}
+            <a href="{% url 'confirm_application' job.slug %}" class="btn btn-success action-btn">
+                <i class="ti ti-check me-2"></i>Apply Now
+            </a>
+            {% elif student.no_of_companies_left == 0 %}
+            <a href="#" class="btn btn-dark action-btn">
+                <i class="ti ti-x me-2"></i>Max. Applications Reached!
+            </a>
+            {% else %}
+            <a href="{% url 'upload_resume' %}" class="btn btn-danger action-btn">
+                <i class="ti ti-upload me-2"></i>Upload Documents First
+            </a>
+            {% endif %}
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

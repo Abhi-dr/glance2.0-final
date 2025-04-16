@@ -29,13 +29,26 @@ class StudentsDataTablesView(View):
     
     def get(self, request, *args, **kwargs):
         try:
+            # Add debug print to see if this view is being called
+            print(f"StudentsDataTablesView called with params: {request.GET}")
+            
             # Validate request parameters
             try:
                 draw = int(request.GET.get('draw', 1))
                 start = max(0, int(request.GET.get('start', 0)))
                 length = min(100, int(request.GET.get('length', 10)))  # Limit max records
-            except ValueError:
-                return JsonResponse({'error': 'Invalid parameters'}, status=400)
+            except ValueError as e:
+                print(f"Parameter validation error: {e}")
+                return JsonResponse({'error': f'Invalid parameters: {str(e)}'}, status=400)
+                
+            # Return a minimal working response for debugging
+            if request.GET.get('limit', '') == '1':
+                return JsonResponse({
+                    'draw': 1,
+                    'recordsTotal': 1,
+                    'recordsFiltered': 1,
+                    'data': [{'id': 1, 'first_name': 'Test', 'last_name': 'User'}]
+                })
             
             # Log all request parameters for debugging
             logger.debug(f"DataTables API request: {request.GET}")

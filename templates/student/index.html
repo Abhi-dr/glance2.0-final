@@ -15,6 +15,7 @@ Student -> Home
         transition: all 0.3s ease;
         border: none;
         overflow: hidden;
+        cursor: pointer;
     }
     
     .dashboard-card:hover {
@@ -95,26 +96,27 @@ Student -> Home
         align-items: center;
         font-weight: bold;
         box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        position: relative;
     }
 
     .progress-bar::before {
-        counter-reset: percentage var(--progress-value);
-        content: counter(percentage) "%";
+        content: attr(data-progress) '%';
+        position: absolute;
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #333;
     }
 
     .html {
-        background: radial-gradient(closest-side, white 79%, transparent 80% 100%), conic-gradient(#5d87ff calc(var(--progress-value) * 1%), #ecf2ff 0);
-        animation: html-progress 2s 1 forwards;
+        background: conic-gradient(#5d87ff calc(var(--progress) * 1%), #ecf2ff 0);
     }
 
     .css {
-        background: radial-gradient(closest-side, white 79%, transparent 80% 100%, white 0), conic-gradient(#2ec779 calc(var(--progress-value) * 1%), #e6f7ef 0);
-        animation: css-progress 2s 1 forwards;
+        background: conic-gradient(#2ec779 calc(var(--progress) * 1%), #e6f7ef 0);
     }
 
     .js {
-        background: radial-gradient(closest-side, white 79%, transparent 80% 100%, white 0), conic-gradient(#5d87ff calc(var(--progress-value) * 1%), #ecf2ff 0);
-        animation: js-progress 2s 1 forwards;
+        background: conic-gradient(#5d87ff calc(var(--progress) * 1%), #ecf2ff 0);
     }
 
     progress {
@@ -258,8 +260,8 @@ Student -> Home
                         </div>
                         <div class="col-4">
                             <div class="d-flex justify-content-center">
-                                <div class="progress-bar html">
-                                    <progress id="html" min="0" max="100" value="70"></progress>
+                                <div class="progress-bar html" style="--progress: {{eligible_companies_count}}" data-progress="{{eligible_companies_count}}">
+                                    <progress id="html" min="0" max="100" value="{{eligible_companies_count}}"></progress>
                                 </div>
                             </div>
                         </div>
@@ -287,8 +289,8 @@ Student -> Home
                         </div>
                         <div class="col-4">
                             <div class="d-flex justify-content-center">
-                                <div class="progress-bar css">
-                                    <progress id="css" min="0" max="100" value="30"></progress>
+                                <div class="progress-bar css" style="--progress: {{no_of_companies_applied_in_percentage}}" data-progress="{{no_of_companies_applied_in_percentage}}">
+                                    <progress id="css" min="0" max="100" value="{{no_of_companies_applied_in_percentage}}"></progress>
                                 </div>
                             </div>
                         </div>
@@ -394,8 +396,8 @@ Student -> Home
                         </div>
                         <div class="col-4">
                             <div class="d-flex justify-content-center">
-                                <div class="progress-bar js">
-                                    <progress id="js" min="0" max="100" value="70"></progress>
+                                <div class="progress-bar js" style="--progress: {{student.get_profile_score}}" data-progress="{{student.get_profile_score}}">
+                                    <progress id="js" min="0" max="100" value="{{student.get_profile_score}}"></progress>
                                 </div>
                             </div>
                         </div>
@@ -546,18 +548,20 @@ Student -> Home
     <div class="row">
         {% for job in all_eligible_jobs %}
         <div class="col-md-3 mb-4">
-            <div class="card dashboard-card h-100">
-                <div class="card-body p-3 text-center">
-                    <img src="{% if job.company.logo %}{{ job.company.logo.url }}{% else %}{% static 'img/user.jpg' %}{% endif %}" class="company-logo mb-3" alt="{{ job.company.name }}">
-                    <h5 class="card-title fw-semibold mb-1">{{ job.company.name|title|truncatechars:15 }}</h5>
-                    <p class="text-muted mb-2">{{ job.title|truncatechars:20 }}</p>
-                    <div class="badge bg-light-primary text-primary mb-3">₹{{ job.salary_range }}</div>
-                    <p class="card-text small mb-3">{{ job.description|truncatechars:60 }}...</p>
-                    <a href="{% url 'job' job.slug %}" class="btn btn-primary action-btn w-100">
-                        <i class="ti ti-info-circle me-1"></i>Details
-                    </a>
+            <a href="{% url 'job' job.slug %}" class="text-decoration-none">
+                <div class="card dashboard-card h-100">
+                    <div class="card-body p-3 text-center">
+                        <img src="{% if job.company.logo %}{{ job.company.logo.url }}{% else %}{% static 'img/user.jpg' %}{% endif %}" class="company-logo mb-3" alt="{{ job.company.name }}">
+                        <h5 class="card-title fw-semibold mb-1">{{ job.company.name|title|truncatechars:15 }}</h5>
+                        <p class="text-muted mb-2">{{ job.title|truncatechars:20 }}</p>
+                        <div class="badge bg-light-primary text-primary mb-3">₹{{ job.salary_range }}</div>
+                        <p class="card-text small mb-3">{{ job.description|truncatechars:60 }}...</p>
+                        <div class="btn btn-primary action-btn w-100">
+                            <i class="ti ti-info-circle me-1"></i>Details
+                        </div>
+                    </div>
                 </div>
-            </div>
+            </a>
         </div>
         {% endfor %}
         
@@ -578,4 +582,14 @@ Student -> Home
     </div>
 </div>
 
+{% endblock %}
+
+{% block myjs %}
+<script>
+    // Initialize progress bars
+    document.addEventListener('DOMContentLoaded', function() {
+        // The progress bars are now handled by CSS custom properties
+        // No additional JavaScript needed
+    });
+</script>
 {% endblock %}

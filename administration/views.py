@@ -14,6 +14,8 @@ import requests
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
+from django.http import JsonResponse
+
 # Comment out the external API email functions
 """
 def send_email_async(to, subject, text):
@@ -898,3 +900,351 @@ def send_message_to_filtered_students(request):
     
     # If not POST, redirect back to filter page
     return redirect("filter_page")
+
+@login_required(login_url='login')
+@staff_member_required(login_url='login')
+def whatsapp_message(request):
+    """Render the WhatsApp messaging page"""
+    return render(request, 'administration/whatsapp_message.html')
+
+@login_required(login_url='login')
+@staff_member_required(login_url='login')
+def whatsapp_test(request):
+    """Render the WhatsApp test page"""
+    return render(request, 'administration/whatsapp_test.html')
+
+@login_required(login_url='login')
+@staff_member_required(login_url='login')
+def send_whatsapp_to_filtered_students(request):
+    """Generate WhatsApp message links for filtered students or a single recipient"""
+    if request.method == "POST":
+        # Extract the message content
+        content = request.POST.get("content")
+        export_mode = request.POST.get("export_mode", "urls")  # 'urls' or 'csv'
+        
+        # Check if this is a simple direct message to one recipient
+        recipient = request.POST.get('recipient')
+        if recipient:
+            # Handle single recipient case
+            try:
+                # Format phone number for WhatsApp
+                phone_number = recipient.strip()
+                if not phone_number.startswith('+'):
+                    if len(phone_number) == 10:
+                        phone_number = '+91' + phone_number  # Default to India country code
+                
+                # Create WhatsApp URL
+                whatsapp_url = f"https://wa.me/{phone_number.replace('+', '')}?text={content}"
+                
+                # Create a notification record
+                notification = Notification(
+                    title="WhatsApp Message Sent",
+                    description=f"WhatsApp message sent to {phone_number}"
+                )
+                notification.save()
+                
+                # Redirect to WhatsApp URL
+                return redirect(whatsapp_url)
+            except Exception as e:
+                messages.error(request, f"Error generating WhatsApp URL: {str(e)}")
+                return redirect("whatsapp_message")
+        
+        # Continue with the original multiple recipient case
+        # Get filter parameters from request
+        id = request.POST.get('id', '')
+        name = request.POST.get('name', '')
+        email = request.POST.get('email', '')
+        phone = request.POST.get('phone', '')
+        course = request.POST.get('course', '')
+        year = request.POST.get('year', '')
+        attendance_status = request.POST.get('attendance_status', '')
+        company = request.POST.get('company', '')
+        
+        # Debug output
+        print(f"WhatsApp filter params: id={id}, name={name}, email={email}, phone={phone}")
+        print(f"Other filters: course={course}, year={year}, attendance_status={attendance_status}, company={company}")
+        
+        # Start with all students
+        students = Student.objects.all()
+        total_students = students.count()
+        print(f"Starting with {total_students} total students")
+        
+        # Apply filters
+        if id:
+            students = students.filter(id__icontains=id)
+            print(f"After ID filter: {students.count()} students")
+        if name:
+            students = students.filter(Q(first_name__icontains=name) | Q(last_name__icontains=name))
+            print(f"After name filter: {students.count()} students")
+        if email:
+            students = students.filter(username__icontains=email)
+            print(f"After email filter: {students.count()} students")
+        if phone:
+            students = students.filter(phone_number__icontains=phone)
+            print(f"After phone filter: {students.count()} students")
+        if course:
+            students = students.filter(course__icontains=course)
+            print(f"After course filter: {students.count()} students")
+        if year and year != 'all':
+            students = students.filter(year=year)
+            print(f"After year filter: {students.count()} students")
+        
+        # Filter by company applications if provided
+        if company:
+            # Get applications for the specified company
+            company_applications = Application.objects.filter(
+                job__company__name__icontains=company
+            ).values_list('student_id', flat=True)
+            students = students.filter(id__in=company_applications)
+            print(f"After company filter: {students.count()} students")
+        
+        # Filter by attendance status if provided
+        if attendance_status:
+            if attendance_status == 'present':
+                # Get student IDs who are marked present
+                present_students = Application.objects.filter(
+                    attendance__is_present=True
+                ).values_list('student_id', flat=True).distinct()
+                students = students.filter(id__in=present_students)
+                print(f"After attendance (present) filter: {students.count()} students")
+            elif attendance_status == 'absent':
+                # Get student IDs who are marked absent
+                absent_students = Application.objects.filter(
+                    attendance__is_present=False
+                ).values_list('student_id', flat=True).distinct()
+                students = students.filter(id__in=absent_students)
+                print(f"After attendance (absent) filter: {students.count()} students")
+            elif attendance_status == 'not_marked':
+                # Get student IDs who have applications but no attendance record
+                application_student_ids = Application.objects.values_list('student_id', flat=True).distinct()
+                attendance_student_ids = Application.objects.filter(
+                    attendance__isnull=False
+                ).values_list('student_id', flat=True).distinct()
+                not_marked_student_ids = set(application_student_ids) - set(attendance_student_ids)
+                students = students.filter(id__in=not_marked_student_ids)
+                print(f"After attendance (not marked) filter: {students.count()} students")
+        
+        # Filter for students with phone numbers only
+        students = students.exclude(phone_number__isnull=True).exclude(phone_number='')
+        print(f"After filtering for valid phone numbers: {students.count()} students")
+        
+        # CSV export mode
+        if export_mode == 'csv':
+            import csv
+            from django.http import HttpResponse
+            from datetime import datetime
+            
+            response = HttpResponse(content_type='text/csv')
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            filename = f'whatsapp_recipients_{timestamp}.csv'
+            response['Content-Disposition'] = f'attachment; filename="{filename}"'
+            
+            writer = csv.writer(response)
+            writer.writerow(['id', 'name', 'phone', 'email', 'course', 'year'])
+            
+            for student in students:
+                writer.writerow([
+                    student.id,
+                    f"{student.first_name} {student.last_name}",
+                    student.phone_number,
+                    student.username,
+                    student.course,
+                    student.year
+                ])
+            
+            # Create a notification record
+            notification = Notification(
+                title="WhatsApp Recipients Export",
+                description=f"Exported {students.count()} students for WhatsApp messaging with filter: {name or 'all students'}"
+            )
+            notification.save()
+            
+            return response
+        
+        # Default URL generation mode
+        else:
+            # Create WhatsApp message URLs for each student
+            whatsapp_data = []
+            valid_count = 0
+            
+            for student in students:
+                try:
+                    # Format phone number for WhatsApp
+                    phone_number = student.phone_number.strip()
+                    phone_number = ''.join(filter(str.isdigit, phone_number))
+                    
+                    # Add country code if missing
+                    if not phone_number.startswith('+'):
+                        if len(phone_number) == 10:
+                            phone_number = '+91' + phone_number  # Default to India country code
+                        elif phone_number.startswith('91') and len(phone_number) == 12:
+                            phone_number = '+' + phone_number
+                    elif phone_number.startswith('+'):
+                        phone_number = phone_number[1:]  # Remove + for URL
+                    
+                    # Skip if phone number is invalid
+                    if len(phone_number) < 10:
+                        continue
+                    
+                    # Personalize message content
+                    personalized_content = content
+                    personalized_content = personalized_content.replace(
+                        '{{name}}', f"{student.first_name} {student.last_name}"
+                    )
+                    personalized_content = personalized_content.replace(
+                        '{{company}}', company or "the company"
+                    )
+                    
+                    # Create WhatsApp URL
+                    whatsapp_url = f"https://wa.me/{phone_number}?text={personalized_content}"
+                    
+                    whatsapp_data.append({
+                        'id': student.id,
+                        'name': f"{student.first_name} {student.last_name}",
+                        'phone': phone_number,
+                        'message': personalized_content,
+                        'url': whatsapp_url
+                    })
+                    
+                    valid_count += 1
+                except Exception as e:
+                    print(f"Error creating WhatsApp URL for student {student.id}: {e}")
+            
+            # Create a notification record
+            notification = Notification(
+                title="WhatsApp Message Campaign",
+                description=f"WhatsApp campaign with message: {content[:50]}..." if len(content) > 50 else content
+            )
+            notification.save()
+            
+            return JsonResponse({
+                'success': True,
+                'total_students': students.count(),
+                'sent_count': valid_count,
+                'whatsapp_data': whatsapp_data[:20],  # Only return first 20 to avoid large responses
+                'automation_command': f"python manage.py send_whatsapp_bulk --message \"{content}\" --filter-json '{{\"name\":\"{name}\",\"course\":\"{course}\",\"attendance_status\":\"{attendance_status}\",\"company\":\"{company}\"}}'"
+            })
+    
+    # If not POST, redirect back to WhatsApp page
+    return redirect("whatsapp_message")
+
+@login_required(login_url='login')
+@staff_member_required(login_url='login')
+def send_whatsapp_bulk_csv(request):
+    """Handle CSV upload for bulk WhatsApp messaging"""
+    if request.method == "POST":
+        # Get form data
+        csv_file = request.FILES.get('csv_file')
+        message_template = request.POST.get('bulk_message')
+        delay_min = int(request.POST.get('delay_min', 10))
+        delay_max = int(request.POST.get('delay_max', 30))
+        limit = request.POST.get('limit')
+        test_mode = request.POST.get('test_mode') == 'on'
+        
+        # Validate inputs
+        if not csv_file or not message_template:
+            messages.error(request, "CSV file and message template are required")
+            return redirect('whatsapp_message')
+        
+        # Save the uploaded CSV file temporarily
+        import tempfile
+        import os
+        
+        with tempfile.NamedTemporaryFile(delete=False, suffix='.csv') as temp_file:
+            for chunk in csv_file.chunks():
+                temp_file.write(chunk)
+            temp_file_path = temp_file.name
+        
+        try:
+            # Create a notification record
+            notification = Notification(
+                title="WhatsApp Bulk Messaging",
+                description=f"Bulk WhatsApp messaging initiated with CSV file: {csv_file.name}"
+            )
+            notification.save()
+            
+            # Prepare command arguments
+            cmd_args = [
+                "python", "manage.py", "send_whatsapp_bulk",
+                f"--message", f'"{message_template}"',
+                f"--csv", f'"{temp_file_path}"',
+                f"--delay-min", str(delay_min),
+                f"--delay-max", str(delay_max)
+            ]
+            
+            if limit:
+                cmd_args.extend(["--limit", str(limit)])
+            
+            if test_mode:
+                cmd_args.append("--test-mode")
+            
+            # Execute the command
+            import subprocess
+            
+            # For test mode, just show the command that would be executed
+            if test_mode:
+                cmd_str = " ".join(cmd_args)
+                messages.info(request, f"Test mode: Command that would be executed: {cmd_str}")
+                
+                # Show preview of CSV data
+                import pandas as pd
+                try:
+                    df = pd.read_csv(temp_file_path)
+                    preview_html = df.head(5).to_html(classes='table table-striped', index=False)
+                    messages.info(request, f"CSV Preview (first 5 rows): {preview_html}")
+                except Exception as e:
+                    messages.error(request, f"Error reading CSV file: {str(e)}")
+            else:
+                # Execute the command
+                process = subprocess.Popen(
+                    cmd_args,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    text=True
+                )
+                
+                stdout, stderr = process.communicate()
+                
+                if process.returncode == 0:
+                    messages.success(request, "Bulk WhatsApp messaging initiated successfully")
+                    messages.info(request, f"Command output: {stdout}")
+                else:
+                    messages.error(request, f"Error executing command: {stderr}")
+            
+            # Clean up the temporary file
+            os.unlink(temp_file_path)
+            
+        except Exception as e:
+            messages.error(request, f"Error processing CSV file: {str(e)}")
+            # Clean up the temporary file in case of error
+            if os.path.exists(temp_file_path):
+                os.unlink(temp_file_path)
+        
+        return redirect('whatsapp_message')
+    
+    # If not POST, redirect to the WhatsApp message page
+    return redirect('whatsapp_message')
+
+@login_required(login_url='login')
+@staff_member_required(login_url='login')
+def download_whatsapp_csv_template(request):
+    """Generate and download a sample CSV template for WhatsApp bulk messaging"""
+    import csv
+    from django.http import HttpResponse
+    
+    # Create the HttpResponse object with CSV header
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="whatsapp_recipients_template.csv"'
+    
+    # Create CSV writer
+    writer = csv.writer(response)
+    
+    # Write header row
+    writer.writerow(['phone', 'name'])
+    
+    # Write sample data rows
+    writer.writerow(['+919876543210', 'John Doe'])
+    writer.writerow(['+919876543211', 'Jane Smith'])
+    writer.writerow(['+919876543212', 'Robert Johnson'])
+    
+    return response

@@ -1,5 +1,5 @@
 from django.urls import path
-from . import views, dataDownload
+from . import views, dataDownload, views_whatsapp
 
 urlpatterns = [
     path("", views.administration, name="administration"),
@@ -16,6 +16,14 @@ urlpatterns = [
     path("rejected_students", views.rejected_students, name="rejected_students"),
     path("add_notification", views.add_notification, name="add_notification"),
     path("send_message_to_filtered_students", views.send_message_to_filtered_students, name="send_message_to_filtered_students"),
+    
+    # WhatsApp Messaging
+    path("whatsapp_message", views.whatsapp_message, name="whatsapp_message"),
+    path("whatsapp_test", views_whatsapp.whatsapp_test, name="whatsapp_test"),
+    path("api_test", views_whatsapp.api_test, name="api_test"),
+    path("send_whatsapp_to_filtered_students", views.send_whatsapp_to_filtered_students, name="send_whatsapp_to_filtered_students"),
+    path("send_whatsapp_bulk_csv", views.send_whatsapp_bulk_csv, name="send_whatsapp_bulk_csv"),
+    path("download_whatsapp_csv_template", views.download_whatsapp_csv_template, name="download_whatsapp_csv_template"),
     
     # ======================== Applications Toggles ========================
     

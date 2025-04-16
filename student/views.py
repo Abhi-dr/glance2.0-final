@@ -124,33 +124,62 @@ def my_applications(request):
 
 @login_required(login_url='login')
 def job(request, slug):
-    
-    job = Job.objects.get(slug=slug)
-    student = Student.objects.get(id=request.user.id)
-  
-    if not (student.tenth and student.twelfth and student.cgpa):
-        messages.error(request,"Complete your Profile to see eligible jobs for you ")
-        return redirect('my_profile')
-
-    eligible_jobs = Job.objects.filter(
-        tenth_percentage__lte=student.tenth,
-        twelfth_percentage__lte=student.twelfth,
-        cgpa_criteria__lte=student.cgpa
-    )
-    
-    
-    
-    parameters = {
-        "student": student,
-        "job": job,
-    }
-    
-    if job in eligible_jobs:
+    try:
+        job = Job.objects.select_related('company').get(slug=slug)
+        student = Student.objects.get(id=request.user.id)
+        
+        # Check if student has complete profile
+        if not all([student.tenth, student.twelfth, student.cgpa]):
+            messages.error(request, "Complete your Profile to see eligible jobs for you")
+            return redirect('my_profile')
+        
+        # Check eligibility
+        is_eligible = (
+            job.tenth_percentage <= student.tenth and
+            job.twelfth_percentage <= student.twelfth and
+            job.cgpa_criteria <= student.cgpa
+        )
+        
+        # Check backlog restriction
+        if student.backlog and student.backlog > 0 and not job.is_backlog_allowed:
+            is_eligible = False
+            messages.error(request, "This job does not allow students with backlogs.")
+            return redirect('student')
+        
+        # Check interview date conflicts
+        has_date_conflict = Application.objects.filter(
+            student=student,
+            job__interview_date=job.interview_date
+        ).exists()
+        
+        if has_date_conflict:
+            messages.error(request, "You have already applied to a company with the same interview date!")
+            return redirect('student')
+        
+        # Check if student has already applied
+        has_applied = Application.objects.filter(student=student, job=job).exists()
+        
+        parameters = {
+            "student": student,
+            "job": job,
+            "is_eligible": is_eligible,
+            "has_applied": has_applied
+        }
+        
         return render(request, 'student/job.html', parameters)
-
-    else:
-        messages.error(request, "Sorry! You are not eligible for this job")
-        return redirect('student')
+        
+    except Job.DoesNotExist:
+        messages.error(request, "Job not found.")
+        return redirect('all_jobs')
+    except Student.DoesNotExist:
+        messages.error(request, "Student profile not found. Please contact support.")
+        return redirect('login')
+    except Exception as e:
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Error in job view: {str(e)}")
+        messages.error(request, "An error occurred while loading the job details. Please try again later.")
+        return redirect('all_jobs')
 
 # ================================== APPLIED JOB ===========================================
 
