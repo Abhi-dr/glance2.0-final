@@ -440,17 +440,20 @@ GLA University, Mathura
 
 @login_required(login_url='login')
 def withdraw_application(request, slug):
-    
-    job = Job.objects.get(slug=slug)
-    student = Student.objects.get(id=request.user.id)
-    
-    application = Application.objects.get(student=student, job=job)
-    application.delete()
-    
-    student.no_of_companies_left += 1
-    student.save()
-    
-    myfile = f"""
+    try:
+        job = Job.objects.get(slug=slug)
+        student = Student.objects.get(id=request.user.id)
+        
+        try:
+            application = Application.objects.get(student=student, job=job)
+            
+            # Only allow withdrawal if application is still pending
+            if application.status == 'pending':
+                application.delete()
+                student.no_of_companies_left += 1
+                student.save()
+                
+                myfile = f"""
 Dear {student.first_name} {student.last_name},
 
 We trust this email finds you in good health and high spirits.
@@ -471,26 +474,39 @@ Technical Team
 Department of Alumni Affairs,
 GLA University, Mathura"""
 
-    email_subject = f"Application Withdrawn: {job.title.title()} at GLANCE"
-    email_body = myfile
-    email_from = 'GLANCE JOB FAIR 2k24 <alumniassociation01@gla.ac.in>'
-    email_to = [student.username]
+                email_subject = f"Application Withdrawn: {job.title.title()} at GLANCE"
+                email_body = myfile
+                email_from = 'GLANCE JOB FAIR 2k24 <alumniassociation01@gla.ac.in>'
+                email_to = [student.username]
 
-    try:
-    # Send the email
-        send_mail(
-            email_subject, 
-            email_body, 
-            email_from, 
-            email_to,
-            fail_silently=False
-            )
+                try:
+                    send_mail(
+                        email_subject, 
+                        email_body, 
+                        email_from, 
+                        email_to,
+                        fail_silently=False
+                    )
+                except Exception as e:
+                    print(f"Error sending email: {e}")
+                    messages.warning(request, "You'll get the confirmation mail soon!")
+                
+                messages.success(request, "Application withdrawn successfully")
+            else:
+                messages.error(request, "Cannot withdraw application - it has already been processed")
+                
+        except Application.DoesNotExist:
+            messages.error(request, "No active application found for this job")
+            
+    except Job.DoesNotExist:
+        messages.error(request, "The job you're trying to withdraw from doesn't exist")
+    except Student.DoesNotExist:
+        messages.error(request, "Student profile not found")
     except Exception as e:
-        print(f"Error sending email: {e}")
-        messages.error(request, "You'll get the confirmation mail soon!")
-        
-    messages.success(request, "Application withdrawn successfully")
-    return redirect('student')
+        print(f"Error in withdraw_application: {e}")
+        messages.error(request, "An error occurred while processing your request")
+    
+    return redirect('my_applications')
 
 # ================================== NOTIFICATIONS ===========================================
 
