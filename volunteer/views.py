@@ -87,6 +87,12 @@ def volunteer_applications(request):
     """
     View to display and filter all student applications for attendance marking
     """
+    # Add debug information
+    print("="*50)
+    print("volunteer_applications view called")
+    print(f"Request GET parameters: {request.GET}")
+    print("="*50)
+    
     # Get filter parameters
     search_query = request.GET.get('search', '')
     selected_date = request.GET.get('date', '')
@@ -94,11 +100,19 @@ def volunteer_applications(request):
     attendance_filter = request.GET.get('attendance', '')
     status_filter = request.GET.get('status', '')
     
+    print(f"Search query: '{search_query}'")
+    print(f"Selected date: '{selected_date}'")
+    print(f"Selected company: '{selected_company}'")
+    print(f"Attendance filter: '{attendance_filter}'")
+    print(f"Status filter: '{status_filter}'")
+    
     # Base queryset - get all applications instead of just accepted ones
     applications = Application.objects.all().select_related(
         'student', 
         'job__company'
     ).prefetch_related('attendance')
+    
+    print(f"Initial application count: {applications.count()}")
     
     # Apply filters
     if search_query:
@@ -107,15 +121,19 @@ def volunteer_applications(request):
             Q(student__last_name__icontains=search_query) |
             Q(student__university_roll_no__icontains=search_query)
         )
+        print(f"After search query filter: {applications.count()} applications")
     
     if selected_date:
         applications = applications.filter(job__interview_date=selected_date)
+        print(f"After date filter: {applications.count()} applications")
     
     if selected_company:
         applications = applications.filter(job__company__id=selected_company)
+        print(f"After company filter: {applications.count()} applications")
     
     if status_filter:
         applications = applications.filter(status=status_filter)
+        print(f"After status filter: {applications.count()} applications")
         
     if attendance_filter:
         if attendance_filter == 'marked':
@@ -126,6 +144,7 @@ def volunteer_applications(request):
             applications = applications.filter(attendance__is_present=True)
         elif attendance_filter == 'absent':
             applications = applications.filter(attendance__is_present=False)
+        print(f"After attendance filter: {applications.count()} applications")
     
     # Get data for filter dropdowns
     interview_dates = []
@@ -144,6 +163,9 @@ def volunteer_applications(request):
         'status_filter': status_filter,
         'search_query': search_query,
     }
+    
+    print(f"Final application count: {applications.count()}")
+    print("="*50)
     
     return render(request, 'volunteer/applications.html', context)
 

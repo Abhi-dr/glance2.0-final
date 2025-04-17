@@ -13,6 +13,7 @@ urlpatterns = [
     path("applications/<str:slug>", views.applications, name="applications"),
     path("all_registrations", views.all_registrations, name="all_registrations"),
     path("all_students", views.all_students, name="all_students"),
+    path("all_students_json", views.get_all_students_json, name="all_students_json"),
     
     path("shortlisted_students", views.shortlisted_students, name="shortlisted_students"),
     path("rejected_students", views.rejected_students, name="rejected_students"),

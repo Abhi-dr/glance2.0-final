@@ -1,9 +1,9 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from accounts.models import Student, Company, Job, Application, Notification
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.mail import send_mail
-from datetime import datetime
+from datetime import datetime, date
 from django.db.models import Q
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 
@@ -39,16 +39,21 @@ def home(request):
     if has_complete_profile:
         # Get eligible jobs with proper error handling
         try:
-            # Base query for eligible jobs
-            all_eligible_jobs = Job.objects.filter(
-                tenth_percentage__lte=student.tenth,
-                twelfth_percentage__lte=student.twelfth,
-                cgpa_criteria__lte=student.cgpa,
-            ).exclude(applications__student=student)
-            
-            # Handle backlog restrictions
-            if student.backlog > 0:
-                all_eligible_jobs = all_eligible_jobs.exclude(is_backlog_allowed=False)
+            # Base query for eligible jobs - handle bypass_eligibility
+            if student.bypass_eligibility:
+                # If bypass is enabled, all jobs are eligible except ones student already applied to
+                all_eligible_jobs = Job.objects.all().exclude(applications__student=student)
+            else:
+                # Normal eligibility criteria
+                all_eligible_jobs = Job.objects.filter(
+                    tenth_percentage__lte=student.tenth,
+                    twelfth_percentage__lte=student.twelfth,
+                    cgpa_criteria__lte=student.cgpa,
+                ).exclude(applications__student=student)
+                
+                # Handle backlog restrictions
+                if student.backlog > 0:
+                    all_eligible_jobs = all_eligible_jobs.exclude(is_backlog_allowed=False)
             
             # Get applications to handle interview date conflicts
             applications = Application.objects.filter(student=student)
@@ -123,63 +128,40 @@ def my_applications(request):
 # ================================== JOB DETAILS ===========================================
 
 @login_required(login_url='login')
-def job(request, slug):
-    try:
-        job = Job.objects.select_related('company').get(slug=slug)
-        student = Student.objects.get(id=request.user.id)
-        
-        # Check if student has complete profile
-        if not all([student.tenth, student.twelfth, student.cgpa]):
-            messages.error(request, "Complete your Profile to see eligible jobs for you")
-            return redirect('my_profile')
-        
-        # Check eligibility
-        is_eligible = (
-            job.tenth_percentage <= student.tenth and
-            job.twelfth_percentage <= student.twelfth and
-            job.cgpa_criteria <= student.cgpa
-        )
-        
-        # Check backlog restriction
-        if student.backlog and student.backlog > 0 and not job.is_backlog_allowed:
-            is_eligible = False
-            messages.error(request, "This job does not allow students with backlogs.")
-            return redirect('student')
-        
-        # Check interview date conflicts
-        has_date_conflict = Application.objects.filter(
-            student=student,
-            job__interview_date=job.interview_date
-        ).exists()
-        
-        if has_date_conflict:
-            messages.error(request, "You have already applied to a company with the same interview date!")
-            return redirect('student')
-        
-        # Check if student has already applied
-        has_applied = Application.objects.filter(student=student, job=job).exists()
-        
-        parameters = {
-            "student": student,
-            "job": job,
-            "is_eligible": is_eligible,
-            "has_applied": has_applied
-        }
-        
-        return render(request, 'student/job.html', parameters)
-        
-    except Job.DoesNotExist:
-        messages.error(request, "Job not found.")
-        return redirect('all_jobs')
-    except Student.DoesNotExist:
-        messages.error(request, "Student profile not found. Please contact support.")
-        return redirect('login')
-    except Exception as e:
-        import logging
-        logger = logging.getLogger(__name__)
-        logger.error(f"Error in job view: {str(e)}")
-        messages.error(request, "An error occurred while loading the job details. Please try again later.")
-        return redirect('all_jobs')
+def job_details(request, slug):
+    student = Student.objects.get(id=request.user.id)
+    job = get_object_or_404(Job, slug=slug)
+    
+    # Check if already applied
+    has_applied = Application.objects.filter(student=student, job=job).exists()
+    
+    # Check eligibility
+    is_eligible, eligibility_message = check_eligibility(student, job)
+    
+    # Format job salary range for better display - use simple string formatting instead
+    salary_parts = job.salary_range.split('-') if job.salary_range and '-' in job.salary_range else None
+    if salary_parts:
+        try:
+            # Format currency manually instead of using format_currency
+            min_salary = f"₹{float(salary_parts[0].strip()):,.2f}"
+            max_salary = f"₹{float(salary_parts[1].strip()):,.2f}"
+            formatted_salary = f"{min_salary} - {max_salary}"
+        except:
+            formatted_salary = job.salary_range
+    else:
+        formatted_salary = job.salary_range
+    
+    parameters = {
+        "student": student,
+        "job": job,
+        "is_eligible": is_eligible,
+        "has_applied": has_applied,
+        "eligibility_message": eligibility_message,
+        "formatted_salary": formatted_salary,
+        "today_date": date.today()
+    }
+    
+    return render(request, 'student/job_details.html', parameters)
 
 # ================================== APPLIED JOB ===========================================
 
@@ -288,10 +270,10 @@ def all_jobs(request):
     
     student = Student.objects.get(id=request.user.id)
     jobs_list = Job.objects.all().exclude(applications__student=student)
-    # for application in Application.objects.filter(student=student):
-    #     jobs = jobs.exclude(interview_date=application.job.interview_date)
-    if student.backlog:
-        if student.backlog > 0:
+    
+    # Apply backlog restrictions only if bypass_eligibility is not enabled
+    if not student.bypass_eligibility:
+        if student.backlog and student.backlog > 0:
             jobs_list = jobs_list.exclude(is_backlog_allowed=False)    
             
     query = request.GET.get("query")
@@ -302,6 +284,11 @@ def all_jobs(request):
             Q(description__icontains=query) |
             Q(company__name__icontains=query)
         ).exclude(applications__student=student)
+        
+        # Re-apply backlog restrictions on search results if needed
+        if not student.bypass_eligibility:
+            if student.backlog and student.backlog > 0:
+                jobs_list = jobs_list.exclude(is_backlog_allowed=False)
     
     # Pagination
     page = request.GET.get('page', 1)
@@ -344,97 +331,55 @@ def confirm_application(request, slug):
 # ================================== APPLY ===========================================
 
 @login_required(login_url='login')
-def apply(request, slug):
-    
-    job = Job.objects.get(slug=slug)
+def apply_job(request, slug):
+    # Check if the student has companies_left
     student = Student.objects.get(id=request.user.id)
     
-    eligible_jobs = Job.objects.filter(
-        tenth_percentage__lte=student.tenth,
-        twelfth_percentage__lte=student.twelfth,
-        cgpa_criteria__lte=student.cgpa
+    if student.no_of_companies_left <= 0:
+        messages.error(request, "You have already applied to the maximum number of companies.")
+        return redirect('student')
+    
+    job = get_object_or_404(Job, slug=slug)
+    
+    # Check if the student has already applied for this job
+    has_applied = Application.objects.filter(student=student, job=job).exists()
+    
+    if has_applied:
+        messages.error(request, "You have already applied for this job.")
+        return redirect('student')
+    
+    # Check eligibility
+    is_eligible, eligibility_message = check_eligibility(student, job)
+    
+    if not is_eligible:
+        messages.error(request, eligibility_message)
+        return redirect('student')
+    
+    # Check interview date conflicts
+    has_date_conflict = Application.objects.filter(
+        student=student,
+        job__interview_date=job.interview_date
+    ).exists()
+    
+    if has_date_conflict:
+        messages.error(request, "You have already applied to a company with the same interview date!")
+        return redirect('student')
+    
+    # Create the application
+    application = Application.objects.create(
+        student=student,
+        job=job,
+        status='pending'
     )
     
-    # check if the user is eligible or not
+    # Decrease the number of companies the student can apply to
+    student.no_of_companies_left -= 1
+    student.save()
     
-    if job not in eligible_jobs:
-        messages.error(request, "Sorry! You are not eligible for this job")
-        return redirect('student')
+    messages.success(request, "Successfully applied for the job. Good luck!")
     
-    for application in Application.objects.filter(student=student):
-        if application.job.interview_date == job.interview_date:
-            messages.error(request, "You have already applied to a company which is coming on the same date!")
-            return redirect('student')
-        
-    # check for the deadline of the job
-    
-    if job.deadline < datetime.now().date():
-        messages.error(request, "The deadline for this job has been passed!")
-        return redirect('student')
-    
-    if student.no_of_companies_left > 0:
-        application = Application.objects.create(
-            student=student,
-            job=job
-        )
-        
-
-        student.no_of_companies_left -= 1
-
-        myfile=f"""
-Dear {student.first_name} {student.last_name},
-
-We are delighted to extend our warm greetings from the Department of Alumni Affairs at GLA University, Mathura.
-
-We are pleased to inform you that your application for the position of {job.title.title()} at {job.company.name.title()}, submitted through GLANCE, the Mega Student Job Fair, has been successfully received. Congratulations on this significant step towards your career aspirations!
-
-Below are the essential details regarding the upcoming interview:
-
-Interview Date: {job.interview_date}
-Interview Mode: {job.interview_mode}
-
-If you wish to withdraw your application, 
-- Go to the GLANCE portal
-- Click on the 'My Applications' tab
-- Select the Application you wish to withdraw
-- Click on the 'Withdraw' button
-
-Should you have any inquiries or require further assistance, please do not hesitate to contact us at alumniassociation01@gla.ac.in.
-
-Best Regards,
-Technical Team
-Department of Alumni Affairs
-GLA University, Mathura
-"""
-
-        email_subject = f"Application Confirmation: {job.title.title()} at GLANCE"
-        email_body = myfile
-        email_from = 'GLANCE JOB FAIR 2k24 <alumniassociation01@gla.ac.in>'
-        email_to = [student.username]
-
-        try:
-            # Send the email
-            send_mail(
-                email_subject, 
-                email_body, 
-                email_from, 
-                email_to,
-                fail_silently=False
-                )
-        
-        except Exception as e:
-            print(f"Error sending email: {e}")
-            messages.warning(request, "You will get the confirmation mail soon!")
-        
-        student.save()
-        application.save()
-        
-        messages.success(request, "Application submitted successfully")
-        return redirect('student')
-    
-    else:
-        messages.error(request, "You have already applied to 3 companies!")
-        return redirect('student')
+    # Redirect to the student dashboard
+    return redirect('student')
 
 # ================================== WITHDRAW APPLICATION ===========================================
 
@@ -536,3 +481,39 @@ def support(request):
     }
     
     return render(request, 'student/support.html', parameters)
+
+def check_eligibility(student, job):
+    """
+    Check if a student is eligible for a job based on criteria like CGPA, 10th, 12th marks
+    and if student has the bypass_eligibility flag enabled.
+    """
+    # If student has bypass_eligibility flag enabled, skip all checks
+    if student.bypass_eligibility:
+        return True, "Eligibility criteria bypassed by administrator"
+    
+    # Perform regular eligibility checks
+    if job.cgpa_criteria:
+        if not student.cgpa:
+            return False, "Your CGPA is not provided but required for this job"
+        if float(student.cgpa) < float(job.cgpa_criteria):
+            return False, f"Your CGPA ({student.cgpa}) is below the required criterion ({job.cgpa_criteria})"
+    
+    if job.tenth_percentage:
+        if not student.tenth:
+            return False, "Your 10th percentage is not provided but required for this job"
+        if float(student.tenth) < float(job.tenth_percentage):
+            return False, f"Your 10th percentage ({student.tenth}) is below the required criterion ({job.tenth_percentage})"
+    
+    if job.twelfth_percentage:
+        if not student.twelfth:
+            return False, "Your 12th percentage is not provided but required for this job"
+        if float(student.twelfth) < float(job.twelfth_percentage):
+            return False, f"Your 12th percentage ({student.twelfth}) is below the required criterion ({job.twelfth_percentage})"
+    
+    if not job.is_backlog_allowed:
+        if student.backlog is None:
+            return False, "Your backlog information is not provided but required for this job"
+        if student.backlog > 0:
+            return False, "You have backlogs and this company does not allow backlogs"
+    
+    return True, "You are eligible for this job"

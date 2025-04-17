@@ -51,6 +51,9 @@ class Student(User):
             MinValueValidator(0)
         ])
     
+    # Flag to bypass eligibility criteria for special cases
+    bypass_eligibility = models.BooleanField(default=False, help_text="If enabled, bypasses all eligibility restrictions like CGPA, 10th, 12th marks")
+    
     profile_pic = models.ImageField(
         upload_to="student_profile/", default="/student_profile/default.jpg")
     
@@ -59,54 +62,69 @@ class Student(User):
         verbose_name = "Student"
 
     def get_profile_score(self):
-        score = 0
-        
-        if self.tenth_marksheet:
-            score += 10
-        if self.twelfth_marksheet:
-            score += 10
-        if self.college_profile_print:
-            score += 10
-        if self.resume:
-            score += 10
-        
-        if self.linkedin_id:
-            score += 5
-        if self.github_id:
-            score += 5
-        if self.instagram_id:
-            score += 5
-        if self.twitter_id:
-            score += 5
+        """
+        Calculate profile score with proper error handling
+        """
+        try:
+            score = 0
             
-        # Check if profile picture is not the default one
-        if self.profile_pic and not str(self.profile_pic).endswith('default.jpg'):
-            score += 15  # Increased from 10 to emphasize importance
-        
-        if self.phone_number:
-            score += 5
-        if self.gender:
-            score += 5
-        if self.course:
-            score += 5
-        if self.year:
-            score += 5
-        
-        if self.cgpa:
-            score += 5
-        if self.backlog:
-            score += 5
-        if self.tenth:
-            score += 5
-        if self.twelfth:
-            score += 5
-        
-        # Alumni information
-        if self.alumni_status == "Alumni" and self.passout_year:
-            score += 10
-        
-        # return score in percentage
-        return score
+            # Documents
+            if hasattr(self, 'tenth_marksheet') and self.tenth_marksheet:
+                score += 10
+            if hasattr(self, 'twelfth_marksheet') and self.twelfth_marksheet:
+                score += 10
+            if hasattr(self, 'college_profile_print') and self.college_profile_print:
+                score += 10
+            if hasattr(self, 'resume') and self.resume:
+                score += 10
+            
+            # Social media
+            if hasattr(self, 'linkedin_id') and self.linkedin_id:
+                score += 5
+            if hasattr(self, 'github_id') and self.github_id:
+                score += 5
+            if hasattr(self, 'instagram_id') and self.instagram_id:
+                score += 5
+            if hasattr(self, 'twitter_id') and self.twitter_id:
+                score += 5
+                
+            # Profile picture (safely check)
+            try:
+                if hasattr(self, 'profile_pic') and self.profile_pic and not str(self.profile_pic).endswith('default.jpg'):
+                    score += 15
+            except Exception:
+                # If any error with profile pic, just skip this score
+                pass
+            
+            # Basic info
+            if hasattr(self, 'phone_number') and self.phone_number:
+                score += 5
+            if hasattr(self, 'gender') and self.gender:
+                score += 5
+            if hasattr(self, 'course') and self.course:
+                score += 5
+            if hasattr(self, 'year') and self.year:
+                score += 5
+            
+            # Academic info
+            if hasattr(self, 'cgpa') and self.cgpa:
+                score += 5
+            if hasattr(self, 'backlog') and self.backlog is not None:
+                score += 5
+            if hasattr(self, 'tenth') and self.tenth:
+                score += 5
+            if hasattr(self, 'twelfth') and self.twelfth:
+                score += 5
+            
+            # Alumni information
+            if hasattr(self, 'alumni_status') and hasattr(self, 'passout_year') and self.alumni_status == "Alumni" and self.passout_year:
+                score += 10
+            
+            return score
+            
+        except Exception as e:
+            # If anything goes wrong, return a default value
+            return 0
 
 # ============================================ ADMINISTRATOR =========================================
 

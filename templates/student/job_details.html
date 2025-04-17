@@ -1,0 +1,206 @@
+{% extends 'student/base.html' %}
+
+{% block title %}
+Job Details
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'student' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'all_jobs' %}">All Jobs</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ job.title }}</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-4">
+                        {% if job.company.logo %}
+                        <img src="{{ job.company.logo.url }}" alt="{{ job.company.name }}" class="me-3" style="width: 80px; height: 80px; object-fit: contain;">
+                        {% else %}
+                        <div class="company-logo-placeholder me-3 d-flex align-items-center justify-content-center bg-light" style="width: 80px; height: 80px; border-radius: 8px;">
+                            <i class="fas fa-building fa-2x text-secondary"></i>
+                        </div>
+                        {% endif %}
+                        <div>
+                            <h3 class="mb-1">{{ job.title }}</h3>
+                            <h5 class="text-primary mb-2">{{ job.company.name }}</h5>
+                            <div class="d-flex flex-wrap">
+                                <span class="badge bg-info me-2 mb-1"><i class="fas fa-map-marker-alt me-1"></i> {{ job.company.location }}</span>
+                                <span class="badge bg-success me-2 mb-1"><i class="fas fa-coins me-1"></i> {{ formatted_salary }}</span>
+                                <span class="badge bg-secondary me-2 mb-1"><i class="fas fa-briefcase me-1"></i> {{ job.job_type }}</span>
+                                <span class="badge bg-warning text-dark me-2 mb-1"><i class="fas fa-calendar-alt me-1"></i> {{ job.interview_date }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h5 class="mb-0">Eligibility Status</h5>
+                        </div>
+                        <div class="card-body">
+                            {% if is_eligible %}
+                                <div class="alert alert-success">
+                                    <i class="fas fa-check-circle me-2"></i> 
+                                    {% if student.bypass_eligibility %}
+                                        <strong>Eligibility criteria bypassed by administrator.</strong> You can apply for this job.
+                                    {% else %}
+                                        <strong>You are eligible for this job!</strong> {{ eligibility_message }}
+                                    {% endif %}
+                                </div>
+                            {% else %}
+                                <div class="alert alert-danger">
+                                    <i class="fas fa-times-circle me-2"></i> <strong>You are not eligible for this job.</strong> {{ eligibility_message }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <h5 class="card-title">Job Description</h5>
+                    <p class="card-text">{{ job.description|linebreaks }}</p>
+
+                    <h5 class="card-title mt-4">Role</h5>
+                    <p class="card-text">{{ job.role }}</p>
+
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <h5>Job Details</h5>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <span><i class="fas fa-users me-2"></i> Company Size:</span>
+                                    <span class="text-primary">{{ job.company.size }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <span><i class="fas fa-calendar-day me-2"></i> Interview Date:</span>
+                                    <span class="text-primary">{{ job.interview_date }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <span><i class="fas fa-calendar-alt me-2"></i> Application Deadline:</span>
+                                    <span class="text-primary">{{ job.deadline }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <span><i class="fas fa-video me-2"></i> Interview Mode:</span>
+                                    <span class="text-primary">{{ job.interview_mode }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <span><i class="fas fa-briefcase me-2"></i> Job Type:</span>
+                                    <span class="text-primary">{{ job.job_type }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <span><i class="fas fa-coins me-2"></i> Salary Range:</span>
+                                    <span class="text-primary">{{ formatted_salary }}</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Eligibility Criteria</h5>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <span><i class="fas fa-graduation-cap me-2"></i> Minimum CGPA:</span>
+                                    <span class="text-primary">{{ job.cgpa_criteria }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <span><i class="fas fa-school me-2"></i> 10th Percentage:</span>
+                                    <span class="text-primary">{{ job.tenth_percentage }}%</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <span><i class="fas fa-school me-2"></i> 12th Percentage:</span>
+                                    <span class="text-primary">{{ job.twelfth_percentage }}%</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <span><i class="fas fa-exclamation-circle me-2"></i> Backlogs Allowed:</span>
+                                    <span class="text-primary">{{ job.is_backlog_allowed|yesno:"Yes,No" }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <span><i class="fas fa-map-marker-alt me-2"></i> Location Flexibility:</span>
+                                    <span class="text-primary">{{ job.location_flexibility }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <span><i class="fas fa-clock me-2"></i> Training Period:</span>
+                                    <span class="text-primary">{{ job.training_period }}</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Application Status</h5>
+                </div>
+                <div class="card-body">
+                    {% if has_applied %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i> You have already applied for this job.
+                        </div>
+                        <a href="{% url 'my_applications' %}" class="btn btn-primary w-100">
+                            <i class="fas fa-list me-2"></i> View My Applications
+                        </a>
+                    {% else %}
+                        {% if is_eligible %}
+                            {% if student.no_of_companies_left > 0 %}
+                                {% if job.deadline|date:"Y-m-d" >= today_date|date:"Y-m-d" %}
+                                    <a href="{% url 'apply_job' job.slug %}" class="btn btn-success w-100 mb-3">
+                                        <i class="fas fa-paper-plane me-2"></i> Apply Now
+                                    </a>
+                                    <div class="alert alert-warning">
+                                        <i class="fas fa-exclamation-triangle me-2"></i> You can only apply to <strong>{{ student.no_of_companies_left }}</strong> more companies.
+                                    </div>
+                                {% else %}
+                                    <div class="alert alert-danger">
+                                        <i class="fas fa-calendar-times me-2"></i> The application deadline for this job has passed.
+                                    </div>
+                                {% endif %}
+                            {% else %}
+                                <div class="alert alert-danger">
+                                    <i class="fas fa-exclamation-circle me-2"></i> You have reached the maximum number of job applications.
+                                </div>
+                            {% endif %}
+                        {% else %}
+                            <div class="alert alert-danger">
+                                <i class="fas fa-times-circle me-2"></i> You cannot apply as you don't meet the eligibility criteria.
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">About {{ job.company.name }}</h5>
+                </div>
+                <div class="card-body">
+                    <p>{{ job.company.description|truncatewords:50 }}</p>
+                    {% if job.company.website %}
+                        <a href="{{ job.company.website }}" target="_blank" class="btn btn-outline-primary btn-sm d-flex align-items-center">
+                            <i class="fas fa-globe me-2"></i> Visit Website
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if job.company.benefits_perks %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Benefits & Perks</h5>
+                </div>
+                <div class="card-body">
+                    <p>{{ job.company.benefits_perks|linebreaks }}</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

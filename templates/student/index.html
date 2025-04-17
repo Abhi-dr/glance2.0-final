@@ -509,7 +509,7 @@ Student -> Home
                                     <td>
                                         <div class="d-flex align-items-center">
                                             {% if student.resume and student.tenth_marksheet and student.twelfth_marksheet and student.college_profile_print %}
-                                            <a href="{% url 'job' job.slug %}" class="btn btn-primary action-btn">
+                                            <a href="{% url 'job_details' job.slug %}" class="btn btn-primary action-btn">
                                                 <i class="ti ti-eye me-1"></i>View
                                             </a>
                                             {% else %}
@@ -548,7 +548,7 @@ Student -> Home
     <div class="row">
             {% for job in all_eligible_jobs %}
         <div class="col-md-3 mb-4">
-            <a href="{% url 'job' job.slug %}" class="text-decoration-none">
+            <a href="{% url 'job_details' job.slug %}" class="text-decoration-none">
                 <div class="card dashboard-card h-100">
                     <div class="card-body p-3 text-center">
                         <img src="{% if job.company.logo %}{{ job.company.logo.url }}{% else %}{% static 'img/user.jpg' %}{% endif %}" class="company-logo mb-3" alt="{{ job.company.name }}">

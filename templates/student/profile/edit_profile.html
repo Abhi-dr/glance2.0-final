@@ -313,6 +313,10 @@ Student - Edit Profile
                                             <option value="M.Tech Information Technology" {% if student.course == 'M.Tech Information Technology' %}selected{% endif %}>M.Tech Information Technology</option>
                                             <option value="MBA" {% if student.course == 'MBA' %}selected{% endif %}>MBA</option>
                                             <option value="B.Com" {% if student.course == 'B.Com' %}selected{% endif %}>B.Com</option>
+                                            <option value="Diploma Computer Science" {% if student.course == 'Diploma Computer Science' %}selected{% endif %}>Diploma Computer Science</option>
+                                            <option value="Diploma.Tech Electronics" {% if student.course == 'Diploma Electronics' %}selected{% endif %}>Diploma Electronics</option>
+                                            <option value="Diploma Electrical" {% if student.course == 'Diploma Electrical' %}selected{% endif %}>Diploma Electrical</option>
+                                            <option value="Diploma Mechanical" {% if student.course == 'Diploma Mechanical' %}selected{% endif %}>Diploma Mechanical</option>
                                             <option value="M.Com" {% if student.course == 'M.Com' %}selected{% endif %}>M.Com</option>
                                             <option value="BBA" {% if student.course == 'BBA' %}selected{% endif %}>BBA</option>
                                             <option value="LLB" {% if student.course == 'LLB' %}selected{% endif %}>LLB</option>
@@ -454,7 +458,7 @@ Student - Edit Profile
                                         <div class="invalid-feedback">Please enter a valid Instagram URL (e.g., https://instagram.com/username) or "N/A".</div>
                                     </div>
                                 </div>
-                                
+
                                 <div class="mb-3">
                                     <label class="small mb-1" for="inputTwitter">Twitter/X</label>
                                     <div class="input-group social-input-group">

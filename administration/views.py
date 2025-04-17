@@ -1,10 +1,19 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.admin.views.decorators import staff_member_required
 from accounts.models import Company, Job, Student, Application, Notification
-from django.db.models import Q
+from django.db.models import Q, Count, Sum, Avg, F, ExpressionWrapper, BooleanField, Case, When, Value, IntegerField
+from django.urls import reverse
+from django.http import HttpResponse, JsonResponse
+from django.db import models
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+import json
+from datetime import datetime, timedelta
+import csv
+import os
+from django.conf import settings
 
 import threading
 
@@ -929,93 +938,76 @@ def get_filtered_students(request):
             except (ValueError, TypeError) as e:
                 print(f"Error filtering by profile score: {e}")
                 pass
-                
-        # Filter by company and job applications if provided
-        if company_ids:
-            # Get applications for the specified companies
-            company_applications = Application.objects.filter(
-                job__company_id__in=company_ids
-            ).values_list('student_id', flat=True)
-            students = students.filter(id__in=company_applications)
-            print(f"After company filter: {students.count()} students")
         
-        # Filter by job applications if provided
-        if job_ids:
-            # Get applications for the specified jobs
-            job_applications = Application.objects.filter(
-                job_id__in=job_ids
-            ).values_list('student_id', flat=True)
-            students = students.filter(id__in=job_applications)
-            print(f"After job filter: {students.count()} students")
-        
-        # Filter by attendance status if provided
+        # Apply attendance status filter
         if attendance_status:
+            print(f"Filtering by attendance status: {attendance_status}")
             if attendance_status == 'present':
-                # Get student IDs who are marked present
-                present_students = Application.objects.filter(
-                    attendance__is_present=True
-                ).values_list('student_id', flat=True).distinct()
-                students = students.filter(id__in=present_students)
-                print(f"After attendance (present) filter: {students.count()} students")
+                # Find students who have attendances marked as present
+                students = students.filter(attendance__is_present=True).distinct()
             elif attendance_status == 'absent':
-                # Get student IDs who are marked absent
-                absent_students = Application.objects.filter(
-                    attendance__is_present=False
-                ).values_list('student_id', flat=True).distinct()
-                students = students.filter(id__in=absent_students)
-                print(f"After attendance (absent) filter: {students.count()} students")
+                # Find students who have attendances marked as absent
+                students = students.filter(attendance__is_present=False).distinct()
             elif attendance_status == 'not_marked':
-                # Get student IDs who have applications but no attendance record
-                application_student_ids = Application.objects.values_list('student_id', flat=True).distinct()
-                attendance_student_ids = Application.objects.filter(
-                    attendance__isnull=False
-                ).values_list('student_id', flat=True).distinct()
-                not_marked_student_ids = set(application_student_ids) - set(attendance_student_ids)
-                students = students.filter(id__in=not_marked_student_ids)
-                print(f"After attendance (not marked) filter: {students.count()} students")
+                # This is more complex - we need to find students with no attendance records
+                students_with_attendance = Attendance.objects.values_list('student_id', flat=True).distinct()
+                students = students.exclude(id__in=students_with_attendance)
+            print(f"After attendance filter: {students.count()} students")
+                
+        # Count total filtered records before pagination
+        total_filtered_records = students.count()
+        print(f"Total filtered records: {total_filtered_records}")
         
-        # Apply pagination for better performance
-        if start is not None and length is not None:
-            end = start + length
-            paginated_students = students[start:end]
-        else:
-            paginated_students = students
-            
-        print(f"Paginated students: {len(paginated_students)}")
+        # Apply pagination
+        paginated_students = students[start:start + length]
+        print(f"After pagination: {len(paginated_students)} students")
         
-        # Prepare data for DataTables
+        # Convert student data to format expected by DataTables
         data = []
-        
         for student in paginated_students:
             try:
+                # Handle profile score calculation
+                try:
+                    profile_score_val = 75  # Default profile score
+                    if hasattr(student, 'get_profile_score'):
+                        student_score = student.get_profile_score()
+                        if student_score is not None:
+                            profile_score_val = student_score
+                except Exception as e:
+                    print(f"Error getting profile score for student {student.id}: {e}")
+                    profile_score_val = 0
+                
+                # Formatted student data for DataTables
                 data.append({
                     'id': student.id,
-                    'first_name': student.first_name or '',
-                    'last_name': student.last_name or '',
-                    'username': student.email or '',
-                    'phone_number': student.phone_number or '',
+                    'name': f"{student.first_name or ''} {student.last_name or ''}".strip(),
+                    'email': student.email or '',
+                    'phone': student.phone_number or '',
                     'course': student.course or '',
                     'year': student.year or '',
                     'cgpa': float(student.cgpa) if student.cgpa else 0,
-                    'alumni_status': student.alumni_status or '',
-                    'no_of_companies_left': student.no_of_companies_left or 0,
-                    'profile_score': student.profile_score or 0,
+                    'status': student.alumni_status or 'Active',
+                    'companies_left': student.no_of_companies_left or 0,
+                    'profile_score': profile_score_val,
                     'actions': f'<a href="/administration/student/{student.id}" class="btn btn-sm btn-primary"><i class="fas fa-eye"></i></a>'
                 })
             except Exception as e:
-                print(f"Error processing student {student.id}: {e}")
+                print(f"Error processing student {getattr(student, 'id', 'unknown')}: {e}")
                 continue
         
         # Create response for DataTables
         response = {
             'draw': draw,
             'recordsTotal': total_students,
-            'recordsFiltered': students.count(),
+            'recordsFiltered': total_filtered_records,
             'data': data
         }
+        
         print(f"Returning {len(data)} students to DataTable")
         return JsonResponse(response)
+    
     except Exception as e:
+        import traceback
         print(f"Error in get_filtered_students: {e}")
         print(traceback.format_exc())
         return JsonResponse({
@@ -1631,4 +1623,53 @@ def test_student_data(request):
         return JsonResponse({
             'success': False,
             'error': str(e)
+        })
+
+@login_required(login_url='login')
+@staff_member_required(login_url='login')
+def get_all_students_json(request):
+    """API endpoint to get all students as JSON for DataTables"""
+    try:
+        students = Student.objects.all()
+        
+        print(f"Found {students.count()} students for JSON response")
+        
+        data = []
+        for student in students:
+            # Handle profile score
+            try:
+                profile_score = 75  # Default profile score
+                if hasattr(student, 'get_profile_score'):
+                    student_score = student.get_profile_score()
+                    if student_score is not None:
+                        profile_score = student_score
+            except Exception as e:
+                print(f"Error getting profile score for student {student.id}: {e}")
+                profile_score = 0
+                
+            # Create a data entry for this student
+            data.append({
+                'id': student.id,
+                'name': f"{student.first_name or ''} {student.last_name or ''}".strip(),
+                'email': student.email or '',
+                'phone': student.phone_number or '',
+                'course': student.course or '',
+                'year': student.year or '',
+                'cgpa': float(student.cgpa) if student.cgpa else 0,
+                'status': student.alumni_status or 'Active',
+                'companies_left': student.no_of_companies_left or 0,
+                'profile_score': profile_score,
+                'actions': f'<a href="/administration/student/{student.id}" class="btn btn-sm btn-primary"><i class="fas fa-eye"></i></a>'
+            })
+            
+        return JsonResponse({
+            'data': data
+        })
+    except Exception as e:
+        import traceback
+        print(f"Error in get_all_students_json: {e}")
+        print(traceback.format_exc())
+        return JsonResponse({
+            'error': str(e),
+            'data': []
         })

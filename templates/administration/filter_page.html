@@ -529,136 +529,164 @@
 <!-- Bootstrap Bundle with Popper -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
+<!-- DataTables JS -->
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+
 <!-- Select2 JS - Make sure it's loaded before using it -->
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-<!-- Custom Dashboard JS - Do not load ApexCharts as it's causing errors -->
-<!-- <script src="{% static 'js/dashboard/dashboard.js' %}"></script> -->
-
 <script>
-    // Define a global variable to store the DataTable instance
-    let dataTable;
-    
     $(document).ready(function() {
-        // Try-catch block to handle Select2 loading issues
+        console.log("Page ready!");
+        
+        // Initialize Select2
         try {
-            // Initialize Select2 for multiple select fields
-            if ($.fn.select2) {
+            console.log("Initializing Select2...");
+            if (typeof $.fn.select2 === 'function') {
                 $('#interview_date').select2({
                     placeholder: "Select interview dates",
                     allowClear: true
                 });
                 console.log("Select2 initialized successfully");
             } else {
-                console.error("Select2 plugin not loaded");
-                // Fallback to regular select
+                console.error("Select2 plugin not loaded correctly");
                 $('#interview_date').prop('multiple', true);
             }
         } catch (error) {
             console.error("Error initializing Select2:", error);
         }
 
-        // Test direct API access through a simple AJAX call
-        console.log('Testing direct API access...');
+        // Initialize DataTable directly with the dedicated JSON endpoint
+        console.log("Initializing DataTable with JSON endpoint...");
+        $('#loadingOverlay').css('display', 'flex');
         
-        // Perform a simple test to check if jQuery AJAX is working
-        $.ajax({
-            url: '/administration/all_students',
-            type: 'GET',
-            dataType: 'html',
-            success: function(response) {
-                console.log('Successfully connected to server!');
-                // Now try the actual data fetch
-                fetchStudentData();
-            },
-            error: function(xhr, status, error) {
-                console.error('Connection test failed:', error);
-                $('#dataTable tbody').html('<tr><td colspan="11" class="text-center">Error connecting to server. Check console for details.</td></tr>');
+        try {
+            if ($.fn.DataTable.isDataTable('#dataTable')) {
+                $('#dataTable').DataTable().destroy();
             }
-        });
-        
-        function fetchStudentData() {
-            console.log('Fetching student data...');
-            $('#loadingOverlay').css('display', 'flex');
             
-            // Add a timestamp to prevent caching
-            var timestamp = new Date().getTime();
-            
-            $.ajax({
-                url: '/administration/all_students',
-                type: 'GET',
-                data: { 
-                    '_': timestamp 
-                },
-                dataType: 'html',
-                success: function(response) {
-                    $('#loadingOverlay').hide();
-                    console.log('Data fetch successful');
-                    
-                    // Extract student data from the HTML response
-                    var tempDiv = document.createElement('div');
-                    tempDiv.innerHTML = response;
-                    
-                    var students = [];
-                    $(tempDiv).find('table tr:not(:first-child)').each(function() {
-                        var cells = $(this).find('td');
-                        if (cells.length > 1) {
-                            students.push({
-                                id: $(cells[0]).text().trim(),
-                                name: $(cells[1]).text().trim(),
-                                email: $(cells[2]).text().trim(),
-                                phone: $(cells[3]).text().trim(),
-                                course: $(cells[4]).text().trim(),
-                                year: $(cells[5]).text().trim(),
-                                cgpa: $(cells[6]).text().trim(),
-                                actions: $(cells[7]).html() || ''
-                            });
+            $('#dataTable').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    ajax: {
+                    url: '/administration/get_filtered_students',
+                        type: 'GET',
+                    data: function(d) {
+                        // Add filter parameters to the request
+                        d.id = $('#id').val() || '';
+                        d.name = $('#name').val() || '';
+                        d.email = $('#email').val() || '';
+                        d.phone = $('#phone').val() || '';
+                        d.year = $('#year').val() || '';
+                        d.cgpa = $('#cgpa').val() || '';
+                        d.cgpa_operator = $('#cgpa_operator').val() || '=';
+                        d.status = $('#status').val() || '';
+                        d.companies_left = $('#companies_left').val() || '';
+                        d.companies_operator = $('#companies_operator').val() || '=';
+                        d.profile_score = $('#profile_score').val() || '';
+                        d.score_operator = $('#score_operator').val() || '=';
+                        d.attendance_status = $('#attendance_status').val() || '';
+                        
+                        // Get selected courses
+                        const courses = [];
+                        $('.course-checkbox:checked').each(function() {
+                            courses.push($(this).val());
+                        });
+                        d.course = courses;
+                        
+                        // Get selected companies
+                        const companies = [];
+                        $('.company-checkbox:checked').each(function() {
+                            companies.push($(this).val());
+                        });
+                        d.companies = companies;
+                        
+                        // Get selected jobs
+                        const jobs = [];
+                        $('.job-checkbox:checked').each(function() {
+                            jobs.push($(this).val());
+                        });
+                        d.jobs = jobs;
+                        
+                        // Get selected interview dates
+                        d.interview_date = $('#interview_date').val() || [];
+                        
+                            return d;
                         }
-                    });
-                    
-                    // Display the data in our table
-                    renderStudentTable(students);
+                    },
+                    columns: [
+                        { data: 'id' },
+                    { data: 'name' },
+                    { data: 'email' },
+                    { data: 'phone' },
+                        { data: 'course' },
+                        { data: 'year' },
+                    { data: 'cgpa' },
+                    { data: 'status' },
+                    { data: 'companies_left' },
+                    { data: 'profile_score' },
+                    { data: 'actions' }
+                ],
+                pageLength: 10,
+                responsive: true,
+                language: {
+                    processing: "Loading data...",
+                    zeroRecords: "No matching records found",
+                    info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                    infoEmpty: "Showing 0 to 0 of 0 entries",
+                    infoFiltered: "(filtered from _MAX_ total entries)"
                 },
-                error: function(xhr, status, error) {
-                    console.error('Error fetching student data:', error);
+                initComplete: function() {
                     $('#loadingOverlay').hide();
-                    $('#dataTable tbody').html('<tr><td colspan="11" class="text-center">Error fetching student data. Check console for details.</td></tr>');
+                    console.log("DataTable initialization complete");
                 }
             });
+        } catch (error) {
+            console.error("Error initializing DataTable:", error);
+            $('#loadingOverlay').hide();
+            $('#dataTable tbody').html('<tr><td colspan="11" class="text-center">Error loading data. Please try again.</td></tr>');
         }
         
-        function renderStudentTable(students) {
-            if (students && students.length > 0) {
-                // Render the table manually
-                let html = '';
-                students.forEach(function(student) {
-                    html += '<tr>';
-                    html += '<td>' + (student.id || '') + '</td>';
-                    html += '<td>' + (student.name || '') + '</td>';
-                    html += '<td>' + (student.email || '') + '</td>';
-                    html += '<td>' + (student.phone || '') + '</td>';
-                    html += '<td>' + (student.course || '') + '</td>';
-                    html += '<td>' + (student.year || '') + '</td>';
-                    html += '<td>' + (student.cgpa || '-') + '</td>';
-                    html += '<td>' + (student.year || '') + '</td>';
-                    html += '<td>-</td>';
-                    html += '<td>-</td>';
-                    html += '<td>' + (student.actions || '<a href="#" class="btn btn-sm btn-primary"><i class="fas fa-eye"></i></a>') + '</td>';
-                    html += '</tr>';
-                });
-                $('#dataTable tbody').html(html);
-            } else {
-                $('#dataTable tbody').html('<tr><td colspan="11" class="text-center">No student data available.</td></tr>');
-            }
-        }
-        
-        // Handle form submission with direct AJAX
+        // Handle form submission
         $('#filterForm').on('submit', function(e) {
             e.preventDefault();
-            fetchStudentData();
+            console.log("Filter form submitted");
+            $('#loadingOverlay').css('display', 'flex');
+            
+            // Get form values for active filters display
+            const formData = {
+                id: $('#id').val(),
+                name: $('#name').val(),
+                email: $('#email').val(),
+                phone: $('#phone').val(),
+                year: $('#year').val(),
+                cgpa: $('#cgpa').val(),
+                cgpa_operator: $('#cgpa_operator').val(),
+                status: $('#status').val(),
+                companies_left: $('#companies_left').val(),
+                companies_operator: $('#companies_operator').val(),
+                profile_score: $('#profile_score').val(),
+                score_operator: $('#score_operator').val(),
+                attendance_status: $('#attendance_status').val()
+            };
+            
+            // Get courses for display
+            const courses = [];
+            $('.course-checkbox:checked').each(function() {
+                courses.push($(this).val());
+            });
+            
+            // Update active filters display
+            updateActiveFilters(formData, courses);
+            
+            // Reload the DataTable with the new filters
+            $('#dataTable').DataTable().ajax.reload();
+            
+            $('#loadingOverlay').hide();
         });
         
-        // Simplified reset function
+        // Reset filters
         $('#resetFilters').on('click', function() {
             $('#filterForm')[0].reset();
             $('.course-checkbox').prop('checked', false);
@@ -666,22 +694,43 @@
             $('.job-checkbox').prop('checked', false);
             $('.job-option').hide();
             
-            // Reset Select2 elements
-            try {
-                if ($.fn.select2) {
-                    $('#interview_date').val(null).trigger('change');
-                }
-            } catch (e) {
-                console.error("Error resetting Select2:", e);
+            if (typeof $.fn.select2 === 'function') {
+                $('#interview_date').val(null).trigger('change');
             }
             
             // Clear active filters
-            $('#activeFilters').empty();
+            $('#activeFilters').empty().html('<span class="text-muted">No active filters</span>');
             
-            // Fetch data with no filters
-            fetchStudentData();
+            // Reset DataTable and reload with no filters
+            const table = $('#dataTable').DataTable();
+                        table.ajax.reload();
         });
     });
+    
+    function updateActiveFilters(formData, courses) {
+        const activeFilters = [];
+        
+        if (formData.id) activeFilters.push(`ID: ${formData.id}`);
+        if (formData.name) activeFilters.push(`Name: ${formData.name}`);
+        if (formData.email) activeFilters.push(`Email: ${formData.email}`);
+        if (formData.phone) activeFilters.push(`Phone: ${formData.phone}`);
+        if (formData.year) activeFilters.push(`Year: ${formData.year}`);
+        if (formData.cgpa) activeFilters.push(`CGPA ${formData.cgpa_operator} ${formData.cgpa}`);
+        if (formData.status) activeFilters.push(`Status: ${formData.status}`);
+        if (formData.companies_left) activeFilters.push(`Companies Left ${formData.companies_operator} ${formData.companies_left}`);
+        if (formData.profile_score) activeFilters.push(`Profile Score ${formData.score_operator} ${formData.profile_score}`);
+        if (formData.attendance_status) activeFilters.push(`Attendance: ${formData.attendance_status}`);
+        
+        if (courses && courses.length > 0) {
+            activeFilters.push(`Courses: ${courses.join(', ')}`);
+        }
+        
+        const activeFiltersHtml = activeFilters.map(filter => 
+            `<span class="badge bg-primary filter-badge">${filter}</span>`
+        ).join('');
+        
+        $('#activeFilters').html(activeFiltersHtml || '<span class="text-muted">No active filters</span>');
+    }
 </script>
 
 <script>
@@ -969,8 +1018,8 @@ $(document).ready(function() {
                 job: $('#msg_job').val(),
                 attendance_status: $('#msg_attendance_status').val()
             });
-        });
     });
+});
 </script>
 
 <script>
@@ -1097,6 +1146,6 @@ $(document).ready(function() {
     
     // Initial update of active filters
     updateActiveFilters();
-});
+    });
 </script>
 {% endblock %}
