@@ -800,9 +800,9 @@ def get_filtered_students(request):
         courses = request.GET.getlist('course')
         print(f"Courses from request: {courses}")
         
-        # Company and job filters (multiple selection)
-        company_ids = request.GET.getlist('companies')
-        job_ids = request.GET.getlist('jobs')
+        # Company and job filters
+        company = request.GET.get('company')
+        job = request.GET.get('job')
         
         # Interview date filter (multiple selection)
         interview_dates = request.GET.getlist('interview_date')
@@ -839,15 +839,23 @@ def get_filtered_students(request):
             print(f"After course filter: {students.count()} students")
         
         # Apply company filter
-        if company_ids:
-            print(f"Filtering by company IDs: {company_ids}")
-            students = students.filter(application__job__company_id__in=company_ids).distinct()
+        if company:
+            print(f"Filtering by company: {company}")
+            # Get applications for the specified company
+            company_applications = Application.objects.filter(
+                job__company__name=company
+            ).values_list('student_id', flat=True).distinct()
+            students = students.filter(id__in=company_applications)
             print(f"After company filter: {students.count()} students")
         
-        # Apply job filter
-        if job_ids:
-            print(f"Filtering by job IDs: {job_ids}")
-            students = students.filter(application__job_id__in=job_ids).distinct()
+        # Apply job filter - only apply if job is specified
+        if job:
+            print(f"Filtering by job: {job}")
+            # Get applications for the specified job
+            job_applications = Application.objects.filter(
+                job__title=job
+            ).values_list('student_id', flat=True).distinct()
+            students = students.filter(id__in=job_applications)
             print(f"After job filter: {students.count()} students")
         
         # Apply interview date filter
