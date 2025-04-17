@@ -167,7 +167,19 @@ Student -> All Jobs
           <div>
             <p class="text-muted mb-2">{{ job.description|truncatechars:100 }}</p>
           </div>
-          <a href="{% url 'job_details' job.slug %}" class="btn btn-sm btn-primary mt-2 w-100">View Details</a>
+          <div class="d-grid gap-2">
+            <!-- Always show View Details button -->
+            <a href="{% url 'job_details' job.slug %}" class="btn btn-sm btn-primary mt-2">View Details</a>
+            
+            <!-- Show Applied or Apply button based on status -->
+            {% if job.id in applied_jobs %}
+              <span class="btn btn-sm btn-success mt-2 disabled">Applied</span>
+            {% elif can_apply_more %}
+              <a href="{% url 'confirm_application' job.slug %}" class="btn btn-sm btn-outline-primary mt-2">Apply Now</a>
+            {% else %}
+              <a href="{% url 'my_applications' %}" class="btn btn-sm btn-warning mt-2">Withdraw First</a>
+            {% endif %}
+          </div>
         </div>
       </div>
     </div>

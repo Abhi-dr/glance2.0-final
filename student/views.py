@@ -131,6 +131,9 @@ def job_details(request, slug):
     # Check if already applied
     has_applied = Application.objects.filter(student=student, job=job).exists()
     
+    # Get all applied jobs for status display
+    applied_jobs = Application.objects.filter(student=student).values_list('job_id', flat=True)
+    
     # Check eligibility
     is_eligible, eligibility_message = check_eligibility(student, job)
     
@@ -154,7 +157,9 @@ def job_details(request, slug):
         "has_applied": has_applied,
         "eligibility_message": eligibility_message,
         "formatted_salary": formatted_salary,
-        "today_date": date.today()
+        "today_date": date.today(),
+        "applied_jobs": applied_jobs,
+        "can_apply_more": student.no_of_companies_left > 0
     }
     
     return render(request, 'student/job_details.html', parameters)
@@ -265,7 +270,12 @@ def upload_resume(request):
 def all_jobs(request):
     
     student = Student.objects.get(id=request.user.id)
-    jobs_list = Job.objects.all().exclude(applications__student=student)
+    
+    # Get all jobs instead of excluding those the student has already applied for
+    jobs_list = Job.objects.all()
+    
+    # Get the jobs the student has already applied for
+    applied_jobs = Application.objects.filter(student=student).values_list('job_id', flat=True)
     
     # Apply backlog restrictions
     if student.backlog and student.backlog > 0:
@@ -273,12 +283,12 @@ def all_jobs(request):
             
     query = request.GET.get("query")
     if query:
-        # fetch the companies based on the name of the company, job role and descritiption
+        # fetch the companies based on the name of the company, job role and description
         jobs_list = Job.objects.filter(
             Q(title__icontains=query) |
             Q(description__icontains=query) |
             Q(company__name__icontains=query)
-        ).exclude(applications__student=student)
+        )
         
         # Re-apply backlog restrictions on search results
         if student.backlog and student.backlog > 0:
@@ -298,7 +308,9 @@ def all_jobs(request):
     parameters = {
         "student": student,
         "jobs": jobs,
-        "query": query
+        "query": query,
+        "applied_jobs": applied_jobs,
+        "can_apply_more": student.no_of_companies_left > 0
     }
     
     return render(request, 'student/all_jobs.html', parameters)

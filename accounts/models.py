@@ -52,7 +52,7 @@ class Student(User):
         ])
     
     # Flag to bypass eligibility criteria for special cases
-    # bypass_eligibility = models.BooleanField(default=False, help_text="If enabled, bypasses all eligibility restrictions like CGPA, 10th, 12th marks")
+    bypass_eligibility = models.BooleanField(default=False, help_text="If enabled, bypasses all eligibility restrictions like CGPA, 10th, 12th marks")
     
     profile_pic = models.ImageField(
         upload_to="student_profile/", default="/student_profile/default.jpg")
@@ -120,7 +120,8 @@ class Student(User):
             if hasattr(self, 'alumni_status') and hasattr(self, 'passout_year') and self.alumni_status == "Alumni" and self.passout_year:
                 score += 10
             
-            return score
+            # Cap the score at 100 to prevent scores over 100%
+            return min(score, 100)
             
         except Exception as e:
             # If anything goes wrong, return a default value
