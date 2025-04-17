@@ -47,20 +47,17 @@ Job Details
                             <h5 class="mb-0">Eligibility Status</h5>
                         </div>
                         <div class="card-body">
-                            {% if is_eligible %}
-                                <div class="alert alert-success">
-                                    <i class="fas fa-check-circle me-2"></i> 
-                                    {% if student.bypass_eligibility %}
-                                        <strong>Eligibility criteria bypassed by administrator.</strong> You can apply for this job.
-                                    {% else %}
-                                        <strong>You are eligible for this job!</strong> {{ eligibility_message }}
-                                    {% endif %}
-                                </div>
-                            {% else %}
-                                <div class="alert alert-danger">
-                                    <i class="fas fa-times-circle me-2"></i> <strong>You are not eligible for this job.</strong> {{ eligibility_message }}
-                                </div>
-                            {% endif %}
+                            <div class="eligibility-info">
+                                {% if is_eligible %}
+                                <p class="eligible-text">
+                                    <i class="fas fa-check-circle text-success me-2"></i> You are eligible to apply for this job!
+                                </p>
+                                {% else %}
+                                <p class="not-eligible-text">
+                                    <i class="fas fa-times-circle text-danger me-2"></i> {{ eligibility_message }}
+                                </p>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
 

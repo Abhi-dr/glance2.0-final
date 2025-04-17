@@ -107,6 +107,22 @@ Administration -> Home
         width: 0;
         height: 0;
     }
+    
+    /* Dashboard banner */
+    .dashboard-banner {
+        width: 100%;
+        height: auto;
+        border-radius: 12px;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+    
+    .dashboard-banner img {
+        width: 100%;
+        max-height: 200px;
+        object-fit: cover;
+    }
 </style>
 
 
@@ -115,6 +131,11 @@ Administration -> Home
 {% block body %}
 
 <div class="container-fluid">
+
+    <!-- Welcome Banner with Dashboard Image -->
+    <div class="card dashboard-banner">
+        <img src="{% static 'img/dashboard-banner.svg' %}" alt="Welcome to GLANCE 2.0 Dashboard">
+    </div>
 
     {% for message in messages %}
 

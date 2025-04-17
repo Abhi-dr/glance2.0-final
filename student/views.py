@@ -40,21 +40,16 @@ def home(request):
     if has_complete_profile:
         # Get eligible jobs with proper error handling
         try:
-            # Base query for eligible jobs - handle bypass_eligibility
-            if student.bypass_eligibility:
-                # If bypass is enabled, all jobs are eligible except ones student already applied to
-                all_eligible_jobs = Job.objects.all().exclude(applications__student=student)
-            else:
-                # Normal eligibility criteria
-                all_eligible_jobs = Job.objects.filter(
-                    tenth_percentage__lte=student.tenth,
-                    twelfth_percentage__lte=student.twelfth,
-                    cgpa_criteria__lte=student.cgpa,
-                ).exclude(applications__student=student)
-                
-                # Handle backlog restrictions
-                if student.backlog > 0:
-                    all_eligible_jobs = all_eligible_jobs.exclude(is_backlog_allowed=False)
+            # Base query for eligible jobs
+            all_eligible_jobs = Job.objects.filter(
+                tenth_percentage__lte=student.tenth,
+                twelfth_percentage__lte=student.twelfth,
+                cgpa_criteria__lte=student.cgpa,
+            ).exclude(applications__student=student)
+            
+            # Handle backlog restrictions
+            if student.backlog > 0:
+                all_eligible_jobs = all_eligible_jobs.exclude(is_backlog_allowed=False)
             
             # Get applications to handle interview date conflicts
             applications = Application.objects.filter(student=student)
@@ -272,16 +267,9 @@ def all_jobs(request):
     student = Student.objects.get(id=request.user.id)
     jobs_list = Job.objects.all().exclude(applications__student=student)
     
-    # Apply backlog restrictions only if bypass_eligibility is not enabled
-    try:
-        bypass_eligibility = student.bypass_eligibility
-    except AttributeError:
-        # If attribute doesn't exist, default to False
-        bypass_eligibility = False
-        
-    if not bypass_eligibility:
-        if student.backlog and student.backlog > 0:
-            jobs_list = jobs_list.exclude(is_backlog_allowed=False)    
+    # Apply backlog restrictions
+    if student.backlog and student.backlog > 0:
+        jobs_list = jobs_list.exclude(is_backlog_allowed=False)    
             
     query = request.GET.get("query")
     if query:
@@ -292,16 +280,9 @@ def all_jobs(request):
             Q(company__name__icontains=query)
         ).exclude(applications__student=student)
         
-        # Re-apply backlog restrictions on search results if needed
-        try:
-            bypass_eligibility = student.bypass_eligibility
-        except AttributeError:
-            # If attribute doesn't exist, default to False
-            bypass_eligibility = False
-            
-        if not bypass_eligibility:
-            if student.backlog and student.backlog > 0:
-                jobs_list = jobs_list.exclude(is_backlog_allowed=False)
+        # Re-apply backlog restrictions on search results
+        if student.backlog and student.backlog > 0:
+            jobs_list = jobs_list.exclude(is_backlog_allowed=False)
     
     # Pagination
     page = request.GET.get('page', 1)
@@ -412,6 +393,9 @@ def withdraw_application(request, slug):
                 student.no_of_companies_left += 1
                 student.save()
                 
+                # Log successful withdrawal
+                print(f"Application withdrawn successfully: Student {student.id} from Job {job.id} ({job.slug})")
+                
                 myfile = f"""
 Dear {student.first_name} {student.last_name},
 
@@ -455,15 +439,21 @@ GLA University, Mathura"""
                 messages.error(request, "Cannot withdraw application - it has already been processed")
                 
         except Application.DoesNotExist:
+            # Log the error with more details
+            print(f"Application not found: Student {student.id} attempted to withdraw from Job {job.id} ({job.slug})")
             messages.error(request, "No active application found for this job")
             
     except Http404:
         # Handle case where the job slug doesn't match any job
+        print(f"Job not found: Invalid slug '{slug}' when attempting to withdraw application")
         messages.error(request, f"The job with slug '{slug}' doesn't exist")
     except Student.DoesNotExist:
         messages.error(request, "Student profile not found")
     except Exception as e:
+        # Add detailed error logging
+        import traceback
         print(f"Error in withdraw_application: {e}")
+        print(traceback.format_exc())
         messages.error(request, "An error occurred while processing your request")
     
     return redirect('my_applications')
@@ -499,13 +489,8 @@ def support(request):
 
 def check_eligibility(student, job):
     """
-    Check if a student is eligible for a job based on criteria like CGPA, 10th, 12th marks
-    and if student has the bypass_eligibility flag enabled.
+    Check if a student is eligible for a job based on criteria like CGPA, 10th, 12th marks.
     """
-    # If student has bypass_eligibility flag enabled, skip all checks
-    if student.bypass_eligibility:
-        return True, "Eligibility criteria bypassed by administrator"
-    
     # Perform regular eligibility checks
     if job.cgpa_criteria:
         if not student.cgpa:
@@ -532,3 +517,83 @@ def check_eligibility(student, job):
             return False, "You have backlogs and this company does not allow backlogs"
     
     return True, "You are eligible for this job"
+
+# ================================== WITHDRAW APPLICATION BY ID ===========================================
+
+@login_required(login_url='login')
+def withdraw_application_by_id(request, application_id):
+    try:
+        # Try to get the application by ID
+        application = get_object_or_404(Application, id=application_id)
+        
+        # Verify that the application belongs to the current user
+        if application.student.id != request.user.id:
+            messages.error(request, "You do not have permission to withdraw this application")
+            return redirect('my_applications')
+            
+        job = application.job
+        student = application.student
+        
+        # Only allow withdrawal if application is still pending
+        if application.status == 'pending':
+            application.delete()
+            student.no_of_companies_left += 1
+            student.save()
+            
+            # Log successful withdrawal
+            print(f"Application withdrawn successfully: Student {student.id} from Job {job.id} ({job.slug})")
+            
+            myfile = f"""
+Dear {student.first_name} {student.last_name},
+
+We trust this email finds you in good health and high spirits.
+
+It is with regret that we inform you of the withdrawal of your application for the position of {job.title.title()} at {job.company.name.title()} for the GLANCE Mega Job Fair, as per your request.
+
+Should you feel that this was a mistake or wish to reapply,
+- Go to the GLANCE portal
+- Click on the 'All Companies' tab
+- Find the company you wish to apply to
+- Click on the 'Apply' button
+
+For any further inquiries or if you require assistance, please do not hesitate to contact us at alumniassociation01@gla.ac.in.
+
+Best regards,
+
+Technical Team
+Department of Alumni Affairs,
+GLA University, Mathura"""
+
+            email_subject = f"Application Withdrawn: {job.title.title()} at GLANCE"
+            email_body = myfile
+            email_from = 'GLANCE JOB FAIR 2k24 <alumniassociation01@gla.ac.in>'
+            email_to = [student.username]
+
+            try:
+                send_mail(
+                    email_subject, 
+                    email_body, 
+                    email_from, 
+                    email_to,
+                    fail_silently=False
+                )
+            except Exception as e:
+                print(f"Error sending email: {e}")
+                messages.warning(request, "You'll get the confirmation mail soon!")
+            
+            messages.success(request, "Application withdrawn successfully")
+        else:
+            messages.error(request, "Cannot withdraw application - it has already been processed")
+            
+    except Application.DoesNotExist:
+        # Log the error with more details
+        print(f"Application not found: Application ID {application_id} not found when attempting to withdraw")
+        messages.error(request, "No active application found with that ID")
+    except Exception as e:
+        # Add detailed error logging
+        import traceback
+        print(f"Error in withdraw_application_by_id: {e}")
+        print(traceback.format_exc())
+        messages.error(request, "An error occurred while processing your request")
+    
+    return redirect('my_applications')

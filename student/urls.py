@@ -13,6 +13,7 @@ urlpatterns = [
     path("confirm_application/<str:slug>", views.confirm_application, name="confirm_application"),
     path("apply_job/<str:slug>", views.apply_job, name="apply_job"),
     path("withdraw_application/<str:slug>", views.withdraw_application, name="withdraw_application"),
+    path("withdraw_application_by_id/<int:application_id>", views.withdraw_application_by_id, name="withdraw_application_by_id"),
     
     path('notifications', views.notifications, name='notifications'),    
     path("support", views.support, name="support"),

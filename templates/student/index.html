@@ -79,7 +79,7 @@ Student -> Home
         to {
             --progress-value: {{no_of_companies_applied_in_percentage}};
         }
-}
+    }
 
     @keyframes js-progress {
         to {
@@ -198,8 +198,7 @@ Student -> Home
         left: 0;
         width: 50px;
         height: 3px;
-        background: #5d87ff;
-        border-radius: 10px;
+        background-color: #5d87ff;
     }
     
     /* Status indicators */
@@ -226,6 +225,22 @@ Student -> Home
     .status-rejected {
         background-color: #e53935;
     }
+
+    /* Dashboard banner */
+    .dashboard-banner {
+        width: 100%;
+        height: auto;
+        border-radius: 12px;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+    
+    .dashboard-banner img {
+        width: 100%;
+        max-height: 200px;
+        object-fit: cover;
+    }
 </style>
 
 
@@ -234,9 +249,13 @@ Student -> Home
 {% block body %}
 
 <div class="container-fluid">
+    <!-- Welcome Banner with Dashboard Image -->
+    <div class="card dashboard-banner">
+        <img src="{% static 'img/dashboard-banner.svg' %}" alt="Welcome to GLANCE 2.0 Dashboard">
+    </div>
 
     {% for message in messages %}
-    <div class="alert alert-warning alert-dismissible fade show dashboard-card" role="alert">
+    <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert">
         <strong>{{ message.tag }}</strong> {{ message }}
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>

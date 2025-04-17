@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1200" height="300" viewBox="0 0 1200 300" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background with gradient -->
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4e73df;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#224abe;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.1" />
+      <stop offset="100%" style="stop-color:#ffffff;stop-opacity:0.3" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Main background -->
+  <rect width="100%" height="100%" fill="url(#grad1)" rx="15" ry="15" />
+  
+  <!-- Decorative elements -->
+  <circle cx="150" cy="150" r="100" fill="url(#grad2)" opacity="0.2" />
+  <circle cx="950" cy="100" r="70" fill="url(#grad2)" opacity="0.2" />
+  <circle cx="1050" cy="200" r="120" fill="url(#grad2)" opacity="0.1" />
+  
+  <!-- Abstract lines -->
+  <path d="M0,150 C200,100 400,200 600,150 S800,100 1200,150" stroke="white" stroke-width="2" fill="none" opacity="0.2" />
+  <path d="M0,100 C300,150 600,50 900,100 S1000,150 1200,100" stroke="white" stroke-width="1.5" fill="none" opacity="0.15" />
+  <path d="M0,200 C250,150 500,250 750,200 S1000,150 1200,200" stroke="white" stroke-width="1" fill="none" opacity="0.1" />
+  
+  <!-- Dots pattern -->
+  <g opacity="0.2">
+    <circle cx="100" cy="50" r="3" fill="white" />
+    <circle cx="150" cy="75" r="2" fill="white" />
+    <circle cx="200" cy="40" r="3" fill="white" />
+    <circle cx="250" cy="60" r="2" fill="white" />
+    <circle cx="300" cy="30" r="2" fill="white" />
+    <circle cx="350" cy="50" r="3" fill="white" />
+    <circle cx="400" cy="70" r="2" fill="white" />
+    <circle cx="800" cy="50" r="3" fill="white" />
+    <circle cx="850" cy="75" r="2" fill="white" />
+    <circle cx="900" cy="40" r="3" fill="white" />
+    <circle cx="950" cy="60" r="2" fill="white" />
+    <circle cx="1000" cy="30" r="2" fill="white" />
+    <circle cx="1050" cy="50" r="3" fill="white" />
+    <circle cx="1100" cy="70" r="2" fill="white" />
+    <circle cx="100" cy="250" r="3" fill="white" />
+    <circle cx="150" cy="230" r="2" fill="white" />
+    <circle cx="200" cy="260" r="3" fill="white" />
+    <circle cx="250" cy="240" r="2" fill="white" />
+    <circle cx="300" cy="270" r="2" fill="white" />
+    <circle cx="350" cy="250" r="3" fill="white" />
+    <circle cx="400" cy="230" r="2" fill="white" />
+    <circle cx="800" cy="250" r="3" fill="white" />
+    <circle cx="850" cy="230" r="2" fill="white" />
+    <circle cx="900" cy="260" r="3" fill="white" />
+    <circle cx="950" cy="240" r="2" fill="white" />
+    <circle cx="1000" cy="270" r="2" fill="white" />
+    <circle cx="1050" cy="250" r="3" fill="white" />
+    <circle cx="1100" cy="230" r="2" fill="white" />
+  </g>
+  
+  <!-- Text -->
+  <text x="600" y="150" font-family="Arial, sans-serif" font-size="40" font-weight="bold" fill="white" text-anchor="middle" dominant-baseline="middle">GLANCE 2.0 Dashboard</text>
+  <text x="600" y="190" font-family="Arial, sans-serif" font-size="20" fill="white" text-anchor="middle" dominant-baseline="middle">Welcome to your personalized job portal experience</text>
+</svg> 
