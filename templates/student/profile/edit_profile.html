@@ -297,31 +297,31 @@ Student - Edit Profile
                                 <div class="form-section-header d-md-none">Educational Information</div>
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
-                                        <label for="course" class="small mb-1">* Course</label>
-                                        <select class="form-select" name="course" id="course" required>
-                                            <option value="" {% if not student.course %}selected{% endif %}>Select Course</option>
-                                            <option value="B.Tech Computer Science" {% if student.course == 'B.Tech Computer Science' %}selected{% endif %}>B.Tech Computer Science</option>
-                                            <option value="B.Tech Information Technology" {% if student.course == 'B.Tech Information Technology' %}selected{% endif %}>B.Tech Information Technology</option>
-                                            <option value="B.Tech Electronics" {% if student.course == 'B.Tech Electronics' %}selected{% endif %}>B.Tech Electronics</option>
-                                            <option value="B.Tech Biotech" {% if student.course == 'B.Tech Biotech' %}selected{% endif %}>B.Tech Biotech</option>
-                                            <option value="B.Tech Civil" {% if student.course == 'B.Tech Civil' %}selected{% endif %}>B.Tech Civil</option>
-                                            <option value="B.Tech Electrical" {% if student.course == 'B.Tech Electrical' %}selected{% endif %}>B.Tech Electrical</option>
-                                            <option value="B.Tech Mechanical" {% if student.course == 'B.Tech Mechanical' %}selected{% endif %}>B.Tech Mechanical</option>
-                                            <option value="BCA" {% if student.course == 'BCA' %}selected{% endif %}>BCA</option>
-                                            <option value="MCA" {% if student.course == 'MCA' %}selected{% endif %}>MCA</option>
-                                            <option value="M.Tech Computer Science" {% if student.course == 'M.Tech Computer Science' %}selected{% endif %}>M.Tech Computer Science</option>
-                                            <option value="M.Tech Information Technology" {% if student.course == 'M.Tech Information Technology' %}selected{% endif %}>M.Tech Information Technology</option>
-                                            <option value="MBA" {% if student.course == 'MBA' %}selected{% endif %}>MBA</option>
-                                            <option value="B.Com" {% if student.course == 'B.Com' %}selected{% endif %}>B.Com</option>
-                                            <option value="Diploma Computer Science" {% if student.course == 'Diploma Computer Science' %}selected{% endif %}>Diploma Computer Science</option>
-                                            <option value="Diploma.Tech Electronics" {% if student.course == 'Diploma Electronics' %}selected{% endif %}>Diploma Electronics</option>
-                                            <option value="Diploma Electrical" {% if student.course == 'Diploma Electrical' %}selected{% endif %}>Diploma Electrical</option>
-                                            <option value="Diploma Mechanical" {% if student.course == 'Diploma Mechanical' %}selected{% endif %}>Diploma Mechanical</option>
-                                            <option value="M.Com" {% if student.course == 'M.Com' %}selected{% endif %}>M.Com</option>
-                                            <option value="BBA" {% if student.course == 'BBA' %}selected{% endif %}>BBA</option>
-                                            <option value="LLB" {% if student.course == 'LLB' %}selected{% endif %}>LLB</option>
+                                        <label for="course" class="small mb-1">* Course(s)</label>
+                                        <select class="form-select" name="course" id="course" multiple size="6" required {% if student.course %}disabled{% endif %}>
+                                            <option value="B.Tech Computer Science" {% if "B.Tech Computer Science" in student_courses %}selected{% endif %}>B.Tech Computer Science</option>
+                                            <option value="B.Tech Information Technology" {% if "B.Tech Information Technology" in student_courses %}selected{% endif %}>B.Tech Information Technology</option>
+                                            <option value="B.Tech Electronics" {% if "B.Tech Electronics" in student_courses %}selected{% endif %}>B.Tech Electronics</option>
+                                            <option value="B.Tech Biotech" {% if "B.Tech Biotech" in student_courses %}selected{% endif %}>B.Tech Biotech</option>
+                                            <option value="B.Tech Civil" {% if "B.Tech Civil" in student_courses %}selected{% endif %}>B.Tech Civil</option>
+                                            <option value="B.Tech Electrical" {% if "B.Tech Electrical" in student_courses %}selected{% endif %}>B.Tech Electrical</option>
+                                            <option value="B.Tech Mechanical" {% if "B.Tech Mechanical" in student_courses %}selected{% endif %}>B.Tech Mechanical</option>
+                                            <option value="BCA" {% if "BCA" in student_courses %}selected{% endif %}>BCA</option>
+                                            <option value="MCA" {% if "MCA" in student_courses %}selected{% endif %}>MCA</option>
+                                            <option value="M.Tech Computer Science" {% if "M.Tech Computer Science" in student_courses %}selected{% endif %}>M.Tech Computer Science</option>
+                                            <option value="M.Tech Information Technology" {% if "M.Tech Information Technology" in student_courses %}selected{% endif %}>M.Tech Information Technology</option>
+                                            <option value="MBA" {% if "MBA" in student_courses %}selected{% endif %}>MBA</option>
+                                            <option value="B.Com" {% if "B.Com" in student_courses %}selected{% endif %}>B.Com</option>
+                                            <option value="M.Com" {% if "M.Com" in student_courses %}selected{% endif %}>M.Com</option>
+                                            <option value="BBA" {% if "BBA" in student_courses %}selected{% endif %}>BBA</option>
+                                            <option value="LLB" {% if "LLB" in student_courses %}selected{% endif %}>LLB</option>
+                                            <option value="Diploma Computer Science" {% if "Diploma Computer Science" in student_courses %}selected{% endif %}>Diploma Computer Science</option>
+                                            <option value="Diploma Electronics" {% if "Diploma Electronics" in student_courses %}selected{% endif %}>Diploma Electronics</option>
+                                            <option value="Diploma Electrical" {% if "Diploma Electrical" in student_courses %}selected{% endif %}>Diploma Electrical</option>
+                                            <option value="Diploma Mechanical" {% if "Diploma Mechanical" in student_courses %}selected{% endif %}>Diploma Mechanical</option>
                                         </select>
-                                        <div class="invalid-feedback">Please select your course.</div>
+                                        <small class="text-muted">Hold Ctrl (Windows) or Command (Mac) to select multiple courses</small>
+                                        <div class="invalid-feedback">Please select at least one course.</div>
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label class="small mb-1" for="inputBacklogs">* Backlogs</label>
@@ -537,18 +537,11 @@ Student - Edit Profile
     
     // Profile form validation
     document.getElementById('profileForm').addEventListener('submit', function(e) {
-        const form = this;
         let hasError = false;
+        window.scrolledToError = false; // Flag to ensure we only scroll once
         
-        if (!form.checkValidity()) {
-            e.preventDefault();
-            e.stopPropagation();
-            hasError = true;
-        }
-        
-        // Validate fields
-        const inputs = form.querySelectorAll('input:not([disabled]), select:not([disabled])');
-        inputs.forEach(input => {
+        const requiredFields = this.querySelectorAll('[required]:not([disabled])');
+        requiredFields.forEach(function(input) {
             if (!input.checkValidity()) {
                 input.classList.add('is-invalid');
                 hasError = true;
@@ -558,40 +551,28 @@ Student - Edit Profile
                     input.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     window.scrolledToError = true;
                 }
-            } else {
-                input.classList.remove('is-invalid');
-                input.classList.add('is-valid');
             }
         });
         
-        // Validate social media fields (allow N/A)
-        const socialInputs = [
-            document.getElementById('inputLinkedIn'),
-            document.getElementById('inputGitHub'),
-            document.getElementById('inputInstagram'),
-            document.getElementById('inputTwitter')
+        // Check if at least one course is selected for multiple select
+        const courseSelect = document.getElementById('course');
+        if (courseSelect && !courseSelect.disabled && courseSelect.selectedOptions.length === 0) {
+            courseSelect.classList.add('is-invalid');
+            hasError = true;
+            
+            if (window.innerWidth < 768 && !window.scrolledToError) {
+                courseSelect.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                window.scrolledToError = true;
+            }
+        }
+        
+        // Validate percentage inputs for 10th and 12th
+        const percentageInputs = [
+            document.getElementById('inputHighschool'),
+            document.getElementById('inputIntermediate')
         ];
         
-        socialInputs.forEach(input => {
-            if (input.value.trim() === '') {
-                input.value = 'N/A';
-                input.classList.remove('is-invalid');
-                input.classList.add('is-valid');
-            } else if (input.value !== 'N/A' && !input.checkValidity()) {
-                input.classList.add('is-invalid');
-                hasError = true;
-                
-                // Scroll to first invalid social field on mobile
-                if (window.innerWidth < 768 && !window.scrolledToError) {
-                    input.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    window.scrolledToError = true;
-                }
-            }
-        });
-        
-        // Special validation for percentages and CGPA to ensure they're in the correct range
-        const percentageInputs = [document.getElementById('inputHighschool'), document.getElementById('inputIntermediate')];
-        percentageInputs.forEach(input => {
+        percentageInputs.forEach(function(input) {
             if (!input.disabled && input.value) {
                 const value = parseFloat(input.value);
                 if (isNaN(value) || value < 0 || value > 100) {
@@ -646,9 +627,26 @@ Student - Edit Profile
             }
         });
         
+        // Handle validation for multiple course selection
+        const courseSelect = document.getElementById('course');
+        if (courseSelect && !courseSelect.disabled) {
+            courseSelect.addEventListener('change', function() {
+                if (this.selectedOptions.length > 0) {
+                    this.classList.remove('is-invalid');
+                    this.classList.add('is-valid');
+                } else {
+                    this.classList.remove('is-valid');
+                    this.classList.add('is-invalid');
+                }
+            });
+        }
+        
         // Add input event listeners for all form fields
         inputs.forEach(input => {
             input.addEventListener('input', function() {
+                // Skip multiple select handling as it's done separately
+                if (this.id === 'course' && this.multiple) return;
+                
                 if (this.checkValidity()) {
                     this.classList.remove('is-invalid');
                     this.classList.add('is-valid');

@@ -34,8 +34,8 @@ def edit_profile(request):
         student.last_name = last_name
         student.gender = gender
         
-        # Educational details - handle single course selection
-        course = request.POST.get('course', '')  # Get single course
+        # Educational details - handle multiple course selection
+        courses = request.POST.getlist('course')  # Get all selected courses
         tenth = request.POST.get('tenth', '')
         twelfth = request.POST.get('twelfth', '')
         cgpa = request.POST.get('cgpa', '')
@@ -54,9 +54,9 @@ def edit_profile(request):
             student.passout_year = None
         
         # Update educational details - only if they haven't been set before
-        if course and not student.course:
-            student.course = course  # Set single course
-            messages.success(request, "Course has been set and cannot be changed later.")
+        if courses and not student.course:
+            student.course = ','.join(courses)  # Set multiple courses as comma-separated list
+            messages.success(request, "Courses have been set and cannot be changed later.")
             
         if year and not student.year:
             student.year = year
@@ -100,9 +100,13 @@ def edit_profile(request):
     current_year = datetime.datetime.now().year
     passout_years = [str(year) for year in range(current_year-5, current_year+6)]
     
+    # Parse existing courses for template rendering
+    student_courses = student.course.split(',') if student.course else []
+    
     parameters = {
         "student": student,
-        "passout_years": passout_years
+        "passout_years": passout_years,
+        "student_courses": student_courses
     }
     
     return render(request, 'student/profile/edit_profile.html', parameters)
