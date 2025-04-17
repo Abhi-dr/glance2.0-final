@@ -9,7 +9,12 @@ from django.contrib import messages
 @login_required(login_url='login')
 def my_profile(request):
     
-    student = Student.objects.get(id=request.user.id)
+    try:
+        student = Student.objects.get(id=request.user.id)
+    except Student.DoesNotExist:
+        # Redirect to edit_profile to create the Student record
+        messages.info(request, "Please complete your profile first.")
+        return redirect('edit_profile')
     
     parameters = {
         "student": student
@@ -21,8 +26,20 @@ def my_profile(request):
 
 @login_required(login_url='login')
 def edit_profile(request):
-    
-    student = Student.objects.get(id=request.user.id)
+    try:
+        student = Student.objects.get(id=request.user.id)
+    except Student.DoesNotExist:
+        # Create a new Student record for this user if it doesn't exist
+        student = Student(
+            id=request.user.id,
+            username=request.user.username,
+            email=request.user.email,
+            first_name=request.user.first_name,
+            last_name=request.user.last_name
+        )
+        # Copy any other fields from User to Student if needed
+        student.save()
+        messages.info(request, "Your student profile has been created. Please complete your profile information.")
     
     if request.method == "POST":
         first_name = request.POST['first_name']
@@ -34,8 +51,8 @@ def edit_profile(request):
         student.last_name = last_name
         student.gender = gender
         
-        # Educational details - handle multiple course selection
-        courses = request.POST.getlist('course')  # Get all selected courses
+        # Educational details - handle single course selection
+        course = request.POST.get('course', '')  # Get single course
         tenth = request.POST.get('tenth', '')
         twelfth = request.POST.get('twelfth', '')
         cgpa = request.POST.get('cgpa', '')
@@ -54,9 +71,13 @@ def edit_profile(request):
             student.passout_year = None
         
         # Update educational details - only if they haven't been set before
-        if courses and not student.course:
-            student.course = ','.join(courses)  # Set multiple courses as comma-separated list
-            messages.success(request, "Courses have been set and cannot be changed later.")
+        if course and not student.course:
+            # Store as a single value, but in a comma-separated format for future filtering
+            student.course = course  # Store single course
+            messages.success(request, f"Course has been set to {course} and cannot be changed later.")
+        elif not student.course and not course:
+            messages.warning(request, "No course was selected. Please select a course.")
+            return redirect('edit_profile')
             
         if year and not student.year:
             student.year = year
@@ -100,8 +121,15 @@ def edit_profile(request):
     current_year = datetime.datetime.now().year
     passout_years = [str(year) for year in range(current_year-5, current_year+6)]
     
-    # Parse existing courses for template rendering
-    student_courses = student.course.split(',') if student.course else []
+    # Parse existing course for template rendering
+    # For backwards compatibility, still attempt to split by comma
+    # but take the first value as the selected one if there are multiple
+    student_courses = []
+    if student.course:
+        # Strip whitespace and filter out empty strings
+        course_parts = [course.strip() for course in student.course.split(',') if course.strip()]
+        if course_parts:
+            student_courses = course_parts
     
     parameters = {
         "student": student,
@@ -120,8 +148,14 @@ def upload_profile(request):
         if 'profile_pic' not in request.FILES:
             messages.error(request, 'Profile picture is required. Please select a valid image file.')
             return redirect('edit_profile')
+        
+        try:
+            student = Student.objects.get(id=request.user.id)
+        except Student.DoesNotExist:
+            # Redirect to edit_profile to create the Student record
+            messages.info(request, "Please complete your profile first.")
+            return redirect('edit_profile')
             
-        student = Student.objects.get(id=request.user.id)
         student.profile_pic = request.FILES['profile_pic']
         student.save()
 

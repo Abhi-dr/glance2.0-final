@@ -295,10 +295,20 @@ Student - Edit Profile
 
                                 <!-- Course and Backlogs -->
                                 <div class="form-section-header d-md-none">Educational Information</div>
+                                {% if student.course %}
+                                <div class="row mb-3">
+                                    <div class="col-12">
+                                        <div class="alert alert-info" role="alert">
+                                            <strong>Your courses:</strong> {{ student.course }}
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
-                                        <label for="course" class="small mb-1">* Course(s)</label>
-                                        <select class="form-select" name="course" id="course" multiple size="6" required {% if student.course %}disabled{% endif %}>
+                                        <label for="course" class="small mb-1">* Course</label>
+                                        <select class="form-select" name="course" id="course" required {% if student.course %}disabled{% endif %}>
+                                            <option value="" {% if not student.course %}selected{% endif %}>Select Course</option>
                                             <option value="B.Tech Computer Science" {% if "B.Tech Computer Science" in student_courses %}selected{% endif %}>B.Tech Computer Science</option>
                                             <option value="B.Tech Information Technology" {% if "B.Tech Information Technology" in student_courses %}selected{% endif %}>B.Tech Information Technology</option>
                                             <option value="B.Tech Electronics" {% if "B.Tech Electronics" in student_courses %}selected{% endif %}>B.Tech Electronics</option>
@@ -320,8 +330,7 @@ Student - Edit Profile
                                             <option value="Diploma Electrical" {% if "Diploma Electrical" in student_courses %}selected{% endif %}>Diploma Electrical</option>
                                             <option value="Diploma Mechanical" {% if "Diploma Mechanical" in student_courses %}selected{% endif %}>Diploma Mechanical</option>
                                         </select>
-                                        <small class="text-muted">Hold Ctrl (Windows) or Command (Mac) to select multiple courses</small>
-                                        <div class="invalid-feedback">Please select at least one course.</div>
+                                        <div class="invalid-feedback">Please select a course.</div>
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label class="small mb-1" for="inputBacklogs">* Backlogs</label>
@@ -554,9 +563,9 @@ Student - Edit Profile
             }
         });
         
-        // Check if at least one course is selected for multiple select
+        // Check if a course is selected
         const courseSelect = document.getElementById('course');
-        if (courseSelect && !courseSelect.disabled && courseSelect.selectedOptions.length === 0) {
+        if (courseSelect && !courseSelect.disabled && !courseSelect.value) {
             courseSelect.classList.add('is-invalid');
             hasError = true;
             
@@ -627,11 +636,11 @@ Student - Edit Profile
             }
         });
         
-        // Handle validation for multiple course selection
+        // Handle validation for course selection
         const courseSelect = document.getElementById('course');
         if (courseSelect && !courseSelect.disabled) {
             courseSelect.addEventListener('change', function() {
-                if (this.selectedOptions.length > 0) {
+                if (this.value) {
                     this.classList.remove('is-invalid');
                     this.classList.add('is-valid');
                 } else {
@@ -644,8 +653,8 @@ Student - Edit Profile
         // Add input event listeners for all form fields
         inputs.forEach(input => {
             input.addEventListener('input', function() {
-                // Skip multiple select handling as it's done separately
-                if (this.id === 'course' && this.multiple) return;
+                // Skip course select handling as it's done separately
+                if (this.id === 'course') return;
                 
                 if (this.checkValidity()) {
                     this.classList.remove('is-invalid');
