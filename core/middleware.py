@@ -2,6 +2,8 @@ from django.shortcuts import render
 from django.conf import settings
 import re
 
+# Commenting out the entire MaintenanceModeMiddleware class
+'''
 class MaintenanceModeMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
@@ -44,4 +46,5 @@ class MaintenanceModeMiddleware:
             ip = x_forwarded_for.split(',')[0].strip()
         else:
             ip = request.META.get('REMOTE_ADDR')
-        return ip 
+        return ip
+''' 
