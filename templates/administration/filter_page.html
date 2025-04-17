@@ -540,21 +540,20 @@
     $(document).ready(function() {
         console.log("Page ready!");
         
-        // Initialize Select2
+        // Initialize multiple select for interview dates
         try {
-            console.log("Initializing Select2...");
-            if (typeof $.fn.select2 === 'function') {
+            if ($.fn.select2) {
                 $('#interview_date').select2({
                     placeholder: "Select interview dates",
                     allowClear: true
                 });
-                console.log("Select2 initialized successfully");
             } else {
-                console.error("Select2 plugin not loaded correctly");
+                // Fallback to standard multiple select
                 $('#interview_date').prop('multiple', true);
             }
         } catch (error) {
-            console.error("Error initializing Select2:", error);
+            console.error("Error initializing interview date select:", error);
+            $('#interview_date').prop('multiple', true);
         }
 
         // Initialize DataTable directly with the dedicated JSON endpoint
@@ -562,90 +561,101 @@
         $('#loadingOverlay').css('display', 'flex');
         
         try {
-            if ($.fn.DataTable.isDataTable('#dataTable')) {
+            if ($.fn.DataTable && $.fn.DataTable.isDataTable('#dataTable')) {
                 $('#dataTable').DataTable().destroy();
             }
             
-            $('#dataTable').DataTable({
+            if ($.fn.DataTable) {
+                $('#dataTable').DataTable({
                     processing: true,
                     serverSide: true,
                     ajax: {
-                    url: '/administration/get_filtered_students',
+                        url: '/administration/get_filtered_students',
                         type: 'GET',
-                    data: function(d) {
-                        // Add filter parameters to the request
-                        d.id = $('#id').val() || '';
-                        d.name = $('#name').val() || '';
-                        d.email = $('#email').val() || '';
-                        d.phone = $('#phone').val() || '';
-                        d.year = $('#year').val() || '';
-                        d.cgpa = $('#cgpa').val() || '';
-                        d.cgpa_operator = $('#cgpa_operator').val() || '=';
-                        d.status = $('#status').val() || '';
-                        d.companies_left = $('#companies_left').val() || '';
-                        d.companies_operator = $('#companies_operator').val() || '=';
-                        d.profile_score = $('#profile_score').val() || '';
-                        d.score_operator = $('#score_operator').val() || '=';
-                        d.attendance_status = $('#attendance_status').val() || '';
-                        
-                        // Get selected courses
-                        const courses = [];
-                        $('.course-checkbox:checked').each(function() {
-                            courses.push($(this).val());
-                        });
-                        d.course = courses;
-                        
-                        // Get selected companies
-                        const companies = [];
-                        $('.company-checkbox:checked').each(function() {
-                            companies.push($(this).val());
-                        });
-                        d.companies = companies;
-                        
-                        // Get selected jobs
-                        const jobs = [];
-                        $('.job-checkbox:checked').each(function() {
-                            jobs.push($(this).val());
-                        });
-                        d.jobs = jobs;
-                        
-                        // Get selected interview dates
-                        d.interview_date = $('#interview_date').val() || [];
-                        
+                        data: function(d) {
+                            // Add filter parameters to the request
+                            d.id = $('#id').val() || '';
+                            d.name = $('#name').val() || '';
+                            d.email = $('#email').val() || '';
+                            d.phone = $('#phone').val() || '';
+                            d.year = $('#year').val() || '';
+                            d.cgpa = $('#cgpa').val() || '';
+                            d.cgpa_operator = $('#cgpa_operator').val() || '=';
+                            d.status = $('#status').val() || '';
+                            d.companies_left = $('#companies_left').val() || '';
+                            d.companies_operator = $('#companies_operator').val() || '=';
+                            d.profile_score = $('#profile_score').val() || '';
+                            d.score_operator = $('#score_operator').val() || '=';
+                            d.attendance_status = $('#attendance_status').val() || '';
+                            
+                            // Get selected courses
+                            const courses = [];
+                            $('.course-checkbox:checked').each(function() {
+                                courses.push($(this).val());
+                            });
+                            d.course = courses;
+                            
+                            // Get selected companies
+                            const companies = [];
+                            $('.company-checkbox:checked').each(function() {
+                                companies.push($(this).val());
+                            });
+                            d.companies = companies;
+                            
+                            // Get selected jobs
+                            const jobs = [];
+                            $('.job-checkbox:checked').each(function() {
+                                jobs.push($(this).val());
+                            });
+                            d.jobs = jobs;
+                            
+                            // Get selected interview dates
+                            d.interview_date = $('#interview_date').val() || [];
+                            
                             return d;
+                        },
+                        error: function(xhr, error, thrown) {
+                            console.error("DataTables AJAX error:", error, thrown);
+                            $('#loadingOverlay').hide();
+                            $('#dataTable tbody').html('<tr><td colspan="11" class="text-center">Error loading data: ' + thrown + '</td></tr>');
                         }
                     },
                     columns: [
                         { data: 'id' },
-                    { data: 'name' },
-                    { data: 'email' },
-                    { data: 'phone' },
+                        { data: 'name' },
+                        { data: 'email' },
+                        { data: 'phone' },
                         { data: 'course' },
                         { data: 'year' },
-                    { data: 'cgpa' },
-                    { data: 'status' },
-                    { data: 'companies_left' },
-                    { data: 'profile_score' },
-                    { data: 'actions' }
-                ],
-                pageLength: 10,
-                responsive: true,
-                language: {
-                    processing: "Loading data...",
-                    zeroRecords: "No matching records found",
-                    info: "Showing _START_ to _END_ of _TOTAL_ entries",
-                    infoEmpty: "Showing 0 to 0 of 0 entries",
-                    infoFiltered: "(filtered from _MAX_ total entries)"
-                },
-                initComplete: function() {
-                    $('#loadingOverlay').hide();
-                    console.log("DataTable initialization complete");
-                }
-            });
+                        { data: 'cgpa' },
+                        { data: 'status' },
+                        { data: 'companies_left' },
+                        { data: 'profile_score' },
+                        { data: 'actions' }
+                    ],
+                    pageLength: 10,
+                    responsive: true,
+                    language: {
+                        processing: "Loading data...",
+                        zeroRecords: "No matching records found",
+                        info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                        infoEmpty: "Showing 0 to 0 of 0 entries",
+                        infoFiltered: "(filtered from _MAX_ total entries)"
+                    },
+                    initComplete: function() {
+                        $('#loadingOverlay').hide();
+                        console.log("DataTable initialization complete");
+                    }
+                });
+            } else {
+                console.error("DataTables plugin not available");
+                $('#loadingOverlay').hide();
+                $('#dataTable tbody').html('<tr><td colspan="11" class="text-center">DataTables plugin not available. Please refresh the page.</td></tr>');
+            }
         } catch (error) {
             console.error("Error initializing DataTable:", error);
             $('#loadingOverlay').hide();
-            $('#dataTable tbody').html('<tr><td colspan="11" class="text-center">Error loading data. Please try again.</td></tr>');
+            $('#dataTable tbody').html('<tr><td colspan="11" class="text-center">Error loading data: ' + error.message + '</td></tr>');
         }
         
         // Handle form submission
@@ -1020,7 +1030,6 @@ $(document).ready(function() {
             });
         });
     });
-});
 </script>
 
 <script>

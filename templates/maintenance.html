@@ -1,0 +1,142 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maintenance Mode - Glance 2.0</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            padding: 20px;
+            color: #212529;
+        }
+        
+        .maintenance-container {
+            max-width: 700px;
+            background-color: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        .logo {
+            max-width: 180px;
+            margin-bottom: 30px;
+        }
+        
+        .maintenance-icon {
+            font-size: 80px;
+            color: #0d6efd;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #0d6efd;
+        }
+        
+        p {
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            color: #6c757d;
+        }
+        
+        .estimated-time {
+            background-color: #f1f8ff;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 30px;
+            font-weight: 500;
+            color: #0d6efd;
+        }
+        
+        .social-links {
+            margin-top: 30px;
+        }
+        
+        .social-links a {
+            color: #6c757d;
+            font-size: 24px;
+            margin: 0 10px;
+            transition: color 0.3s;
+        }
+        
+        .social-links a:hover {
+            color: #0d6efd;
+        }
+        
+        @media (max-width: 768px) {
+            .maintenance-container {
+                padding: 30px 20px;
+            }
+            
+            .maintenance-icon {
+                font-size: 60px;
+            }
+            
+            h1 {
+                font-size: 28px;
+            }
+            
+            p {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="maintenance-container">
+        <img src="{% static 'img/home/logo.svg' %}" alt="Glance 2.0 Logo" class="logo">
+        
+        <div class="maintenance-icon">
+            <i class="fas fa-tools"></i>
+        </div>
+        
+        <h1>We're Under Maintenance</h1>
+        
+        <p>
+            We're currently performing scheduled maintenance on our system to provide you with a better experience.
+            We apologize for any inconvenience and appreciate your patience.
+        </p>
+        
+        <div class="estimated-time">
+            <i class="far fa-clock me-2"></i> Estimated completion time: <span id="completion-time">{{ completion_time|default:"Soon" }}</span>
+        </div>
+        
+        <p>
+            Our team is working hard to bring the system back online as quickly as possible.
+            Please check back later.
+        </p>
+        
+        <div class="social-links">
+            <a href="#"><i class="fab fa-facebook-f"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-linkedin-in"></i></a>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html> 

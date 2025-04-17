@@ -6,6 +6,7 @@ from django.core.mail import send_mail
 from datetime import datetime, date
 from django.db.models import Q
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from django.http import Http404
 
 # ========================================= DASHBOARD =========================================
 
@@ -386,7 +387,8 @@ def apply_job(request, slug):
 @login_required(login_url='login')
 def withdraw_application(request, slug):
     try:
-        job = Job.objects.get(slug=slug)
+        # Try to get the job by exact slug
+        job = get_object_or_404(Job, slug=slug)
         student = Student.objects.get(id=request.user.id)
         
         try:
@@ -443,8 +445,9 @@ GLA University, Mathura"""
         except Application.DoesNotExist:
             messages.error(request, "No active application found for this job")
             
-    except Job.DoesNotExist:
-        messages.error(request, "The job you're trying to withdraw from doesn't exist")
+    except Http404:
+        # Handle case where the job slug doesn't match any job
+        messages.error(request, f"The job with slug '{slug}' doesn't exist")
     except Student.DoesNotExist:
         messages.error(request, "Student profile not found")
     except Exception as e:

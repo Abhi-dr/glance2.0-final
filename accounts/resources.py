@@ -13,7 +13,7 @@ class StudentResource(resources.ModelResource):
     class Meta:
         model = Student
         fields = ('id', 'username', 'first_name', 'last_name', 'email', 'cgpa', 'year', 'course', 
-                 'no_of_companies_left', 'bypass_eligibility', 'phone_number', 'gender', 'backlog')
+                 'no_of_companies_left', 'phone_number', 'gender', 'backlog')
     
 class ApplicationResource(resources.ModelResource):
     class Meta:

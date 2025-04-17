@@ -12,21 +12,9 @@ admin.site.index_title = "Welcome to GLANCE Admin Portal"
 
 class StudentAdmin(ImportExportModelAdmin):
     resource_class = StudentResource
-    list_display = ('username', 'year', 'cgpa', "no_of_companies_left", "bypass_eligibility")
-    list_filter = ('year', "no_of_companies_left", "bypass_eligibility")
-    search_fields = ('first_name', 'last_name', 'username', "year", "phone_number")
-    exclude = ('email', 'password', 'last_login', 'is_superuser', 'groups', 'user_permissions', 'is_staff', 'is_active', 'date_joined')
-    actions = ['enable_bypass_eligibility', 'disable_bypass_eligibility']
-    
-    def enable_bypass_eligibility(self, request, queryset):
-        updated = queryset.update(bypass_eligibility=True)
-        self.message_user(request, f"{updated} students now have eligibility criteria bypassed.")
-    enable_bypass_eligibility.short_description = "Enable eligibility bypass for selected students"
-    
-    def disable_bypass_eligibility(self, request, queryset):
-        updated = queryset.update(bypass_eligibility=False)
-        self.message_user(request, f"{updated} students now follow normal eligibility criteria.")
-    disable_bypass_eligibility.short_description = "Disable eligibility bypass for selected students"
+    list_display = ('username', 'year', 'cgpa', "no_of_companies_left")
+    list_filter = ('year', "no_of_companies_left")
+    search_fields = ('username', 'first_name', 'last_name', 'email', 'course')
 
 class AdministratorAdmin(admin.ModelAdmin):
     list_display = ('username', 'first_name', 'last_name', 'email', 'phone_number')

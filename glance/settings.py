@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     'dbbackup',
     
     'import_export',
-    "user_visit"
+    "user_visit",
+    'maintenance_mode',
 ]
 
 MIDDLEWARE = [
@@ -50,7 +51,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'user_visit.middleware.UserVisitMiddleware'
+    'user_visit.middleware.UserVisitMiddleware',
+    'maintenance_mode.middleware.MaintenanceModeMiddleware',
 ]
 
 ROOT_URLCONF = 'glance.urls'
@@ -180,4 +182,12 @@ SESSION_COOKIE_AGE = 15 * 60
 SESSION_COOKIE_SECURE = True  
 SESSION_COOKIE_HTTPONLY = os.getenv("SESSION_COOKIE_HTTPONLY", True)
 CSRF_COOKIE_SECURE = os.getenv("CSRF_COOKIE_SECURE", True) 
+
+# Maintenance Mode Settings
+MAINTENANCE_MODE = os.getenv('MAINTENANCE_MODE', False)
+MAINTENANCE_MODE_TEMPLATE = 'maintenance.html'
+MAINTENANCE_MODE_IGNORE_SUPERUSER = True
+MAINTENANCE_MODE_IGNORE_STAFF = True
+MAINTENANCE_MODE_IGNORE_TESTS = True
+MAINTENANCE_MODE_IGNORE_IP_ADDRESSES = os.getenv('MAINTENANCE_MODE_IGNORE_IP_ADDRESSES', '').split(',')
 
