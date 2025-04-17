@@ -120,8 +120,7 @@ class Student(User):
             if hasattr(self, 'alumni_status') and hasattr(self, 'passout_year') and self.alumni_status == "Alumni" and self.passout_year:
                 score += 10
             
-            # Cap the score at 100 to prevent scores over 100%
-            return min(score, 100)
+            return score
             
         except Exception as e:
             # If anything goes wrong, return a default value
