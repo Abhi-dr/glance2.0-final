@@ -33,4 +33,7 @@ backups/
 /static/
 dbbackup.log
 /dbbackup
+**/__pycache__/
+*.pyc
+db.sqlite3
 
