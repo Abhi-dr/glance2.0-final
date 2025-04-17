@@ -540,19 +540,34 @@
     $(document).ready(function() {
         console.log("Page ready!");
         
-        // Initialize multiple select for interview dates
+        // Initialize multiple select for interview dates with Select2
         try {
             if ($.fn.select2) {
                 $('#interview_date').select2({
                     placeholder: "Select interview dates",
-                    allowClear: true
+                    allowClear: true,
+                    width: '100%'
+                });
+                
+                // Initialize company dropdown with Select2
+                $('#company').select2({
+                    placeholder: "Select a company",
+                    allowClear: true,
+                    width: '100%'
+                });
+                
+                // Initialize job dropdown with Select2
+                $('#job').select2({
+                    placeholder: "Select a job",
+                    allowClear: true,
+                    width: '100%'
                 });
             } else {
                 // Fallback to standard multiple select
                 $('#interview_date').prop('multiple', true);
             }
         } catch (error) {
-            console.error("Error initializing interview date select:", error);
+            console.error("Error initializing select2:", error);
             $('#interview_date').prop('multiple', true);
         }
 
@@ -595,22 +610,47 @@
                             });
                             d.course = courses;
                             
-                            // Get selected companies
+                            // Get selected companies from both checkbox group and dropdown
                             const companies = [];
                             $('.company-checkbox:checked').each(function() {
                                 companies.push($(this).val());
                             });
+                            
+                            // Add company from dropdown if selected
+                            const companyDropdownVal = $('#company').val();
+                            if (companyDropdownVal) {
+                                const companyId = $('#company option:selected').data('company-id');
+                                if (companyId && !companies.includes(companyId.toString())) {
+                                    companies.push(companyId.toString());
+                                }
+                            }
                             d.companies = companies;
                             
-                            // Get selected jobs
+                            // Get selected jobs from both checkbox group and dropdown
                             const jobs = [];
                             $('.job-checkbox:checked').each(function() {
                                 jobs.push($(this).val());
                             });
+                            
+                            // Add job from dropdown if selected
+                            const jobDropdownVal = $('#job').val();
+                            if (jobDropdownVal) {
+                                const jobId = $('#job option:selected').data('job-id');
+                                if (jobId && !jobs.includes(jobId.toString())) {
+                                    jobs.push(jobId.toString());
+                                }
+                            }
                             d.jobs = jobs;
                             
                             // Get selected interview dates
                             d.interview_date = $('#interview_date').val() || [];
+                            
+                            // Log the filter data for debugging
+                            console.log("Filter data being sent:", {
+                                companies: d.companies, 
+                                jobs: d.jobs, 
+                                interviewDates: d.interview_date
+                            });
                             
                             return d;
                         },
@@ -690,6 +730,17 @@
             // Update active filters display
             updateActiveFilters(formData, courses);
             
+            // Log all filter data for debugging
+            console.log("Filter submission:", {
+                formData: formData,
+                courses: courses,
+                companies: $('.company-checkbox:checked').map(function() { return $(this).val(); }).get(),
+                company: $('#company').val(),
+                jobs: $('.job-checkbox:checked').map(function() { return $(this).val(); }).get(),
+                job: $('#job').val(),
+                interviewDates: $('#interview_date').val()
+            });
+            
             // Reload the DataTable with the new filters
             $('#dataTable').DataTable().ajax.reload();
             
@@ -735,9 +786,45 @@
             activeFilters.push(`Courses: ${courses.join(', ')}`);
         }
         
+        // Add selected companies from checkboxes
+        const selectedCompanies = [];
+        $('.company-checkbox:checked').each(function() {
+            selectedCompanies.push($(this).next('label').text());
+        });
+        if (selectedCompanies.length > 0) {
+            activeFilters.push(`Companies: ${selectedCompanies.join(', ')}`);
+        }
+        
+        // Add company from dropdown
+        const companyDropdownVal = $('#company').val();
+        if (companyDropdownVal) {
+            activeFilters.push(`Company: ${companyDropdownVal}`);
+        }
+        
+        // Add selected jobs from checkboxes
+        const selectedJobs = [];
+        $('.job-checkbox:checked').each(function() {
+            selectedJobs.push($(this).next('label').text());
+        });
+        if (selectedJobs.length > 0) {
+            activeFilters.push(`Jobs: ${selectedJobs.join(', ')}`);
+        }
+        
+        // Add job from dropdown
+        const jobDropdownVal = $('#job').val();
+        if (jobDropdownVal) {
+            activeFilters.push(`Job: ${jobDropdownVal}`);
+        }
+        
+        // Add interview dates
+        const interviewDates = $('#interview_date').val();
+        if (interviewDates && interviewDates.length > 0) {
+            activeFilters.push(`Interview Dates: ${interviewDates.join(', ')}`);
+        }
+        
         const activeFiltersHtml = activeFilters.map(filter => 
             `<span class="badge bg-primary filter-badge">${filter}</span>`
-        ).join('');
+        ).join(' ');
         
         $('#activeFilters').html(activeFiltersHtml || '<span class="text-muted">No active filters</span>');
     }
@@ -1043,50 +1130,111 @@ $(document).ready(function() {
             const jobSelect = $('#job');
             
             // Reset job dropdown
-            jobSelect.val('');
-            
-            // Show all job options initially, then hide those that don't match
-            $('.job-option').show();
+            jobSelect.val(null).trigger('change');
             
             if (selectedCompanyName) {
-                // Filter jobs to only show those from the selected company
-                let visibleOptions = 0;
-                $('.job-option').each(function() {
+                // Filter job dropdown options
+                $('#job option').each(function() {
                     const jobCompanyId = $(this).data('company-id');
-                    // If it doesn't match the selected company, hide it
-                    if (jobCompanyId != selectedCompanyId) {
-                        $(this).hide();
+                    // If it's the default "All Jobs" option or matches the selected company, show it
+                    if (!$(this).val() || jobCompanyId == selectedCompanyId) {
+                        $(this).prop('disabled', false);
+                        $(this).show();
                     } else {
-                        visibleOptions++;
+                        $(this).prop('disabled', true);
+                        $(this).hide();
                     }
                 });
                 
+                // Refresh Select2 to reflect changes
+                if ($.fn.select2) {
+                    $('#job').select2('destroy').select2({
+                        placeholder: "Select a job",
+                        allowClear: true,
+                        width: '100%'
+                    });
+                }
+                
                 // If no jobs found for this company, add a disabled option with message
-                if (visibleOptions === 0) {
+                const visibleOptions = $('#job option:not(:disabled)').length;
+                if (visibleOptions <= 1) { // 1 is for the default empty option
                     if ($('#no-jobs-message').length === 0) {
                         jobSelect.append('<option id="no-jobs-message" disabled>No jobs available for this company</option>');
+                        
+                        // Refresh Select2 again
+                        if ($.fn.select2) {
+                            $('#job').select2('destroy').select2({
+                                placeholder: "Select a job",
+                                allowClear: true,
+                                width: '100%'
+                            });
+                        }
                     }
                 } else {
                     // Remove message if it exists
                     $('#no-jobs-message').remove();
                 }
             } else {
-                // Remove message if it exists
+                // If no company selected, enable all job options
+                $('#job option').prop('disabled', false).show();
                 $('#no-jobs-message').remove();
+                
+                // Refresh Select2
+                if ($.fn.select2) {
+                    $('#job').select2('destroy').select2({
+                        placeholder: "Select a job",
+                        allowClear: true,
+                        width: '100%'
+                    });
+                }
             }
         }
         
         // Handle company selection change
         $('#company').on('change', function() {
             filterJobsByCompany();
+            
+            // Automatically refresh the table when company changes
+            if ($.fn.DataTable) {
+                $('#dataTable').DataTable().ajax.reload();
+            }
+        });
+        
+        // Handle job selection change
+        $('#job').on('change', function() {
+            // Automatically refresh the table when job changes
+            if ($.fn.DataTable) {
+                $('#dataTable').DataTable().ajax.reload();
+            }
+        });
+        
+        // Handle interview date selection change
+        $('#interview_date').on('change', function() {
+            // Automatically refresh the table when interview dates change
+            if ($.fn.DataTable) {
+                $('#dataTable').DataTable().ajax.reload();
+            }
         });
         
         // Handle form reset
         $('#resetFilters').on('click', function() {
             // Reset job dropdown and show all options
-            $('#job').val('');
-            $('.job-option').show();
+            $('#job').val('').trigger('change');
+            $('#company').val('').trigger('change');
+            $('#interview_date').val(null).trigger('change');
             $('#no-jobs-message').remove();
+            
+            // Ensure all job options are visible
+            $('#job option').prop('disabled', false).show();
+            
+            // Refresh Select2
+            if ($.fn.select2) {
+                $('#job').select2('destroy').select2({
+                    placeholder: "Select a job",
+                    allowClear: true,
+                    width: '100%'
+                });
+            }
         });
         
         // Initial filtering on page load
@@ -1095,12 +1243,81 @@ $(document).ready(function() {
 </script>
 
 <script>
-// Handle company and job selection
+// Handle company and job checkboxes for advanced filtering
 $(document).ready(function() {
-    // Initially hide all job options
-    $('.job-option').hide();
+    // Function to update active filters display when checkboxes change
+    function updateActiveFiltersDisplay() {
+        const activeFilters = [];
+        
+        // Add selected courses
+        const selectedCourses = $('.course-checkbox:checked').map(function() {
+            return $(this).next('label').text();
+        }).get();
+        if (selectedCourses.length > 0) {
+            activeFilters.push(`Courses: ${selectedCourses.join(', ')}`);
+        }
+        
+        // Add selected companies
+        const selectedCompanies = $('.company-checkbox:checked').map(function() {
+            return $(this).next('label').text();
+        }).get();
+        if (selectedCompanies.length > 0) {
+            activeFilters.push(`Companies: ${selectedCompanies.join(', ')}`);
+        }
+        
+        // Add company from dropdown if selected
+        const companyDropdown = $('#company').val();
+        if (companyDropdown) {
+            activeFilters.push(`Company: ${companyDropdown}`);
+        }
+        
+        // Add selected jobs
+        const selectedJobs = $('.job-checkbox:checked').map(function() {
+            return $(this).next('label').text();
+        }).get();
+        if (selectedJobs.length > 0) {
+            activeFilters.push(`Jobs: ${selectedJobs.join(', ')}`);
+        }
+        
+        // Add job from dropdown if selected
+        const jobDropdown = $('#job').val();
+        if (jobDropdown) {
+            activeFilters.push(`Job: ${jobDropdown}`);
+        }
+        
+        // Add selected interview dates
+        const selectedDates = $('#interview_date').val();
+        if (selectedDates && selectedDates.length > 0) {
+            activeFilters.push(`Interview Dates: ${selectedDates.join(', ')}`);
+        }
+        
+        // Update the display
+        const activeFiltersHtml = activeFilters.map(filter => 
+            `<span class="badge bg-primary filter-badge">${filter}</span>`
+        ).join(' ');
+        
+        $('#activeFilters').html(activeFiltersHtml || '<span class="text-muted">No active filters</span>');
+    }
     
-    // When companies are selected, show their jobs
+    // Update active filters when checkboxes change
+    $('.course-checkbox, .company-checkbox, .job-checkbox').on('change', function() {
+        updateActiveFiltersDisplay();
+        
+        // Reload the table when checkboxes change
+        if ($.fn.DataTable) {
+            $('#dataTable').DataTable().ajax.reload();
+        }
+    });
+    
+    // Update active filters when select dropdowns change
+    $('#company, #job, #interview_date').on('change', function() {
+        updateActiveFiltersDisplay();
+    });
+    
+    // Initial update of active filters
+    updateActiveFiltersDisplay();
+    
+    // When company checkboxes change, filter available jobs
     $('.company-checkbox').on('change', function() {
         const selectedCompanies = $('.company-checkbox:checked').map(function() {
             return $(this).val();
@@ -1122,61 +1339,10 @@ $(document).ready(function() {
                 }
             });
         }
+        
+        // Update active filters display
+        updateActiveFiltersDisplay();
     });
-    
-    // Initialize multiple select for interview dates
-    $('#interview_date').select2({
-        placeholder: "Select interview dates",
-        allowClear: true
-    });
-    
-    // Update active filters display
-    function updateActiveFilters() {
-        const activeFilters = [];
-        
-        // Add selected courses
-        const selectedCourses = $('.course-checkbox:checked').map(function() {
-            return $(this).val();
-        }).get();
-        if (selectedCourses.length > 0) {
-            activeFilters.push(`Courses: ${selectedCourses.join(', ')}`);
-        }
-        
-        // Add selected companies
-        const selectedCompanies = $('.company-checkbox:checked').map(function() {
-            return $(this).next('label').text();
-        }).get();
-        if (selectedCompanies.length > 0) {
-            activeFilters.push(`Companies: ${selectedCompanies.join(', ')}`);
-        }
-        
-        // Add selected jobs
-        const selectedJobs = $('.job-checkbox:checked').map(function() {
-            return $(this).next('label').text();
-        }).get();
-        if (selectedJobs.length > 0) {
-            activeFilters.push(`Jobs: ${selectedJobs.join(', ')}`);
-        }
-        
-        // Add selected interview dates
-        const selectedDates = $('#interview_date').val();
-        if (selectedDates && selectedDates.length > 0) {
-            activeFilters.push(`Interview Dates: ${selectedDates.join(', ')}`);
-        }
-        
-        // Update the display
-        const activeFiltersHtml = activeFilters.map(filter => 
-            `<span class="badge bg-primary filter-badge">${filter}</span>`
-        ).join('');
-        
-        $('#activeFilters').html(activeFiltersHtml);
-    }
-    
-    // Update active filters when selections change
-    $('.course-checkbox, .company-checkbox, .job-checkbox, #interview_date').on('change', updateActiveFilters);
-    
-    // Initial update of active filters
-    updateActiveFilters();
-    });
+});
 </script>
 {% endblock %}

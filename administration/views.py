@@ -797,15 +797,23 @@ def get_filtered_students(request):
         phone = request.GET.get('phone')
         
         # Course filter (multiple selection)
-        courses = request.GET.getlist('course')
+        courses = request.GET.getlist('course[]') or request.GET.getlist('course')
         print(f"Courses from request: {courses}")
         
-        # Company and job filters
+        # Company and job filters (from both dropdowns and checkbox groups)
+        company_ids = request.GET.getlist('companies[]') or request.GET.getlist('companies')
+        job_ids = request.GET.getlist('jobs[]') or request.GET.getlist('jobs')
+        
+        # Interview date filter (multiple selection)
+        interview_dates = request.GET.getlist('interview_date[]') or request.GET.getlist('interview_date')
+        
+        # For backward compatibility
         company = request.GET.get('company')
         job = request.GET.get('job')
         
-        # Interview date filter (multiple selection)
-        interview_dates = request.GET.getlist('interview_date')
+        print(f"Company IDs: {company_ids}")
+        print(f"Job IDs: {job_ids}")
+        print(f"Interview dates: {interview_dates}")
         
         # Other filters
         year = request.GET.get('year')
@@ -838,31 +846,71 @@ def get_filtered_students(request):
             students = students.filter(course__in=courses)
             print(f"After course filter: {students.count()} students")
         
-        # Apply company filter
-        if company:
-            print(f"Filtering by company: {company}")
-            # Get applications for the specified company
-            company_applications = Application.objects.filter(
-                job__company__name=company
-            ).values_list('student_id', flat=True).distinct()
-            students = students.filter(id__in=company_applications)
-            print(f"After company filter: {students.count()} students")
+        # Apply company filter using company IDs
+        if company_ids:
+            print(f"Filtering by company IDs: {company_ids}")
+            try:
+                # Get applications for the specified companies
+                company_applications = Application.objects.filter(
+                    job__company__id__in=company_ids
+                ).values_list('student_id', flat=True).distinct()
+                
+                students = students.filter(id__in=company_applications)
+                print(f"After company ID filter: {students.count()} students")
+            except Exception as e:
+                print(f"Error filtering by company IDs: {e}")
+        # Apply old company filter for backward compatibility
+        elif company:
+            print(f"Filtering by company name: {company}")
+            try:
+                # Get applications for the specified company
+                company_applications = Application.objects.filter(
+                    job__company__name=company
+                ).values_list('student_id', flat=True).distinct()
+                
+                students = students.filter(id__in=company_applications)
+                print(f"After company name filter: {students.count()} students")
+            except Exception as e:
+                print(f"Error filtering by company name: {e}")
         
-        # Apply job filter - only apply if job is specified
-        if job:
-            print(f"Filtering by job: {job}")
-            # Get applications for the specified job
-            job_applications = Application.objects.filter(
-                job__title=job
-            ).values_list('student_id', flat=True).distinct()
-            students = students.filter(id__in=job_applications)
-            print(f"After job filter: {students.count()} students")
+        # Apply job filter using job IDs
+        if job_ids:
+            print(f"Filtering by job IDs: {job_ids}")
+            try:
+                # Get applications for the specified jobs
+                job_applications = Application.objects.filter(
+                    job__id__in=job_ids
+                ).values_list('student_id', flat=True).distinct()
+                
+                students = students.filter(id__in=job_applications)
+                print(f"After job ID filter: {students.count()} students")
+            except Exception as e:
+                print(f"Error filtering by job IDs: {e}")
+        # Apply old job filter for backward compatibility
+        elif job:
+            print(f"Filtering by job title: {job}")
+            try:
+                # Get applications for the specified job
+                job_applications = Application.objects.filter(
+                    job__title=job
+                ).values_list('student_id', flat=True).distinct()
+                
+                students = students.filter(id__in=job_applications)
+                print(f"After job title filter: {students.count()} students")
+            except Exception as e:
+                print(f"Error filtering by job title: {e}")
         
         # Apply interview date filter
         if interview_dates:
             print(f"Filtering by interview dates: {interview_dates}")
-            students = students.filter(application__job__interview_date__in=interview_dates).distinct()
-            print(f"After interview date filter: {students.count()} students")
+            try:
+                # Get students with applications for jobs with these interview dates
+                students = students.filter(
+                    application__job__interview_date__in=interview_dates
+                ).distinct()
+                print(f"After interview date filter: {students.count()} students")
+            except Exception as e:
+                print(f"Error filtering by interview dates: {e}")
         
         # Apply year filter
         if year:

@@ -273,7 +273,13 @@ def all_jobs(request):
     jobs_list = Job.objects.all().exclude(applications__student=student)
     
     # Apply backlog restrictions only if bypass_eligibility is not enabled
-    if not student.bypass_eligibility:
+    try:
+        bypass_eligibility = student.bypass_eligibility
+    except AttributeError:
+        # If attribute doesn't exist, default to False
+        bypass_eligibility = False
+        
+    if not bypass_eligibility:
         if student.backlog and student.backlog > 0:
             jobs_list = jobs_list.exclude(is_backlog_allowed=False)    
             
@@ -287,7 +293,13 @@ def all_jobs(request):
         ).exclude(applications__student=student)
         
         # Re-apply backlog restrictions on search results if needed
-        if not student.bypass_eligibility:
+        try:
+            bypass_eligibility = student.bypass_eligibility
+        except AttributeError:
+            # If attribute doesn't exist, default to False
+            bypass_eligibility = False
+            
+        if not bypass_eligibility:
             if student.backlog and student.backlog > 0:
                 jobs_list = jobs_list.exclude(is_backlog_allowed=False)
     
