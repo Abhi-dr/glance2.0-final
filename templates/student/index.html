@@ -301,6 +301,11 @@ Student -> Home
                             <div class="d-flex align-items-center mb-2">
                                 <p class="fs-5 mb-0">Left: {{ student.no_of_companies_left }} more</p>
                             </div>
+                            {% if student.bypass_eligibility %}
+                            <div class="d-flex align-items-center mb-2">
+                                <span class="badge bg-success">Academic Bypass Enabled</span>
+                            </div>
+                            {% endif %}
                             <div class="d-flex align-items-center">
                                 <span class="status-indicator status-accepted"></span>
                                 <span class="fs-5">This Week</span>

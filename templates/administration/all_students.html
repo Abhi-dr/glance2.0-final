@@ -14,6 +14,23 @@ Administration -> Students
             height: 400px;
         }
     }
+    
+    .action-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 10px;
+    }
+    
+    .action-buttons .btn {
+        flex: 1;
+        min-width: 180px;
+    }
+    
+    .modal-header {
+        background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+        color: white;
+    }
 </style>
 {% endblock %}
 
@@ -27,10 +44,88 @@ Administration -> Students
                 <span class="fs-4"> | GLANCE &nbsp; Job &nbsp; Fair</span>
             </h3>
         </div>
-        <a href="{% url 'export_unapplied_students_csv' %}" class="btn btn-outline-success m-3 mb-1">Download Unapplied Students Data</a>
-        <a href="{% url 'export_uneligible_students' %}" class="btn btn-outline-primary m-3">Download Uneligible Students Data</a>
+        <div class="action-buttons">
+            <a href="{% url 'export_unapplied_students_csv' %}" class="btn btn-outline-success mb-1">Download Unapplied Students</a>
+            <a href="{% url 'export_uneligible_students' %}" class="btn btn-outline-primary">Download Uneligible Students</a>
+            <button type="button" class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#companyLimitModal">
+                <i class="fas fa-building me-1"></i> Update Company Limits
+            </button>
+            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#bypassCGPAModal">
+                <i class="fas fa-graduation-cap me-1"></i> Toggle Academic Requirements
+            </button>
+        </div>
     </div>
 
+    <!-- Company Limit Modal -->
+    <div class="modal fade" id="companyLimitModal" tabindex="-1" aria-labelledby="companyLimitModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="companyLimitModalLabel">Update Company Limits</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="{% url 'update_company_limit' %}" method="post">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="limitInput" class="form-label">New Company Limit</label>
+                            <input type="number" class="form-control" id="limitInput" name="limit" min="1" max="100" value="10">
+                            <div class="form-text">Set the number of companies students can apply to</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="filterSelect" class="form-label">Apply To</label>
+                            <select class="form-select" id="filterSelect" name="filter">
+                                <option value="all">All Students</option>
+                                <option value="selected">Selected Students</option>
+                                <option value="zero">Students with 0 Companies Left</option>
+                                <option value="less_than_limit">Students with Less Than New Limit</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Update Limits</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- CGPA Bypass Modal -->
+    <div class="modal fade" id="bypassCGPAModal" tabindex="-1" aria-labelledby="bypassCGPAModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="bypassCGPAModalLabel">Toggle Academic Requirements</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="{% url 'bypass_cgpa_validation' %}" method="post">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="actionSelect" class="form-label">Action</label>
+                            <select class="form-select" id="actionSelect" name="action">
+                                <option value="enable">Enable Academic Bypass</option>
+                                <option value="disable">Disable Academic Bypass</option>
+                            </select>
+                            <div class="form-text">This will bypass all academic requirements (10th/12th/UG CGPA) for job eligibility</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="filterSelectCGPA" class="form-label">Apply To</label>
+                            <select class="form-select" id="filterSelectCGPA" name="filter">
+                                <option value="all">All Students</option>
+                                <option value="selected">Selected Students</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Apply Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
     {% for message in messages %}
 
@@ -83,6 +178,11 @@ Administration -> Students
                         <tr>
                             <th class="border-bottom-0">
                                 <h6 class="fw-semibold mb-0">
+                                    <input type="checkbox" id="select-all-students">
+                                </h6>
+                            </th>
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">
                                     #
                                 </h6>
                             </th>
@@ -101,13 +201,16 @@ Administration -> Students
                                     Companies Applied
                                 </h6>
                             </th>
-
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">
+                                    CGPA Bypass
+                                </h6>
+                            </th>
                             <th class="border-bottom-0">
                                 <h6 class="fw-semibold mb-0">
                                     Social Links
                                 </h6>
                             </th>
-
                             <th class="border-bottom-0 justify-content-center">
                                 <h6 class="fw-semibold mb-0">
                                     Contacts
@@ -127,6 +230,9 @@ Administration -> Students
                         {% for student in students %}
 
                         <tr>
+                            <td class="border-bottom-0">
+                                <input type="checkbox" class="student-checkbox" data-student-id="{{ student.id }}">
+                            </td>
                             <td class="border-bottom-0">
                                 <h6 class="fw-semibold mb-0">{{ forloop.counter }}</h6>
                             </td>
@@ -160,6 +266,17 @@ Administration -> Students
                             <td class="border-bottom-0 ">
                                 <p class="fw-semibold mb-0">
                                    {{ student.application_set.count }}
+                                </p>
+                            </td>
+
+                            <td class="border-bottom-0">
+                                {% if student.bypass_eligibility %}
+                                <span class="badge bg-success">Enabled</span>
+                                {% else %}
+                                <span class="badge bg-danger">Disabled</span>
+                                {% endif %}
+                                <p class="fw-normal mt-1 mb-0">
+                                    <small>Companies Left: {{ student.no_of_companies_left }}</small>
                                 </p>
                             </td>
 
@@ -273,4 +390,101 @@ Administration -> Students
 </div>
 <!-- End Pagination Section -->
 
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Select/deselect all students
+    document.getElementById('select-all-students').addEventListener('change', function() {
+        const studentCheckboxes = document.querySelectorAll('.student-checkbox');
+        studentCheckboxes.forEach(checkbox => {
+            checkbox.checked = this.checked;
+        });
+    });
+    
+    // Collect and submit selected student IDs
+    document.addEventListener('DOMContentLoaded', function() {
+        const companyLimitForm = document.querySelector('#companyLimitModal form');
+        const bypassCGPAForm = document.querySelector('#bypassCGPAModal form');
+        
+        const addSelectedStudentIds = function(form) {
+            // Remove any previously added hidden fields
+            const existingHiddenFields = form.querySelectorAll('input[name="student_ids"]');
+            existingHiddenFields.forEach(field => field.remove());
+            
+            // Add selected student IDs if "selected" filter is chosen
+            const filterSelect = form.querySelector('select[name="filter"]');
+            if (filterSelect.value === 'selected') {
+                const selectedCheckboxes = document.querySelectorAll('.student-checkbox:checked');
+                
+                if (selectedCheckboxes.length === 0) {
+                    alert('Please select at least one student first');
+                    event.preventDefault();
+                    return false;
+                }
+                
+                selectedCheckboxes.forEach(checkbox => {
+                    const studentId = checkbox.getAttribute('data-student-id');
+                    const hiddenField = document.createElement('input');
+                    hiddenField.type = 'hidden';
+                    hiddenField.name = 'student_ids';
+                    hiddenField.value = studentId;
+                    form.appendChild(hiddenField);
+                });
+            }
+            return true;
+        };
+        
+        companyLimitForm.addEventListener('submit', function(event) {
+            if (!addSelectedStudentIds(this)) {
+                event.preventDefault();
+            }
+        });
+        
+        bypassCGPAForm.addEventListener('submit', function(event) {
+            if (!addSelectedStudentIds(this)) {
+                event.preventDefault();
+            }
+        });
+        
+        // Show/hide alert about selecting students
+        const companyFilterSelect = document.getElementById('filterSelect');
+        const cgpaFilterSelect = document.getElementById('filterSelectCGPA');
+        
+        const updateSelectionAlert = function(select, alertId) {
+            const alert = document.getElementById(alertId);
+            if (select.value === 'selected') {
+                alert.style.display = 'block';
+            } else {
+                alert.style.display = 'none';
+            }
+        };
+        
+        // Add selection alerts to the modals
+        const companyModalBody = companyLimitForm.querySelector('.modal-body');
+        const cgpaModalBody = bypassCGPAForm.querySelector('.modal-body');
+        
+        const companySelectionAlert = document.createElement('div');
+        companySelectionAlert.id = 'companySelectionAlert';
+        companySelectionAlert.className = 'alert alert-info mt-2';
+        companySelectionAlert.style.display = 'none';
+        companySelectionAlert.textContent = 'Please select students from the table first';
+        companyModalBody.appendChild(companySelectionAlert);
+        
+        const cgpaSelectionAlert = document.createElement('div');
+        cgpaSelectionAlert.id = 'cgpaSelectionAlert';
+        cgpaSelectionAlert.className = 'alert alert-info mt-2';
+        cgpaSelectionAlert.style.display = 'none';
+        cgpaSelectionAlert.textContent = 'Please select students from the table first';
+        cgpaModalBody.appendChild(cgpaSelectionAlert);
+        
+        companyFilterSelect.addEventListener('change', function() {
+            updateSelectionAlert(this, 'companySelectionAlert');
+        });
+        
+        cgpaFilterSelect.addEventListener('change', function() {
+            updateSelectionAlert(this, 'cgpaSelectionAlert');
+        });
+    });
+</script>
 {% endblock %}

@@ -1755,3 +1755,78 @@ def get_all_students_json(request):
             'error': str(e),
             'data': []
         })
+
+@login_required(login_url='login')
+@admin_required
+def update_company_limit(request):
+    """Update company limit for students"""
+    if request.method == 'POST':
+        limit = int(request.POST.get('limit', 10))
+        filter_type = request.POST.get('filter', 'all')
+        
+        # Check if we're working with selected students
+        student_ids = request.POST.getlist('student_ids')
+        if filter_type == 'selected' and student_ids:
+            # Update only the selected students
+            queryset = Student.objects.filter(id__in=student_ids)
+        else:
+            # Apply filter
+            if filter_type == 'less_than_limit':
+                queryset = Student.objects.filter(no_of_companies_left__lt=limit)
+            elif filter_type == 'zero':
+                queryset = Student.objects.filter(no_of_companies_left=0)
+            else:  # 'all'
+                queryset = Student.objects.all()
+        
+        # Update the limit
+        students_updated = queryset.update(no_of_companies_left=limit)
+        
+        # Show success message
+        if students_updated == 0:
+            messages.warning(request, f"No students were updated")
+        else:
+            messages.success(request, f"Successfully updated {students_updated} students to have {limit} company limit")
+        
+        # Redirect back to referring page or a default
+        return redirect(request.META.get('HTTP_REFERER', 'all_students'))
+    
+    # If GET request, just redirect to all students page
+    return redirect('all_students')
+
+@login_required(login_url='login')
+@admin_required
+def bypass_cgpa_validation(request):
+    """Toggle bypass_eligibility flag for students"""
+    if request.method == 'POST':
+        action = request.POST.get('action', 'enable')
+        
+        # Get filter type
+        filter_type = request.POST.get('filter', 'all')
+        
+        # Check if we're working with selected students
+        student_ids = request.POST.getlist('student_ids')
+        if filter_type == 'selected' and student_ids:
+            # Update only the selected students
+            queryset = Student.objects.filter(id__in=student_ids)
+        else:
+            # Apply filter for all students
+            queryset = Student.objects.all()
+        
+        # Update the bypass_eligibility flag
+        if action == 'enable':
+            students_updated = queryset.update(bypass_eligibility=True)
+            message = f"Successfully enabled CGPA bypass for {students_updated} students"
+        else:
+            students_updated = queryset.update(bypass_eligibility=False)
+            message = f"Successfully disabled CGPA bypass for {students_updated} students"
+        
+        if students_updated == 0:
+            messages.warning(request, "No students were updated")
+        else:
+            messages.success(request, message)
+        
+        # Redirect back to referring page or a default
+        return redirect(request.META.get('HTTP_REFERER', 'all_students'))
+    
+    # If GET request, just redirect to all students page
+    return redirect('all_students')

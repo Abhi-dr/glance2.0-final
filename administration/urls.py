@@ -8,6 +8,10 @@ urlpatterns = [
     path("get_filtered_students", views.get_filtered_students, name="get_filtered_students"),
     path("test_student_data", views.test_student_data, name="test_student_data"),
     
+    # New utility buttons
+    path("update_company_limit", views.update_company_limit, name="update_company_limit"),
+    path("bypass_cgpa_validation", views.bypass_cgpa_validation, name="bypass_cgpa_validation"),
+    
     path("company/<int:id>", views.company, name="company"),
     path("job_details/<str:slug>", views.job_details, name="admin_job_details"),
     path("applications/<str:slug>", views.applications, name="applications"),

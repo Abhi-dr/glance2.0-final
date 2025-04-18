@@ -15,6 +15,21 @@ class StudentAdmin(ImportExportModelAdmin):
     list_display = ('username', 'year', 'cgpa', "no_of_companies_left")
     list_filter = ('year', "no_of_companies_left")
     search_fields = ('username', 'first_name', 'last_name', 'email', 'course')
+    actions = ['update_company_limit']
+    
+    def update_company_limit(self, request, queryset):
+        # Update all selected students
+        updated = queryset.update(no_of_companies_left=10)
+        
+        # Show a success message
+        if updated == 1:
+            message = "1 student was updated to have 10 company limit"
+        else:
+            message = f"{updated} students were updated to have 10 company limit"
+        
+        self.message_user(request, message)
+    
+    update_company_limit.short_description = "Update selected students to 10 company limit"
 
 class AdministratorAdmin(admin.ModelAdmin):
     list_display = ('username', 'first_name', 'last_name', 'email', 'phone_number')

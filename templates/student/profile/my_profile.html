@@ -287,6 +287,46 @@ Profile {% endblock %}
                 {% endif %}
               </div>
             </div>
+            
+            <hr>
+            
+            <!-- Application Status Section -->
+            <div class="row">
+              <div class="col-sm-3">
+                <p class="mb-0 fw-bolder fs-3">Application Status</p>
+              </div>
+            </div>
+            
+            <div class="row mt-3">
+              <div class="col-sm-3">
+                <p class="mb-0 fw-bold">Companies Left</p>
+              </div>
+              <div class="col-sm-9">
+                <p class="fw-semibold mb-0">
+                  <span class="badge bg-primary p-2">{{ student.no_of_companies_left }} remaining</span>
+                </p>
+              </div>
+            </div>
+            
+            <div class="row mt-3">
+              <div class="col-sm-3">
+                <p class="mb-0 fw-bold">Academic Bypass</p>
+              </div>
+              <div class="col-sm-9">
+                {% if student.bypass_eligibility %}
+                <p class="fw-semibold mb-0">
+                  <span class="badge bg-success p-2">Enabled</span>
+                  <small class="d-block mt-1 text-muted">You're exempt from academic eligibility requirements</small>
+                </p>
+                {% else %}
+                <p class="fw-semibold mb-0">
+                  <span class="badge bg-secondary p-2">Disabled</span>
+                  <small class="d-block mt-1 text-muted">Normal academic eligibility criteria apply</small>
+                </p>
+                {% endif %}
+              </div>
+            </div>
+            
           </div>
           
           <!-- For mobile view -->
@@ -417,6 +457,32 @@ Profile {% endblock %}
                 <p class="fw-semibold mb-0 text-danger">{{ student.backlog }}</p>
                 {% else %}
                 <p class="fw-semibold mb-0 text-danger">Not Updated</p>
+                {% endif %}
+              </div>
+            </div>
+            
+            <div class="profile-section">
+              <p class="profile-label">Application Status</p>
+              <div class="profile-value">
+                <p class="fw-semibold mb-0">
+                  <span class="badge bg-primary p-2">{{ student.no_of_companies_left }} remaining</span>
+                </p>
+              </div>
+            </div>
+            
+            <div class="profile-section">
+              <p class="profile-label">Academic Bypass</p>
+              <div class="profile-value">
+                {% if student.bypass_eligibility %}
+                <p class="fw-semibold mb-0">
+                  <span class="badge bg-success p-2">Enabled</span>
+                  <small class="d-block mt-1 text-muted">You're exempt from academic eligibility requirements</small>
+                </p>
+                {% else %}
+                <p class="fw-semibold mb-0">
+                  <span class="badge bg-secondary p-2">Disabled</span>
+                  <small class="d-block mt-1 text-muted">Normal academic eligibility criteria apply</small>
+                </p>
                 {% endif %}
               </div>
             </div>
