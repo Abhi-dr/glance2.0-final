@@ -1,10 +1,15 @@
 {% extends 'student/base.html' %}
 
 {% block title %}
-Job Details
+Job Details - {{ job.title }} at {{ job.company.name }}
 {% endblock %}
 
 {% block body %}
+<!-- DEBUG INFO: JOB DETAILS TEMPLATE IS BEING RENDERED -->
+<!-- JOB TITLE: {{ job.title }} -->
+<!-- COMPANY: {{ job.company.name }} -->
+<!-- ELIGIBILITY: {{ is_eligible }} -->
+
 <div class="container mt-4">
     <div class="row mb-4">
         <div class="col-12">

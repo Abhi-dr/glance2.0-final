@@ -1204,7 +1204,7 @@ $(document).ready(function() {
         $('#job').on('change', function() {
             // Automatically refresh the table when job changes
             if ($.fn.DataTable) {
-                $('#dataTable').DataTable().ajax.reload();
+        $('#dataTable').DataTable().ajax.reload();
             }
         });
         
@@ -1239,12 +1239,12 @@ $(document).ready(function() {
         
         // Initial filtering on page load
         filterJobsByCompany();
-    });
+});
 </script>
 
 <script>
 // Handle company and job checkboxes for advanced filtering
-$(document).ready(function() {
+    $(document).ready(function() {
     // Function to update active filters display when checkboxes change
     function updateActiveFiltersDisplay() {
         const activeFilters = [];
@@ -1329,12 +1329,12 @@ $(document).ready(function() {
             $('.job-checkbox').prop('checked', false);
         } else {
             // Show jobs for selected companies
-            $('.job-option').each(function() {
+                $('.job-option').each(function() {
                 const companyId = $(this).data('company-id');
                 if (selectedCompanies.includes(companyId.toString())) {
-                    $(this).show();
-                } else {
-                    $(this).hide();
+                        $(this).show();
+                    } else {
+                        $(this).hide();
                     $(this).find('.job-checkbox').prop('checked', false);
                 }
             });
@@ -1342,7 +1342,7 @@ $(document).ready(function() {
         
         // Update active filters display
         updateActiveFiltersDisplay();
+        });
     });
-});
 </script>
 {% endblock %}

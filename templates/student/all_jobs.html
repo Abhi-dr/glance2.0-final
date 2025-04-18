@@ -138,7 +138,7 @@ Student -> All Jobs
     <div class="col-sm-6 col-md-4 col-xl-3">
       <div class="card h-100 overflow-hidden rounded-2">
         <div class="position-relative text-center p-3 bg-dark">
-          <a href="{% url 'job_details' job.slug %}">
+          <a href="{% url 'student_job_details' job.slug %}">
             {% if job.company.logo %}
             <img src="{{ job.company.logo.url }}" class="card-img-top rounded-0 img-fluid" 
               style="max-height: 120px; width: auto; max-width: 100%;" alt="{{ job.company.name }} logo" />
@@ -167,7 +167,7 @@ Student -> All Jobs
           <div>
             <p class="text-muted mb-2">{{ job.description|truncatechars:100 }}</p>
           </div>
-          <a href="{% url 'job_details' job.slug %}" class="btn btn-sm btn-primary mt-2 w-100">View Details</a>
+          <a href="{% url 'student_job_details' job.slug %}" class="btn btn-sm btn-primary mt-2 w-100">View Details</a>
         </div>
       </div>
     </div>

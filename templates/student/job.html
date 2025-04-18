@@ -94,7 +94,7 @@ Job Details
 <div class="container-fluid">
     <div class="job-header">
         <div class="row align-items-center">
-            <div class="col-md-8">
+                <div class="col-md-8">
                 <h2 class="mb-2">{{ job.title|title }}</h2>
                 <h4 class="mb-0">{{ job.company.name|title }}</h4>
             </div>
@@ -107,74 +107,74 @@ Job Details
             </div>
         </div>
     </div>
-
+    
     <div class="job-details">
         {% if is_eligible %}
         <div class="eligibility-badge eligible">
             <i class="ti ti-check me-2"></i>You are eligible for this position
         </div>
-        {% else %}
+            {% else %}
         <div class="eligibility-badge not-eligible">
             <i class="ti ti-x me-2"></i>You are not eligible for this position
         </div>
-        {% endif %}
-
+            {% endif %}
+    
         <div class="row">
             <div class="col-md-6">
                 <div class="detail-item">
                     <div class="detail-label">Job Description</div>
                     <div class="detail-value">{{ job.description|linebreaks }}</div>
-                </div>
-                
+        </div>
+
                 <div class="detail-item">
                     <div class="detail-label">Role</div>
                     <div class="detail-value">{{ job.role|title }}</div>
-                </div>
+                        </div>
                 
                 <div class="detail-item">
                     <div class="detail-label">Job Type</div>
                     <div class="detail-value">{{ job.job_type|title }}</div>
                 </div>
-                
+
                 <div class="detail-item">
                     <div class="detail-label">Salary Range</div>
                     <div class="detail-value">{{ job.salary_range }}</div>
                 </div>
             </div>
-            
+
             <div class="col-md-6">
                 <div class="detail-item">
                     <div class="detail-label">Interview Date</div>
                     <div class="detail-value text-primary">{{ job.interview_date }}</div>
-                </div>
+            </div>
                 
                 <div class="detail-item">
                     <div class="detail-label">Interview Mode</div>
                     <div class="detail-value">{{ job.interview_mode|title }}</div>
-                </div>
+            </div>
                 
                 <div class="detail-item">
                     <div class="detail-label">Location Flexibility</div>
                     <div class="detail-value">{{ job.location_flexibility|title }}</div>
-                </div>
+                    </div>
                 
                 <div class="detail-item">
                     <div class="detail-label">Training Period</div>
                     <div class="detail-value">{{ job.training_period }}</div>
-                </div>
+                    </div>
                 
                 <div class="detail-item">
                     <div class="detail-label">Bond Duration</div>
                     <div class="detail-value">{{ job.bond_timing }}</div>
-                </div>
+                    </div>
                 
                 <div class="detail-item">
                     <div class="detail-label">Application Deadline</div>
                     <div class="detail-value text-danger">{{ job.deadline }}</div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
 
     <div class="action-buttons">
         {% if has_applied %}
@@ -198,4 +198,4 @@ Job Details
         {% endif %}
     </div>
 </div>
-{% endblock %}
+    {% endblock %}

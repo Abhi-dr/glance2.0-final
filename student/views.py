@@ -181,7 +181,6 @@ def applied_job(request, slug):
 
 @login_required(login_url='login')
 def upload_resume(request):
-    
     student = Student.objects.get(id=request.user.id)
     
     if request.method == "POST":
@@ -208,9 +207,7 @@ def upload_resume(request):
                     messages.error(request, f"File '{file_obj.name}' is not a PDF. Only PDF files are allowed.")
                     return redirect('upload_resume')
             
-            # Get the student and update fields
-            student = Student.objects.get(id=request.user.id)            
-            
+            # Get the student and update fields (student already fetched above)
             upload_success = False
             
             if resume:
@@ -228,7 +225,7 @@ def upload_resume(request):
             if college_profile_print:
                 student.college_profile_print = college_profile_print
                 upload_success = True
-                
+            
             student.save()
             
             # List of successfully uploaded files for the success message
@@ -348,7 +345,7 @@ def apply_job(request, slug):
     if not is_eligible:
         messages.error(request, eligibility_message)
         return redirect('student')
-    
+        
     # Check interview date conflicts
     has_date_conflict = Application.objects.filter(
         student=student,
@@ -365,11 +362,11 @@ def apply_job(request, slug):
         job=job,
         status='pending'
     )
-    
+        
     # Decrease the number of companies the student can apply to
     student.no_of_companies_left -= 1
     student.save()
-    
+        
     messages.success(request, "Successfully applied for the job. Good luck!")
     
     # Redirect to the student dashboard
@@ -378,14 +375,15 @@ def apply_job(request, slug):
 # ================================== WITHDRAW APPLICATION ===========================================
 
 @login_required(login_url='login')
-def withdraw_application(request, slug):
+def withdraw_application(request, job_slug):
     try:
-        # Try to get the job by exact slug
-        job = get_object_or_404(Job, slug=slug)
+        # Get job by slug
+        job = get_object_or_404(Job, slug=job_slug)
         student = Student.objects.get(id=request.user.id)
         
+        # Check if application exists
         try:
-            application = Application.objects.get(student=student, job=job)
+            application = Application.objects.get(job=job, student=student)
             
             # Only allow withdrawal if application is still pending
             if application.status == 'pending':
@@ -440,15 +438,11 @@ GLA University, Mathura"""
                 
         except Application.DoesNotExist:
             # Log the error with more details
-            print(f"Application not found: Student {student.id} attempted to withdraw from Job {job.id} ({job.slug})")
+            print(f"Application not found: Job {job.slug}, Student {student.id} combination not found")
             messages.error(request, "No active application found for this job")
-            
     except Http404:
-        # Handle case where the job slug doesn't match any job
-        print(f"Job not found: Invalid slug '{slug}' when attempting to withdraw application")
-        messages.error(request, f"The job with slug '{slug}' doesn't exist")
-    except Student.DoesNotExist:
-        messages.error(request, "Student profile not found")
+        print(f"Job not found: Invalid job slug '{job_slug}'")
+        messages.error(request, "Job not found")
     except Exception as e:
         # Add detailed error logging
         import traceback
@@ -462,15 +456,15 @@ GLA University, Mathura"""
 
 @login_required(login_url='login')
 def notifications(request):
-    
+        
     student = Student.objects.get(id=request.user.id)
     notifications = Notification.objects.all()[::-1]
-    
+        
     parameters = {
-        "student": student,
-        "notifications": notifications
-    }
-    
+            "student": student,
+            "notifications": notifications
+        }
+        
     return render(request, 'student/notifications.html', parameters)
 
 
@@ -521,18 +515,18 @@ def check_eligibility(student, job):
 # ================================== WITHDRAW APPLICATION BY ID ===========================================
 
 @login_required(login_url='login')
-def withdraw_application_by_id(request, application_id):
+def withdraw_application_by_id(request, app_id):
     try:
-        # Try to get the application by ID
-        application = get_object_or_404(Application, id=application_id)
+        # Get application by ID and verify it belongs to current user
+        application = get_object_or_404(Application, id=app_id)
         
-        # Verify that the application belongs to the current user
         if application.student.id != request.user.id:
-            messages.error(request, "You do not have permission to withdraw this application")
+            messages.error(request, "You can only withdraw your own applications")
             return redirect('my_applications')
-            
+        
+        # Store job information before deletion for email notification
         job = application.job
-        student = application.student
+        student = request.user
         
         # Only allow withdrawal if application is still pending
         if application.status == 'pending':
@@ -541,7 +535,7 @@ def withdraw_application_by_id(request, application_id):
             student.save()
             
             # Log successful withdrawal
-            print(f"Application withdrawn successfully: Student {student.id} from Job {job.id} ({job.slug})")
+            print(f"Application withdrawn successfully: Application ID {app_id}, Student {student.id}, Job {job.id}")
             
             myfile = f"""
 Dear {student.first_name} {student.last_name},
@@ -568,7 +562,7 @@ GLA University, Mathura"""
             email_body = myfile
             email_from = 'GLANCE JOB FAIR 2k24 <alumniassociation01@gla.ac.in>'
             email_to = [student.username]
-
+            
             try:
                 send_mail(
                     email_subject, 
@@ -585,10 +579,10 @@ GLA University, Mathura"""
         else:
             messages.error(request, "Cannot withdraw application - it has already been processed")
             
-    except Application.DoesNotExist:
-        # Log the error with more details
-        print(f"Application not found: Application ID {application_id} not found when attempting to withdraw")
-        messages.error(request, "No active application found with that ID")
+    except Http404:
+        # Application not found
+        print(f"Application not found: Invalid application ID '{app_id}'")
+        messages.error(request, "Application not found")
     except Exception as e:
         # Add detailed error logging
         import traceback
