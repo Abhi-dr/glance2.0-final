@@ -30,70 +30,65 @@ def home(request):
     # Get total companies count safely
     companies_count = Job.objects.all().count() or 1  # Avoid division by zero
     
-    # Check if student has complete profile
-    has_complete_profile = all([
-        student.tenth is not None,
-        student.twelfth is not None,
-        student.cgpa is not None
-    ])
+    # Check if student has complete profile using helper function
+    has_complete_profile, missing_items, _ = check_profile_completeness(student)
     
-    if has_complete_profile:
-        # Get eligible jobs with proper error handling
-        try:
-            # Base query for eligible jobs
-            all_eligible_jobs = Job.objects.filter(
-                tenth_percentage__lte=student.tenth,
-                twelfth_percentage__lte=student.twelfth,
-                cgpa_criteria__lte=student.cgpa,
-            ).exclude(applications__student=student)
+    try:
+        # Only fetch jobs if student has complete profile
+        if has_complete_profile:
+            # Get today's date for comparison
+            today = date.today()
             
-            # Handle backlog restrictions
-            if student.backlog > 0:
-                all_eligible_jobs = all_eligible_jobs.exclude(is_backlog_allowed=False)
+            # Get active eligible jobs (non-expired) first
+            active_eligible_jobs = []
+            for job in Job.objects.filter(deadline__gte=today).order_by('deadline'):
+                is_eligible, _ = check_eligibility(student, job)
+                if is_eligible:
+                    active_eligible_jobs.append(job)
             
-            # Get applications to handle interview date conflicts
-            applications = Application.objects.filter(student=student)
+            # Get expired eligible jobs
+            expired_eligible_jobs = []
+            for job in Job.objects.filter(deadline__lt=today).order_by('-deadline'):
+                is_eligible, _ = check_eligibility(student, job)
+                if is_eligible:
+                    expired_eligible_jobs.append(job)
             
-            # Exclude jobs with interview date conflicts
-            for application in applications:
-                if application.job and application.job.interview_date:
-                    all_eligible_jobs = all_eligible_jobs.exclude(
-                        interview_date=application.job.interview_date
-                    )
+            # Combine active and expired jobs
+            all_eligible_jobs = active_eligible_jobs + expired_eligible_jobs
             
-            # Calculate percentage of eligible companies
-            eligible_companies_count = int((all_eligible_jobs.count() / companies_count) * 100)
+            # Get first 3 jobs for dashboard display
+            eligible_jobs = all_eligible_jobs[:3]
             
-            # Create duplicate for displaying limited results
-            eligible_jobs = all_eligible_jobs[:3]  # First 3 jobs for dashboard
-
-        except Exception as e:
-            # Log the exception for debugging
-            import logging
-            logger = logging.getLogger(__name__)
-            logger.error(f"Error in home view: {str(e)}")
+            # Count eligible companies
+            eligible_companies_count = len(all_eligible_jobs)
             
-            # Set empty queryset
-            all_eligible_jobs = Job.objects.none()
-            eligible_jobs = Job.objects.none()
-            eligible_companies_count = 0
-    else:
-        messages.info(request, "Complete your profile to see eligible jobs for you 🔥")
-        all_eligible_jobs = Job.objects.none()
-        eligible_jobs = Job.objects.none()
+        # Get latest applications
+        applications = Application.objects.filter(student=student).order_by('-application_date')[:5]
+    except Exception as e:
+        # Just log the error and continue - don't fail the entire page
+        print(f"Error in dashboard: {str(e)}")
+    
+    # Calculate application percentage (out of 100)
+    companies_applied_percentage = (no_of_companies_applied / companies_count) * 100
+    companies_applied_percentage = min(companies_applied_percentage, 100)  # Cap at 100%
+    
+    # Safely calculate profile score
+    profile_score = student.get_profile_score()
     
     parameters = {
         "student": student,
+        "has_complete_profile": has_complete_profile,
+        "missing_items": missing_items if not has_complete_profile else [],
         "no_of_companies_applied": no_of_companies_applied,
         "eligible_jobs": eligible_jobs,
-        "all_eligible_jobs": all_eligible_jobs,
-        "no_of_companies_applied_in_percentage": no_of_companies_applied_in_percentage,
         "eligible_companies_count": eligible_companies_count,
         "applications": applications,
-        "has_complete_profile": has_complete_profile
+        "companies_applied_percentage": companies_applied_percentage,
+        "profile_score": profile_score,
+        "today_date": date.today()
     }
     
-    return render(request, "student/index.html", parameters)
+    return render(request, 'student/index.html', parameters)
 
 # ================================== MY JOBS ===============================================
 
@@ -262,11 +257,19 @@ def upload_resume(request):
 def all_jobs(request):
     
     student = Student.objects.get(id=request.user.id)
-    jobs_list = Job.objects.all().exclude(applications__student=student)
+    # Get today's date for comparison
+    today = date.today()
+    
+    # Get active jobs (non-expired) and sort by deadline in ascending order
+    active_jobs = Job.objects.filter(deadline__gte=today).exclude(applications__student=student).order_by('deadline')
+    
+    # Get expired jobs and sort by deadline in descending order
+    expired_jobs = Job.objects.filter(deadline__lt=today).exclude(applications__student=student).order_by('-deadline')
     
     # Apply backlog restrictions
     if student.backlog and student.backlog > 0:
-        jobs_list = jobs_list.exclude(is_backlog_allowed=False)    
+        active_jobs = active_jobs.exclude(is_backlog_allowed=False)
+        expired_jobs = expired_jobs.exclude(is_backlog_allowed=False)
             
     query = request.GET.get("query")
     if query:
@@ -280,6 +283,16 @@ def all_jobs(request):
         # Re-apply backlog restrictions on search results
         if student.backlog and student.backlog > 0:
             jobs_list = jobs_list.exclude(is_backlog_allowed=False)
+            
+        # Get today's date for comparison
+        today = date.today()
+        
+        # Separate active and expired jobs in search results
+        active_jobs = jobs_list.filter(deadline__gte=today).order_by('deadline')
+        expired_jobs = jobs_list.filter(deadline__lt=today).order_by('-deadline')
+    
+    # Combine active and expired jobs, with active jobs first
+    jobs_list = list(active_jobs) + list(expired_jobs)
     
     # Pagination
     page = request.GET.get('page', 1)
@@ -295,7 +308,8 @@ def all_jobs(request):
     parameters = {
         "student": student,
         "jobs": jobs,
-        "query": query
+        "query": query,
+        "today_date": today
     }
     
     return render(request, 'student/all_jobs.html', parameters)
@@ -316,16 +330,30 @@ def confirm_application(request, slug):
         return render(request, 'student/confirmation.html', parameters)
     
     else:
-        messages.error(request, "You have already applied to 3 companies!")
+        messages.error(request, "You have already applied to 10 companies!")
         return redirect('student')
     
 # ================================== APPLY ===========================================
 
 @login_required(login_url='login')
 def apply_job(request, slug):
-    # Check if the student has companies_left
+    # Get the student
     student = Student.objects.get(id=request.user.id)
     
+    # Check if profile is complete and has required documents
+    has_complete_profile, missing_items, redirect_url = check_profile_completeness(student)
+    
+    if not has_complete_profile:
+        # Prepare descriptive error message
+        if len(missing_items) > 1:
+            message = f"Please provide the following missing information before applying: {', '.join(missing_items)}"
+        else:
+            message = f"Please provide your {missing_items[0]} before applying."
+        
+        messages.error(request, message)
+        return redirect(redirect_url)
+    
+    # Check if the student has companies_left
     if student.no_of_companies_left <= 0:
         messages.error(request, "You have already applied to the maximum number of companies.")
         return redirect('student')
@@ -344,16 +372,6 @@ def apply_job(request, slug):
     
     if not is_eligible:
         messages.error(request, eligibility_message)
-        return redirect('student')
-        
-    # Check interview date conflicts
-    has_date_conflict = Application.objects.filter(
-        student=student,
-        job__interview_date=job.interview_date
-    ).exists()
-    
-    if has_date_conflict:
-        messages.error(request, "You have already applied to a company with the same interview date!")
         return redirect('student')
     
     # Create the application
@@ -483,34 +501,78 @@ def support(request):
 
 def check_eligibility(student, job):
     """
-    Check if a student is eligible for a job based on criteria like CGPA, 10th, 12th marks.
+    Check if a student is eligible for a job based on criteria.
+    Returns a tuple of (is_eligible, message).
     """
-    # Perform regular eligibility checks
-    if job.cgpa_criteria:
-        if not student.cgpa:
-            return False, "Your CGPA is not provided but required for this job"
-        if float(student.cgpa) < float(job.cgpa_criteria):
-            return False, f"Your CGPA ({student.cgpa}) is below the required criterion ({job.cgpa_criteria})"
+    # If student has bypass_eligibility enabled, they're always eligible
+    if student.bypass_eligibility:
+        return True, "You are eligible for this job"
     
-    if job.tenth_percentage:
-        if not student.tenth:
-            return False, "Your 10th percentage is not provided but required for this job"
-        if float(student.tenth) < float(job.tenth_percentage):
-            return False, f"Your 10th percentage ({student.tenth}) is below the required criterion ({job.tenth_percentage})"
+    # Check CGPA
+    if job.cgpa_criteria and student.cgpa and student.cgpa < job.cgpa_criteria:
+        return False, f"Your CGPA ({student.cgpa}) is lower than the required CGPA ({job.cgpa_criteria})"
     
-    if job.twelfth_percentage:
-        if not student.twelfth:
-            return False, "Your 12th percentage is not provided but required for this job"
-        if float(student.twelfth) < float(job.twelfth_percentage):
-            return False, f"Your 12th percentage ({student.twelfth}) is below the required criterion ({job.twelfth_percentage})"
+    # Check 10th percentage
+    if job.tenth_percentage and student.tenth and student.tenth < job.tenth_percentage:
+        return False, f"Your 10th percentage ({student.tenth}%) is lower than the required percentage ({job.tenth_percentage}%)"
     
-    if not job.is_backlog_allowed:
-        if student.backlog is None:
-            return False, "Your backlog information is not provided but required for this job"
-        if student.backlog > 0:
-            return False, "You have backlogs and this company does not allow backlogs"
+    # Check 12th percentage
+    if job.twelfth_percentage and student.twelfth and student.twelfth < job.twelfth_percentage:
+        return False, f"Your 12th percentage ({student.twelfth}%) is lower than the required percentage ({job.twelfth_percentage}%)"
     
+    # Check backlog
+    if student.backlog and student.backlog > 0 and not job.is_backlog_allowed:
+        return False, "This job does not allow students with backlogs"
+    
+    # If we get here, the student is eligible
     return True, "You are eligible for this job"
+
+def check_profile_completeness(student):
+    """
+    Check if a student's profile is complete and has all required documents.
+    Returns a tuple of (is_complete, missing_items, redirect_url).
+    """
+    missing_items = []
+    
+    # Check basic profile info
+    if student.tenth is None:
+        missing_items.append("10th percentage")
+    if student.twelfth is None:
+        missing_items.append("12th percentage")
+    if student.cgpa is None:
+        missing_items.append("CGPA")
+    if student.gender is None:
+        missing_items.append("Gender")
+    if student.course is None:
+        missing_items.append("Course")
+    if student.year is None:
+        missing_items.append("Year")
+        
+    # If basic profile info is missing, redirect to edit profile
+    if missing_items:
+        return False, missing_items, 'edit_profile'
+    
+    # Check for documents
+    missing_docs = []
+    if student.resume is None:
+        missing_docs.append("Resume")
+    if student.tenth_marksheet is None:
+        missing_docs.append("10th Marksheet")
+    if student.twelfth_marksheet is None:
+        missing_docs.append("12th Marksheet")
+    if student.college_profile_print is None:
+        missing_docs.append("College Profile Print")
+    
+    # If documents are missing, redirect to upload_resume
+    if missing_docs:
+        return False, missing_docs, 'upload_resume'
+    
+    # Check profile picture
+    if not student.profile_pic or str(student.profile_pic).endswith('default.jpg'):
+        return False, ["Profile Picture"], 'edit_profile'
+    
+    # All checks passed
+    return True, [], None
 
 # ================================== WITHDRAW APPLICATION BY ID ===========================================
 

@@ -47,7 +47,7 @@ class Student(User):
     instagram_id = models.URLField(blank=True, null=True)
     twitter_id = models.URLField(blank=True, null=True)
     
-    no_of_companies_left = models.IntegerField(default=100, validators=[
+    no_of_companies_left = models.IntegerField(default=10, validators=[
             MinValueValidator(0)
         ])
     

@@ -153,9 +153,25 @@ Job Details - {{ job.title }} at {{ job.company.name }}
                         {% if is_eligible %}
                             {% if student.no_of_companies_left > 0 %}
                                 {% if job.deadline|date:"Y-m-d" >= today_date|date:"Y-m-d" %}
-                                    <a href="{% url 'apply_job' job.slug %}" class="btn btn-success w-100 mb-3">
-                                        <i class="fas fa-paper-plane me-2"></i> Apply Now
-                                    </a>
+                                    {% if student.resume and student.tenth_marksheet and student.twelfth_marksheet and student.college_profile_print and student.profile_pic and not student.profile_pic.url|slice:"-12:" == 'default.jpg' %}
+                                        <a href="{% url 'apply_job' job.slug %}" class="btn btn-success w-100 mb-3">
+                                            <i class="fas fa-paper-plane me-2"></i> Apply Now
+                                        </a>
+                                    {% elif not student.profile_pic or student.profile_pic.url|slice:"-12:" == 'default.jpg' %}
+                                        <a href="{% url 'edit_profile' %}" class="btn btn-danger w-100 mb-3">
+                                            <i class="fas fa-user-circle me-2"></i> Upload Profile Picture First
+                                        </a>
+                                        <div class="alert alert-warning">
+                                            <i class="fas fa-exclamation-triangle me-2"></i> You need to upload a profile picture before applying.
+                                        </div>
+                                    {% elif not student.resume or not student.tenth_marksheet or not student.twelfth_marksheet or not student.college_profile_print %}
+                                        <a href="{% url 'upload_resume' %}" class="btn btn-danger w-100 mb-3">
+                                            <i class="fas fa-upload me-2"></i> Upload Required Documents First
+                                        </a>
+                                        <div class="alert alert-warning">
+                                            <i class="fas fa-exclamation-triangle me-2"></i> You need to upload all required documents before applying.
+                                        </div>
+                                    {% endif %}
                                     <div class="alert alert-warning">
                                         <i class="fas fa-exclamation-triangle me-2"></i> You can only apply to <strong>{{ student.no_of_companies_left }}</strong> more companies.
                                     </div>

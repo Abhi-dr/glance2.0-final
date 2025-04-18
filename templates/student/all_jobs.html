@@ -5,6 +5,42 @@
 Student -> All Jobs
 {% endblock %}
 
+{% block extra_css %}
+<style>
+  .card-expired {
+    opacity: 0.8;
+    border: 1px solid #ffc107;
+  }
+  
+  .expired-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #dc3545;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-weight: bold;
+    z-index: 2;
+    transform: rotate(10deg);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  }
+  
+  /* Rest of your existing CSS */
+  .job-header {
+    margin-bottom: 25px;
+  }
+  
+  .job-search-box {
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+  }
+</style>
+{% endblock %}
+
 {% block body %}
 <!-- 
 <div class="container-fluid">
@@ -136,8 +172,11 @@ Student -> All Jobs
   <div class="row g-4">
     {% for job in jobs %}
     <div class="col-sm-6 col-md-4 col-xl-3">
-      <div class="card h-100 overflow-hidden rounded-2">
+      <div class="card h-100 overflow-hidden rounded-2 {% if job.deadline < today_date %}card-expired{% endif %}">
         <div class="position-relative text-center p-3 bg-dark">
+          {% if job.deadline < today_date %}
+          <div class="expired-badge">EXPIRED</div>
+          {% endif %}
           <a href="{% url 'student_job_details' job.slug %}">
             {% if job.company.logo %}
             <img src="{{ job.company.logo.url }}" class="card-img-top rounded-0 img-fluid" 
@@ -163,6 +202,9 @@ Student -> All Jobs
             </span>
             <span class="badge bg-danger text-white me-1">{{ job.job_type|title|truncatechars:10 }}</span>
             <span class="badge bg-primary text-white">{{ job.location_flexibility|title|truncatechars:10 }}</span>
+            {% if job.deadline < today_date %}
+            <span class="badge bg-warning text-dark mt-1">Deadline Passed</span>
+            {% endif %}
           </div>
           <div>
             <p class="text-muted mb-2">{{ job.description|truncatechars:100 }}</p>

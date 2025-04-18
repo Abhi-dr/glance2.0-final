@@ -536,6 +536,9 @@ Student -> Home
                                                 <i class="ti ti-upload me-1"></i>Upload Docs
                                             </a>
                                             {% endif %}
+                                            {% if job.deadline < today_date %}
+                                            <span class="badge bg-warning mt-1 d-block">Expired</span>
+                                            {% endif %}
                                         </div>
                                     </td>
                                 </tr>
@@ -587,11 +590,11 @@ Student -> Home
         {% if not all_eligible_jobs %}
         <div class="col-12">
             <div class="card dashboard-card">
-                <div class="card-body text-center py-5">
-                    <i class="ti ti-mood-sad fs-1 text-muted mb-3"></i>
-                    <h5>No Eligible Companies Found</h5>
-                    <p class="mb-3">Complete your profile to see companies that match your qualifications.</p>
-                    <a href="{% url 'my_profile' %}" class="btn btn-primary action-btn">
+                <div class="card-body text-center py-5 bg-danger-subtle">
+                    <i class="ti ti-mood-sad fs-1 text-danger mb-3"></i>
+                    <h5 class="text-danger">No Eligible Companies Found</h5>
+                    <p class="mb-3 text-danger">Complete your profile to see companies that match your qualifications.</p>
+                    <a href="{% url 'my_profile' %}" class="btn btn-danger action-btn">
                         <i class="ti ti-user-circle me-1"></i>Update Profile
                     </a>
                 </div>
@@ -600,6 +603,25 @@ Student -> Home
         {% endif %}
     </div>
 </div>
+
+{% if not has_complete_profile %}
+<div class="alert alert-danger">
+  <h5 class="mb-2"><i class="ti ti-alert-triangle me-2"></i>Complete Your Profile</h5>
+  <p class="mb-0">Please complete your profile to see eligible jobs. Missing information:</p>
+  <ul class="mt-2 mb-0">
+    {% for item in missing_items %}
+    <li>{{ item }}</li>
+    {% endfor %}
+  </ul>
+  <div class="mt-2">
+    {% if 'Profile Picture' in missing_items or 'Gender' in missing_items or '10th percentage' in missing_items or '12th percentage' in missing_items or 'CGPA' in missing_items or 'Course' in missing_items or 'Year' in missing_items %}
+    <a href="{% url 'edit_profile' %}" class="btn btn-danger btn-sm">Complete Profile</a>
+    {% elif 'Resume' in missing_items or '10th Marksheet' in missing_items or '12th Marksheet' in missing_items or 'College Profile Print' in missing_items %}
+    <a href="{% url 'upload_resume' %}" class="btn btn-danger btn-sm">Upload Documents</a>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
 
 {% endblock %}
 
