@@ -120,7 +120,6 @@ def volunteer_applications(request):
         applications = applications.filter(
             Q(student__first_name__icontains=search_query) |
             Q(student__last_name__icontains=search_query) |
-            Q(student__university_roll_no__icontains=search_query) |
             Q(student__email__icontains=search_query) |
             Q(job__company__name__icontains=search_query) |
             Q(job__role__icontains=search_query)
@@ -213,7 +212,7 @@ def volunteer_attendance(request):
         attendance_records = attendance_records.filter(
             Q(application__student__first_name__icontains=search_query) |
             Q(application__student__last_name__icontains=search_query) |
-            Q(application__student__university_roll_no__icontains=search_query)
+            Q(application__student__email__icontains=search_query)
         )
     
     if selected_date:
