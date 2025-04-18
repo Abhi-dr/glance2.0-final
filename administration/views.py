@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.admin.views.decorators import staff_member_required
-from accounts.models import Company, Job, Student, Application, Notification
+from accounts.models import Company, Job, Student, Application, Notification, Administrator
 from django.db.models import Q, Count, Sum, Avg, F, ExpressionWrapper, BooleanField, Case, When, Value, IntegerField
 from django.urls import reverse
 from django.http import HttpResponse, JsonResponse
@@ -24,6 +24,17 @@ import requests
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from django.http import JsonResponse
+
+# Custom decorator that allows administrators to access pages
+def admin_required(view_func):
+    def wrapper(request, *args, **kwargs):
+        if request.user.is_authenticated:
+            # Check if user is staff or is an administrator
+            if request.user.is_staff or hasattr(request.user, 'administrator'):
+                return view_func(request, *args, **kwargs)
+        # Redirect to login page if not authenticated or not an admin
+        return redirect('login')
+    return wrapper
 
 # Comment out the external API email functions
 """
@@ -56,40 +67,55 @@ def send_emails_threaded(recipients, subject, text):
 """
 
 @login_required(login_url='login')
-@staff_member_required(login_url='login')
+@admin_required
 def administration(request):
-    
-    user = User.objects.get(id = request.user.id)
-    
-    applications = Application.objects.all()
-    registered_companies = Company.objects.all()
-    jobs = Job.objects.all()
-    shortlisted_applications = Application.objects.filter(status="accepted")
-    
-    # get the percentage of shortlisted students out of all students
-    total_students = Application.objects.all().count()
-    shortlisted_students = shortlisted_applications.count()
-    
-    if total_students > 0:
-        shortlisted_percentage = (shortlisted_students / total_students) * 100
-    else:
-        shortlisted_percentage = 0    
-    
-    parameters = {
-        "user": user,
-        "applications": applications,
-        "registered_companies": registered_companies,
-        "jobs": jobs,
-        "shortlisted_applications": shortlisted_applications,
-        "shortlisted_percentage": int(shortlisted_percentage),
-    }
-    
-    return render(request, "administration/index.html", parameters)
+    try:
+        # Debug information
+        print(f"User ID: {request.user.id}")
+        print(f"Is Staff: {request.user.is_staff}")
+        print(f"Is Admin: {hasattr(request.user, 'administrator')}")
+        
+        # Set is_staff flag if it's an administrator but not set as staff
+        if hasattr(request.user, 'administrator') and not request.user.is_staff:
+            print("Administrator found but is_staff is False. Setting is_staff to True.")
+            request.user.is_staff = True
+            request.user.save()
+            
+        user = User.objects.get(id = request.user.id)
+        
+        applications = Application.objects.all()
+        registered_companies = Company.objects.all()
+        jobs = Job.objects.all()
+        shortlisted_applications = Application.objects.filter(status="accepted")
+        
+        # get the percentage of shortlisted students out of all students
+        total_students = Application.objects.all().count()
+        shortlisted_students = shortlisted_applications.count()
+        
+        if total_students > 0:
+            shortlisted_percentage = (shortlisted_students / total_students) * 100
+        else:
+            shortlisted_percentage = 0    
+        
+        parameters = {
+            "user": user,
+            "applications": applications,
+            "registered_companies": registered_companies,
+            "jobs": jobs,
+            "shortlisted_applications": shortlisted_applications,
+            "shortlisted_percentage": int(shortlisted_percentage),
+        }
+        
+        return render(request, "administration/index.html", parameters)
+    except Exception as e:
+        print(f"Error in administration view: {e}")
+        messages.error(request, f"An error occurred: {str(e)}")
+        return redirect('home')
 
 # ============================================ COMPANIES =========================================
 
 @login_required(login_url='login')
-@staff_member_required(login_url='login')
+@admin_required
 def companies(request):
     
     user = User.objects.get(id = request.user.id)
@@ -107,7 +133,7 @@ def companies(request):
 # ============================================ ALL REGISTRATIONS =========================================
 
 @login_required(login_url='login')
-@staff_member_required(login_url='login')
+@admin_required
 def all_registrations(request):
         
     user = User.objects.get(id = request.user.id)
@@ -138,7 +164,7 @@ def all_registrations(request):
 # ============================================ COMPANY =========================================
 
 @login_required(login_url='login')
-@staff_member_required(login_url='login')
+@admin_required
 def company(request, id):
     user = User.objects.get(id=request.user.id)
     company = Company.objects.get(id=id)
@@ -191,7 +217,7 @@ def company(request, id):
 # ============================================ JOB DETAILS ======================================
 
 @login_required(login_url='login')
-@staff_member_required(login_url='login')
+@admin_required
 def job_details(request, slug):
     
     user = User.objects.get(id = request.user.id)
@@ -207,7 +233,7 @@ def job_details(request, slug):
 # ============================================ APPLICATIONS =====================================
 
 @login_required(login_url='login')
-@staff_member_required(login_url='login')
+@admin_required
 def applications(request, slug):
     
     user = User.objects.get(id = request.user.id)
@@ -229,7 +255,7 @@ def applications(request, slug):
 # ============================================ MAIN PAGE SHORTLISTED STUDENTS =============================
 
 @login_required(login_url='login')
-@staff_member_required(login_url='login')
+@admin_required
 def shortlisted_students(request):
     
     user = User.objects.get(id = request.user.id)
@@ -265,7 +291,7 @@ def shortlisted_students(request):
 # ============================================ MAIN PAGE REJECTED STUDENTS =============================
 
 @login_required(login_url='login')
-@staff_member_required(login_url='login')
+@admin_required
 def rejected_students(request):
     
     user = User.objects.get(id = request.user.id)
@@ -302,7 +328,7 @@ def rejected_students(request):
 # ============================================ ADD NOTIFICATION =========================================
 
 @login_required(login_url='login')
-@staff_member_required(login_url='login')
+@admin_required
 def add_notification(request):
     
     notifications = Notification.objects.all()[::-1]
@@ -363,7 +389,7 @@ def add_notification(request):
 # =========================================== ALL STUDENTS ===========================================
 
 @login_required(login_url='login')
-@staff_member_required(login_url='login')
+@admin_required
 def all_students(request):
         
     user = User.objects.get(id = request.user.id)
@@ -418,7 +444,7 @@ def all_students(request):
 # ===============================================================================================
 
 @login_required(login_url='login')
-@staff_member_required(login_url='login')
+@admin_required
 def accept_application(request, id):
     
     application = Application.objects.get(id=id)
@@ -485,7 +511,7 @@ GLA University, Mathura
 # ================================== REJECT APPLICATION =========================================
         
 @login_required(login_url='login')
-@staff_member_required(login_url='login')
+@admin_required
 def reject_application(request, id):
     
     application = Application.objects.get(id=id)
@@ -539,7 +565,7 @@ GLA University, Mathura"""
 # ================================== CHANGE TO PENDING =========================================
 
 @login_required(login_url='login')
-@staff_member_required(login_url='login')
+@admin_required
 def change_to_pending(request, id):
     
     application = Application.objects.get(id=id)
@@ -557,7 +583,7 @@ def change_to_pending(request, id):
 # ===============================================================================================
 
 @login_required(login_url='login')
-@staff_member_required(login_url='login')
+@admin_required
 def add_company(request):
     
     if request.method == "POST":
@@ -589,7 +615,7 @@ def add_company(request):
 # ============================================ ADD JOB =========================================
 
 @login_required(login_url='login')
-@staff_member_required(login_url='login')
+@admin_required
 def add_job(request, id):
     
     company = Company.objects.get(id=id)
@@ -728,7 +754,7 @@ def export_company_applications_summary_csv(request):
 #     student.save()
 
 @login_required(login_url='login')
-@staff_member_required(login_url='login')
+@admin_required
 def filter_page(request):
     """
     View for the advanced filter page with DataTables integration
@@ -746,7 +772,7 @@ def filter_page(request):
     })
 
 @login_required(login_url='login')
-@staff_member_required(login_url='login')
+@admin_required
 def get_filtered_students(request):
     """
     AJAX view to handle filtering students based on various criteria
@@ -1075,7 +1101,7 @@ def get_filtered_students(request):
         })
 
 @login_required(login_url='login')
-@staff_member_required(login_url='login')
+@admin_required
 def send_message_to_filtered_students(request):
     """Send messages to filtered students with both email and notification"""
     if request.method == "POST":
@@ -1290,19 +1316,19 @@ def send_message_to_filtered_students(request):
     return redirect("filter_page")
 
 @login_required(login_url='login')
-@staff_member_required(login_url='login')
+@admin_required
 def whatsapp_message(request):
     """Render the WhatsApp messaging page"""
     return render(request, 'administration/whatsapp_message.html')
 
 @login_required(login_url='login')
-@staff_member_required(login_url='login')
+@admin_required
 def whatsapp_test(request):
     """Render the WhatsApp test page"""
     return render(request, 'administration/whatsapp_test.html')
 
 @login_required(login_url='login')
-@staff_member_required(login_url='login')
+@admin_required
 def send_whatsapp_to_filtered_students(request):
     """Generate WhatsApp message links for filtered students or a single recipient"""
     if request.method == "POST":
@@ -1521,7 +1547,7 @@ def send_whatsapp_to_filtered_students(request):
     return redirect("whatsapp_message")
 
 @login_required(login_url='login')
-@staff_member_required(login_url='login')
+@admin_required
 def send_whatsapp_bulk_csv(request):
     """Handle CSV upload for bulk WhatsApp messaging"""
     if request.method == "POST":
@@ -1618,7 +1644,7 @@ def send_whatsapp_bulk_csv(request):
     return redirect('whatsapp_message')
 
 @login_required(login_url='login')
-@staff_member_required(login_url='login')
+@admin_required
 def download_whatsapp_csv_template(request):
     """Generate and download a sample CSV template for WhatsApp bulk messaging"""
     import csv
@@ -1642,7 +1668,7 @@ def download_whatsapp_csv_template(request):
     return response
 
 @login_required(login_url='login')
-@staff_member_required(login_url='login')
+@admin_required
 def test_student_data(request):
     """
     Simple test view to return student data as JSON
@@ -1682,7 +1708,7 @@ def test_student_data(request):
         })
 
 @login_required(login_url='login')
-@staff_member_required(login_url='login')
+@admin_required
 def get_all_students_json(request):
     """API endpoint to get all students as JSON for DataTables"""
     try:

@@ -38,7 +38,13 @@ def login(request):
                 messages.warning(request, f"Your profile is only {profile_score}% complete. Please complete your profile to continue using the system.")
                 return redirect('edit_profile')
         elif hasattr(request.user, 'administrator'):
-            return redirect('administration')
+            try:
+                admin = Administrator.objects.get(id=request.user.id)
+                return redirect('administration')
+            except Exception as e:
+                print(f"Error accessing administrator: {e}")
+                messages.error(request, "Error accessing administrator account. Please contact support.")
+                return redirect('home')
         elif hasattr(request.user, 'volunteer'):
             return redirect('volunteer_dashboard')
         else:

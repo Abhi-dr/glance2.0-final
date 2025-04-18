@@ -47,7 +47,7 @@ class Student(User):
     instagram_id = models.URLField(blank=True, null=True)
     twitter_id = models.URLField(blank=True, null=True)
     
-    no_of_companies_left = models.IntegerField(default=3, validators=[
+    no_of_companies_left = models.IntegerField(default=100, validators=[
             MinValueValidator(0)
         ])
     
@@ -146,6 +146,11 @@ class Administrator(User):
     class Meta:
         verbose_name_plural = "Administrators"
         verbose_name = "Administrator"
+        
+    def save(self, *args, **kwargs):
+        # Ensure administrator users have staff permission
+        self.is_staff = True
+        super().save(*args, **kwargs)
 
 
 # ======================================================= COMPANY ===========================================
