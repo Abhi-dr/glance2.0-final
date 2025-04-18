@@ -260,56 +260,79 @@ def all_jobs(request):
     # Get today's date for comparison
     today = date.today()
     
-    # Get active jobs (non-expired) and sort by deadline in ascending order
-    active_jobs = Job.objects.filter(deadline__gte=today).exclude(applications__student=student).order_by('deadline')
+    # Get all jobs 
+    all_jobs_query = Job.objects.all().exclude(applications__student=student)
     
-    # Get expired jobs and sort by deadline in descending order
-    expired_jobs = Job.objects.filter(deadline__lt=today).exclude(applications__student=student).order_by('-deadline')
+    # Apply filters
+    query = request.GET.get("query")
+    job_type = request.GET.get("job_type")
+    salary_min = request.GET.get("salary_min")
+    location = request.GET.get("location")
+    cgpa_max = request.GET.get("cgpa_max")
+    show_expired = request.GET.get("show_expired") == "on"
+    
+    # Filter by search query
+    if query:
+        all_jobs_query = all_jobs_query.filter(
+            Q(title__icontains=query) |
+            Q(description__icontains=query) |
+            Q(company__name__icontains=query) |
+            Q(role__icontains=query)
+        )
+    
+    # Filter by job type
+    if job_type:
+        all_jobs_query = all_jobs_query.filter(job_type=job_type)
+    
+    # Filter by salary minimum (simple text comparison)
+    if salary_min:
+        # This is a rough filter since salary is stored as text
+        all_jobs_query = all_jobs_query.filter(salary_range__icontains=salary_min)
+    
+    # Filter by location
+    if location:
+        all_jobs_query = all_jobs_query.filter(location_flexibility__icontains=location)
+    
+    # Filter by maximum CGPA requirement
+    if cgpa_max:
+        try:
+            cgpa_max_float = float(cgpa_max)
+            all_jobs_query = all_jobs_query.filter(cgpa_criteria__lte=cgpa_max_float)
+        except (ValueError, TypeError):
+            pass  # Ignore invalid CGPA values
     
     # Apply backlog restrictions
     if student.backlog and student.backlog > 0:
-        active_jobs = active_jobs.exclude(is_backlog_allowed=False)
-        expired_jobs = expired_jobs.exclude(is_backlog_allowed=False)
-            
-    query = request.GET.get("query")
-    if query:
-        # fetch the companies based on the name of the company, job role and descritiption
-        jobs_list = Job.objects.filter(
-            Q(title__icontains=query) |
-            Q(description__icontains=query) |
-            Q(company__name__icontains=query)
-        ).exclude(applications__student=student)
-        
-        # Re-apply backlog restrictions on search results
-        if student.backlog and student.backlog > 0:
-            jobs_list = jobs_list.exclude(is_backlog_allowed=False)
-            
-        # Get today's date for comparison
-        today = date.today()
-        
-        # Separate active and expired jobs in search results
-        active_jobs = jobs_list.filter(deadline__gte=today).order_by('deadline')
-        expired_jobs = jobs_list.filter(deadline__lt=today).order_by('-deadline')
+        all_jobs_query = all_jobs_query.exclude(is_backlog_allowed=False)
     
-    # Combine active and expired jobs, with active jobs first
-    jobs_list = list(active_jobs) + list(expired_jobs)
+    # Separate active and expired jobs
+    if not show_expired:
+        active_jobs = all_jobs_query.filter(deadline__gte=today).order_by('deadline')
+        jobs_list = list(active_jobs)
+    else:
+        active_jobs = all_jobs_query.filter(deadline__gte=today).order_by('deadline')
+        expired_jobs = all_jobs_query.filter(deadline__lt=today).order_by('-deadline')
+        jobs_list = list(active_jobs) + list(expired_jobs)
     
-    # Pagination
-    page = request.GET.get('page', 1)
-    paginator = Paginator(jobs_list, 12)  # Show 12 jobs per page
+    # Get unique job types for filter dropdown
+    job_types = Job.objects.values_list('job_type', flat=True).distinct()
     
-    try:
-        jobs = paginator.page(page)
-    except PageNotAnInteger:
-        jobs = paginator.page(1)
-    except EmptyPage:
-        jobs = paginator.page(paginator.num_pages)
+    # Get unique location options for filter dropdown
+    locations = Job.objects.values_list('location_flexibility', flat=True).distinct()
     
     parameters = {
         "student": student,
-        "jobs": jobs,
+        "jobs": jobs_list,
         "query": query,
-        "today_date": today
+        "job_type": job_type,
+        "salary_min": salary_min,
+        "location": location,
+        "cgpa_max": cgpa_max,
+        "show_expired": show_expired,
+        "job_types": job_types,
+        "locations": locations,
+        "today_date": today,
+        "total_jobs": len(jobs_list)
     }
     
     return render(request, 'student/all_jobs.html', parameters)
