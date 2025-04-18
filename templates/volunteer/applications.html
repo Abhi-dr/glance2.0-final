@@ -7,11 +7,14 @@
         <p class="text-muted">Manage and track student applications</p>
       </div>
       <div class="d-flex gap-2 mt-3 mt-sm-0">
+        <button id="refreshData" class="btn btn-sm btn-success" type="button">
+          <i class="fas fa-sync me-1"></i> Refresh Data
+        </button>
         <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#filtersCollapse" aria-expanded="false" aria-controls="filtersCollapse">
           <i class="fas fa-filter me-1"></i> Filters
         </button>
         <a href="{% url 'volunteer_applications' %}" class="btn btn-sm btn-outline-primary">
-          <i class="fas fa-sync me-1"></i> Reset
+          <i class="fas fa-times me-1"></i> Reset
         </a>
       </div>
     </div>
@@ -26,11 +29,11 @@
         <h5 class="mb-0"><i class="fas fa-filter me-2 text-primary"></i>Filter Applications</h5>
       </div>
       <div class="card-body">
-        <form action="{% url 'volunteer_applications' %}" method="GET" class="row g-3">
+        <form id="filterForm" action="{% url 'volunteer_applications' %}" method="GET" class="row g-3">
           <div class="col-md-4">
             <div class="form-floating">
               <input type="text" class="form-control" id="search" name="search" placeholder="Search" value="{{ search_query }}">
-              <label for="search">Search Student Name/ID</label>
+              <label for="search">Search Student Name/ID/Company/Role</label>
             </div>
           </div>
           
@@ -172,136 +175,213 @@
             <i class="fas fa-list-alt me-2 text-primary"></i>Applications
           </h5>
           <div>
-            <span class="badge bg-primary rounded-pill px-3 py-2">{{ applications|length }} results</span>
+            <span class="badge bg-primary rounded-pill px-3 py-2">{{ total_count }} results</span>
+            <span id="lastUpdated" class="badge bg-secondary rounded-pill px-3 py-2 ms-2">
+              Updated: <span id="updateTime">{{ now|date:"H:i:s" }}</span>
+            </span>
           </div>
         </div>
       </div>
       <div class="card-body p-0">
-        {% if applications %}
-        <div class="table-responsive">
-          <table class="table table-hover align-middle mb-0">
-            <thead class="table-light">
-              <tr>
-                <th>Student</th>
-                <th>University ID</th>
-                <th>Company</th>
-                <th>Position</th>
-                <th>Date</th>
-                <th>Status</th>
-                <th>Attendance</th>
-                <th class="text-center">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for application in applications %}
-              <tr>
-                <td>
-                  <div class="d-flex align-items-center">
-                    <img src="{{ application.student.profile_pic.url }}" alt="Profile" class="rounded-circle me-2" width="40" height="40">
-                    <div>
-                      <div class="fw-bold">{{ application.student.first_name }} {{ application.student.last_name }}</div>
-                      <small class="text-muted">{{ application.student.course }} - {{ application.student.year }}</small>
-                    </div>
-                  </div>
-                </td>
-                <td>{{ application.student.university_roll_no }}</td>
-                <td>
-                  <div class="d-flex align-items-center">
-                    {% if application.job.company.logo %}
-                    <img src="{{ application.job.company.logo.url }}" alt="{{ application.job.company.name }}" class="me-2" width="24" height="24">
-                    {% else %}
-                    <span class="me-2 text-muted"><i class="fas fa-building"></i></span>
-                    {% endif %}
-                    {{ application.job.company.name }}
-                  </div>
-                </td>
-                <td>{{ application.job.role }}</td>
-                <td><span class="badge bg-light text-dark">{{ application.job.interview_date }}</span></td>
-                <td>
-                  {% if application.status == 'accepted' %}
-                    <span class="badge bg-success">Accepted</span>
-                  {% elif application.status == 'rejected' %}
-                    <span class="badge bg-danger">Rejected</span>
-                  {% else %}
-                    <span class="badge bg-warning">Pending</span>
-                  {% endif %}
-                </td>
-                <td>
-                  {% if application.attendance %}
-                    {% if application.attendance.is_present %}
-                      <span class="badge bg-success d-flex align-items-center gap-1 py-2 px-3">
-                        <i class="fas fa-check-circle me-1"></i>Present
-                        {% if application.attendance.notes %}
-                        <i class="fas fa-info-circle ms-1" data-bs-toggle="tooltip" title="{{ application.attendance.notes }}"></i>
+        <div id="applicationsContainer">
+          {% if applications %}
+          <form id="bulkAttendanceForm" action="{% url 'bulk_mark_attendance' %}" method="POST">
+            {% csrf_token %}
+            <div class="table-responsive">
+              <div class="d-flex p-3 bg-light border-bottom">
+                <div class="form-check ms-2">
+                  <input class="form-check-input" type="checkbox" id="selectAll">
+                  <label class="form-check-label" for="selectAll">Select All</label>
+                </div>
+                <div class="ms-auto">
+                  <button type="button" id="markPresentBtn" class="btn btn-sm btn-success bulk-mark-btn" data-status="present" disabled>
+                    <i class="fas fa-check me-1"></i> Mark Selected Present
+                  </button>
+                  <button type="button" id="markAbsentBtn" class="btn btn-sm btn-danger bulk-mark-btn ms-2" data-status="absent" disabled>
+                    <i class="fas fa-times me-1"></i> Mark Selected Absent
+                  </button>
+                </div>
+              </div>
+              <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th style="width: 50px;"></th>
+                    <th>Student</th>
+                    <th>University ID</th>
+                    <th>Company</th>
+                    <th>Position</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Attendance</th>
+                    <th class="text-center">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for application in applications %}
+                  <tr>
+                    <td>
+                      {% if not application.attendance %}
+                      <div class="form-check">
+                        <input class="form-check-input application-checkbox" type="checkbox" 
+                          name="application_ids" value="{{ application.id }}" 
+                          id="app{{ application.id }}">
+                      </div>
+                      {% endif %}
+                    </td>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <img src="{{ application.student.profile_pic.url }}" alt="Profile" class="rounded-circle me-2" width="40" height="40">
+                        <div>
+                          <div class="fw-bold">{{ application.student.first_name }} {{ application.student.last_name }}</div>
+                          <small class="text-muted">{{ application.student.course }} - {{ application.student.year }}</small>
+                        </div>
+                      </div>
+                    </td>
+                    <td>{{ application.student.university_roll_no }}</td>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        {% if application.job.company.logo %}
+                        <img src="{{ application.job.company.logo.url }}" alt="{{ application.job.company.name }}" class="me-2" width="24" height="24">
+                        {% else %}
+                        <span class="me-2 text-muted"><i class="fas fa-building"></i></span>
                         {% endif %}
-                      </span>
-                    {% else %}
-                      <span class="badge bg-danger d-flex align-items-center gap-1 py-2 px-3">
-                        <i class="fas fa-times-circle me-1"></i>Absent
-                        {% if application.attendance.notes %}
-                        <i class="fas fa-info-circle ms-1" data-bs-toggle="tooltip" title="{{ application.attendance.notes }}"></i>
+                        {{ application.job.company.name }}
+                      </div>
+                    </td>
+                    <td>{{ application.job.role }}</td>
+                    <td><span class="badge bg-light text-dark">{{ application.job.interview_date }}</span></td>
+                    <td>
+                      {% if application.status == 'accepted' %}
+                        <span class="badge bg-success">Accepted</span>
+                      {% elif application.status == 'rejected' %}
+                        <span class="badge bg-danger">Rejected</span>
+                      {% else %}
+                        <span class="badge bg-warning">Pending</span>
+                      {% endif %}
+                    </td>
+                    <td>
+                      {% if application.attendance %}
+                        {% if application.attendance.is_present %}
+                          <span class="badge bg-success d-flex align-items-center gap-1 py-2 px-3">
+                            <i class="fas fa-check-circle me-1"></i>Present
+                            {% if application.attendance.notes %}
+                            <i class="fas fa-info-circle ms-1" data-bs-toggle="tooltip" title="{{ application.attendance.notes }}"></i>
+                            {% endif %}
+                          </span>
+                        {% else %}
+                          <span class="badge bg-danger d-flex align-items-center gap-1 py-2 px-3">
+                            <i class="fas fa-times-circle me-1"></i>Absent
+                            {% if application.attendance.notes %}
+                            <i class="fas fa-info-circle ms-1" data-bs-toggle="tooltip" title="{{ application.attendance.notes }}"></i>
+                            {% endif %}
+                          </span>
                         {% endif %}
-                      </span>
-                    {% endif %}
-                  {% else %}
-                    <span class="badge bg-secondary d-flex align-items-center gap-1 py-2 px-3">
-                      <i class="fas fa-hourglass-half me-1"></i>Not Marked
-                    </span>
-                  {% endif %}
-                </td>
-                <td class="text-center">
-                  {% if not application.attendance %}
-                    <div class="btn-group btn-group-sm" role="group">
-                      <a href="{% url 'mark_attendance' application_id=application.id status='present' %}" class="btn btn-success" data-bs-toggle="tooltip" title="Mark Present">
-                        <i class="fas fa-check"></i>
-                      </a>
-                      <a href="{% url 'mark_attendance' application_id=application.id status='absent' %}" class="btn btn-danger" data-bs-toggle="tooltip" title="Mark Absent">
-                        <i class="fas fa-times"></i>
-                      </a>
-                    </div>
-                  {% elif application.attendance %}
-                    <a href="{% url 'change_attendance' attendance_id=application.attendance.id %}" class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="Change Attendance Status">
-                      <i class="fas fa-exchange-alt"></i>
+                      {% else %}
+                        <span class="badge bg-secondary d-flex align-items-center gap-1 py-2 px-3">
+                          <i class="fas fa-hourglass-half me-1"></i>Not Marked
+                        </span>
+                      {% endif %}
+                    </td>
+                    <td class="text-center">
+                      {% if not application.attendance %}
+                        <div class="btn-group btn-group-sm" role="group">
+                          <a href="{% url 'mark_attendance' application_id=application.id status='present' %}" class="btn btn-success mark-attendance-btn" data-application-id="{{ application.id }}" data-status="present" data-bs-toggle="tooltip" title="Mark Present">
+                            <i class="fas fa-check"></i>
+                          </a>
+                          <a href="{% url 'mark_attendance' application_id=application.id status='absent' %}" class="btn btn-danger mark-attendance-btn" data-application-id="{{ application.id }}" data-status="absent" data-bs-toggle="tooltip" title="Mark Absent">
+                            <i class="fas fa-times"></i>
+                          </a>
+                        </div>
+                      {% elif application.attendance %}
+                        <a href="{% url 'change_attendance' attendance_id=application.attendance.id %}" class="btn btn-sm btn-outline-primary change-attendance-btn" data-attendance-id="{{ application.attendance.id }}" data-bs-toggle="tooltip" title="Change Attendance Status">
+                          <i class="fas fa-exchange-alt"></i>
+                        </a>
+                      {% endif %}
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </form>
+          
+          <!-- Pagination Controls -->
+          {% if applications.paginator.num_pages > 1 %}
+          <div class="card-footer bg-white py-3">
+            <nav aria-label="Page navigation">
+              <ul class="pagination justify-content-center mb-0">
+                {% if applications.has_previous %}
+                  <li class="page-item">
+                    <a class="page-link" href="?page={{ applications.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if selected_date %}&date={{ selected_date }}{% endif %}{% if selected_company %}&company={{ selected_company }}{% endif %}{% if attendance_filter %}&attendance={{ attendance_filter }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}" aria-label="Previous">
+                      <span aria-hidden="true">&laquo;</span>
                     </a>
+                  </li>
+                {% else %}
+                  <li class="page-item disabled">
+                    <a class="page-link" href="#" aria-label="Previous">
+                      <span aria-hidden="true">&laquo;</span>
+                    </a>
+                  </li>
+                {% endif %}
+                
+                {% for num in applications.paginator.page_range %}
+                  {% if applications.number == num %}
+                    <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
+                  {% elif num > applications.number|add:'-3' and num < applications.number|add:'3' %}
+                    <li class="page-item"><a class="page-link" href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% if selected_date %}&date={{ selected_date }}{% endif %}{% if selected_company %}&company={{ selected_company }}{% endif %}{% if attendance_filter %}&attendance={{ attendance_filter }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}">{{ num }}</a></li>
                   {% endif %}
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-        {% else %}
-        <div class="text-center py-5">
-          <img src="{% static 'img/no-data.svg' %}" alt="No Data" class="img-fluid mb-3" style="max-width: 180px;">
-          <h5>No Applications Found</h5>
-          <p class="text-muted px-4">We couldn't find any applications matching your current filters.</p>
-          <div class="mt-3">
-            <p class="mb-3">This could be because:</p>
-            <div class="d-flex flex-column flex-md-row justify-content-center gap-3 mb-3">
-              <div class="card border-0 bg-light p-3 text-center" style="max-width: 200px">
-                <i class="fas fa-users text-primary mb-2 fa-2x"></i>
-                <p class="small mb-0">No students have applied yet</p>
-              </div>
-              <div class="card border-0 bg-light p-3 text-center" style="max-width: 200px">
-                <i class="fas fa-filter text-primary mb-2 fa-2x"></i>
-                <p class="small mb-0">Your search criteria is too specific</p>
-              </div>
-              <div class="card border-0 bg-light p-3 text-center" style="max-width: 200px">
-                <i class="fas fa-calendar-alt text-primary mb-2 fa-2x"></i>
-                <p class="small mb-0">Event registration hasn't started</p>
+                {% endfor %}
+                
+                {% if applications.has_next %}
+                  <li class="page-item">
+                    <a class="page-link" href="?page={{ applications.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if selected_date %}&date={{ selected_date }}{% endif %}{% if selected_company %}&company={{ selected_company }}{% endif %}{% if attendance_filter %}&attendance={{ attendance_filter }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}" aria-label="Next">
+                      <span aria-hidden="true">&raquo;</span>
+                    </a>
+                  </li>
+                {% else %}
+                  <li class="page-item disabled">
+                    <a class="page-link" href="#" aria-label="Next">
+                      <span aria-hidden="true">&raquo;</span>
+                    </a>
+                  </li>
+                {% endif %}
+              </ul>
+            </nav>
+          </div>
+          {% endif %}
+          {% else %}
+          <div class="text-center py-5">
+            <img src="{% static 'img/no-data.svg' %}" alt="No Data" class="img-fluid mb-3" style="max-width: 180px;">
+            <h5>No Applications Found</h5>
+            <p class="text-muted px-4">We couldn't find any applications matching your current filters.</p>
+            <div class="mt-3">
+              <p class="mb-3">This could be because:</p>
+              <div class="d-flex flex-column flex-md-row justify-content-center gap-3 mb-3">
+                <div class="card border-0 bg-light p-3 text-center" style="max-width: 200px">
+                  <i class="fas fa-users text-primary mb-2 fa-2x"></i>
+                  <p class="small mb-0">No students have applied yet</p>
+                </div>
+                <div class="card border-0 bg-light p-3 text-center" style="max-width: 200px">
+                  <i class="fas fa-filter text-primary mb-2 fa-2x"></i>
+                  <p class="small mb-0">Your search criteria is too specific</p>
+                </div>
+                <div class="card border-0 bg-light p-3 text-center" style="max-width: 200px">
+                  <i class="fas fa-calendar-alt text-primary mb-2 fa-2x"></i>
+                  <p class="small mb-0">Event registration hasn't started</p>
+                </div>
               </div>
             </div>
+            <div class="mt-3">
+              <a href="{% url 'volunteer_applications' %}" class="btn btn-primary">
+                <i class="fas fa-sync me-1"></i> Reset Filters
+              </a>
+              <a href="{% url 'volunteer_dashboard' %}" class="btn btn-outline-secondary ms-2">
+                <i class="fas fa-arrow-left me-1"></i> Back to Dashboard
+              </a>
+            </div>
           </div>
-          <div class="mt-3">
-            <a href="{% url 'volunteer_applications' %}" class="btn btn-primary">
-              <i class="fas fa-sync me-1"></i> Reset Filters
-            </a>
-            <a href="{% url 'volunteer_dashboard' %}" class="btn btn-outline-secondary ms-2">
-              <i class="fas fa-arrow-left me-1"></i> Back to Dashboard
-            </a>
-          </div>
+          {% endif %}
         </div>
-        {% endif %}
       </div>
     </div>
   </div>
@@ -320,6 +400,25 @@
   .table tr:last-child td {
     border-bottom: none;
   }
+
+  /* Loading spinner styles */
+  .loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .spinner-border {
+    width: 3rem;
+    height: 3rem;
+  }
 </style>
 
 <script>
@@ -329,6 +428,375 @@
     var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
       return new bootstrap.Tooltip(tooltipTriggerEl)
     });
+    
+    // Bulk selection functionality
+    const selectAllCheckbox = document.getElementById('selectAll');
+    const applicationCheckboxes = document.querySelectorAll('.application-checkbox');
+    const markPresentBtn = document.getElementById('markPresentBtn');
+    const markAbsentBtn = document.getElementById('markAbsentBtn');
+    
+    if (selectAllCheckbox) {
+      selectAllCheckbox.addEventListener('change', function() {
+        const isChecked = this.checked;
+        applicationCheckboxes.forEach(checkbox => {
+          checkbox.checked = isChecked;
+        });
+        updateButtonState();
+      });
+    }
+    
+    applicationCheckboxes.forEach(checkbox => {
+      checkbox.addEventListener('change', updateButtonState);
+    });
+    
+    function updateButtonState() {
+      const checkedCount = document.querySelectorAll('.application-checkbox:checked').length;
+      if (markPresentBtn) markPresentBtn.disabled = checkedCount === 0;
+      if (markAbsentBtn) markAbsentBtn.disabled = checkedCount === 0;
+      
+      // Update select all checkbox state
+      if (applicationCheckboxes.length > 0 && selectAllCheckbox) {
+        selectAllCheckbox.checked = checkedCount === applicationCheckboxes.length;
+        selectAllCheckbox.indeterminate = checkedCount > 0 && checkedCount < applicationCheckboxes.length;
+      }
+    }
+
+    // Real-time data refresh functionality
+    const refreshButton = document.getElementById('refreshData');
+    const applicationsContainer = document.getElementById('applicationsContainer');
+    const updateTimeSpan = document.getElementById('updateTime');
+    const lastUpdatedBadge = document.getElementById('lastUpdated');
+    
+    // Add event listener to refresh button
+    if (refreshButton && applicationsContainer) {
+      refreshButton.addEventListener('click', function() {
+        refreshApplicationData();
+      });
+    }
+
+    // Set up AJAX attendance marking
+    if (applicationsContainer) {
+      setupAttendanceMarking();
+    }
+    
+    // Function to refresh application data
+    function refreshApplicationData() {
+      if (!applicationsContainer) return;
+      
+      // Create loading overlay
+      const loadingOverlay = document.createElement('div');
+      loadingOverlay.className = 'loading-overlay';
+      loadingOverlay.innerHTML = '<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>';
+      
+      // Add loading overlay to container
+      const containerParent = applicationsContainer.parentNode;
+      containerParent.style.position = 'relative';
+      containerParent.appendChild(loadingOverlay);
+      
+      // Get current URL with query parameters
+      const currentUrl = window.location.href;
+      
+      // Make AJAX request
+      fetch(currentUrl)
+        .then(response => response.text())
+        .then(html => {
+          // Parse HTML
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(html, 'text/html');
+          
+          // Extract applications container from response
+          const newApplicationsContainer = doc.getElementById('applicationsContainer');
+          
+          if (newApplicationsContainer) {
+            // Replace the content
+            applicationsContainer.innerHTML = newApplicationsContainer.innerHTML;
+            
+            // Update timestamp
+            if (updateTimeSpan) {
+              const now = new Date();
+              updateTimeSpan.textContent = now.getHours().toString().padStart(2, '0') + ':' + 
+                                           now.getMinutes().toString().padStart(2, '0') + ':' + 
+                                           now.getSeconds().toString().padStart(2, '0');
+            }
+            
+            // Show success indicator
+            if (lastUpdatedBadge) {
+              lastUpdatedBadge.classList.remove('bg-secondary');
+              lastUpdatedBadge.classList.add('bg-success');
+              
+              setTimeout(() => {
+                lastUpdatedBadge.classList.remove('bg-success');
+                lastUpdatedBadge.classList.add('bg-secondary');
+              }, 2000);
+            }
+            
+            // Reinitialize tooltips and event listeners
+            tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+              return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+            
+            // Reinitialize bulk selection functionality
+            const selectAllCheckbox = document.getElementById('selectAll');
+            const applicationCheckboxes = document.querySelectorAll('.application-checkbox');
+            
+            if (selectAllCheckbox) {
+              selectAllCheckbox.addEventListener('change', function() {
+                const isChecked = this.checked;
+                applicationCheckboxes.forEach(checkbox => {
+                  checkbox.checked = isChecked;
+                });
+                updateButtonState();
+              });
+            }
+            
+            applicationCheckboxes.forEach(checkbox => {
+              checkbox.addEventListener('change', updateButtonState);
+            });
+
+            // Reinitialize attendance marking
+            setupAttendanceMarking();
+          }
+        })
+        .catch(error => {
+          console.error('Error refreshing data:', error);
+          alert('Failed to refresh data. Please try again.');
+        })
+        .finally(() => {
+          // Remove loading overlay
+          if (containerParent && containerParent.contains(loadingOverlay)) {
+            containerParent.removeChild(loadingOverlay);
+          }
+        });
+    }
+
+    // Function to set up attendance marking via AJAX
+    function setupAttendanceMarking() {
+      // Mark attendance buttons
+      document.querySelectorAll('.mark-attendance-btn').forEach(button => {
+        button.addEventListener('click', function(e) {
+          e.preventDefault();
+          
+          const applicationId = this.dataset.applicationId;
+          const status = this.dataset.status;
+          
+          if (applicationId && status) {
+            markAttendance(applicationId, status);
+          }
+        });
+      });
+      
+      // Change attendance buttons
+      document.querySelectorAll('.change-attendance-btn').forEach(button => {
+        button.addEventListener('click', function(e) {
+          e.preventDefault();
+          
+          const attendanceId = this.dataset.attendanceId;
+          
+          if (attendanceId) {
+            changeAttendance(attendanceId);
+          }
+        });
+      });
+      
+      // Bulk mark buttons
+      document.querySelectorAll('.bulk-mark-btn').forEach(button => {
+        button.addEventListener('click', function(e) {
+          e.preventDefault();
+          
+          const status = this.dataset.status;
+          const bulkForm = document.getElementById('bulkAttendanceForm');
+          
+          if (status && bulkForm) {
+            submitBulkAttendance(status, bulkForm);
+          }
+        });
+      });
+    }
+    
+    // Function to mark attendance via AJAX
+    function markAttendance(applicationId, status) {
+      if (!applicationsContainer) return;
+      
+      // Create loading overlay
+      const loadingOverlay = document.createElement('div');
+      loadingOverlay.className = 'loading-overlay';
+      loadingOverlay.innerHTML = '<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>';
+      
+      // Add loading overlay to container
+      const containerParent = applicationsContainer.parentNode;
+      containerParent.style.position = 'relative';
+      containerParent.appendChild(loadingOverlay);
+      
+      // Get CSRF token
+      const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+      
+      // Make AJAX request
+      fetch(`/volunteer/mark-attendance/${applicationId}/${status}/`, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': csrfToken,
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        credentials: 'same-origin'
+      })
+      .then(response => {
+        if (response.ok) {
+          // Refresh application data
+          refreshApplicationData();
+        } else {
+          throw new Error('Failed to mark attendance');
+        }
+      })
+      .catch(error => {
+        console.error('Error marking attendance:', error);
+        alert('Failed to mark attendance. Please try again.');
+      })
+      .finally(() => {
+        // Remove loading overlay
+        if (containerParent && containerParent.contains(loadingOverlay)) {
+          containerParent.removeChild(loadingOverlay);
+        }
+      });
+    }
+    
+    // Function to change attendance via AJAX
+    function changeAttendance(attendanceId) {
+      if (!applicationsContainer) return;
+      
+      // Create loading overlay
+      const loadingOverlay = document.createElement('div');
+      loadingOverlay.className = 'loading-overlay';
+      loadingOverlay.innerHTML = '<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>';
+      
+      // Add loading overlay to container
+      const containerParent = applicationsContainer.parentNode;
+      containerParent.style.position = 'relative';
+      containerParent.appendChild(loadingOverlay);
+      
+      // Get CSRF token
+      const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+      
+      // Make AJAX request
+      fetch(`/volunteer/change-attendance/${attendanceId}/`, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': csrfToken,
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        credentials: 'same-origin'
+      })
+      .then(response => {
+        if (response.ok) {
+          // Refresh application data
+          refreshApplicationData();
+        } else {
+          throw new Error('Failed to change attendance');
+        }
+      })
+      .catch(error => {
+        console.error('Error changing attendance:', error);
+        alert('Failed to change attendance. Please try again.');
+      })
+      .finally(() => {
+        // Remove loading overlay
+        if (containerParent && containerParent.contains(loadingOverlay)) {
+          containerParent.removeChild(loadingOverlay);
+        }
+      });
+    }
+    
+    // Function to submit bulk attendance marking via AJAX
+    function submitBulkAttendance(status, form) {
+      if (!applicationsContainer) return;
+      
+      // Check if any checkboxes are selected
+      const selectedCheckboxes = document.querySelectorAll('.application-checkbox:checked');
+      if (selectedCheckboxes.length === 0) {
+        alert('No applications selected');
+        return;
+      }
+      
+      // Create loading overlay
+      const loadingOverlay = document.createElement('div');
+      loadingOverlay.className = 'loading-overlay';
+      loadingOverlay.innerHTML = '<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>';
+      
+      // Add loading overlay to container
+      const containerParent = applicationsContainer.parentNode;
+      containerParent.style.position = 'relative';
+      containerParent.appendChild(loadingOverlay);
+      
+      // Prepare form data
+      const formData = new FormData(form);
+      formData.append('status', status);
+      
+      // Make AJAX request
+      fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        credentials: 'same-origin'
+      })
+      .then(response => {
+        if (response.ok) {
+          // Refresh application data
+          refreshApplicationData();
+        } else {
+          throw new Error('Failed to mark attendance');
+        }
+      })
+      .catch(error => {
+        console.error('Error marking attendance:', error);
+        alert('Failed to mark attendance. Please try again.');
+      })
+      .finally(() => {
+        // Remove loading overlay
+        if (containerParent && containerParent.contains(loadingOverlay)) {
+          containerParent.removeChild(loadingOverlay);
+        }
+      });
+    }
+
+    // Real-time search functionality
+    const searchInput = document.getElementById('search');
+    const filterForm = document.getElementById('filterForm');
+    let searchTimeout;
+    
+    if (searchInput && filterForm) {
+      searchInput.addEventListener('input', function() {
+        // Clear previous timeout
+        clearTimeout(searchTimeout);
+        
+        // Set a new timeout to delay the search (debounce technique)
+        searchTimeout = setTimeout(function() {
+          // Only submit if there's text or the field was previously filled
+          if (searchInput.value.trim().length > 2 || (searchInput.value.trim() === '' && searchInput.defaultValue !== '')) {
+            filterForm.submit();
+          }
+        }, 500); // 500ms delay
+      });
+    }
+    
+    // Make dropdown filters auto-submit when changed
+    if (filterForm) {
+      const filterSelects = filterForm.querySelectorAll('#date, #company, #attendance, #status');
+      filterSelects.forEach(select => {
+        select.addEventListener('change', function() {
+          filterForm.submit();
+        });
+      });
+    }
+
+    // Set up auto-refresh timer if on the applications page
+    if (applicationsContainer) {
+      // Auto-refresh data every 60 seconds
+      setInterval(refreshApplicationData, 60000);
+    }
   });
 </script>
 {% endblock %} 

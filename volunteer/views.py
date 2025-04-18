@@ -1,13 +1,16 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.db.models import Q, Count, Case, When, IntegerField, F
+from django.db.models import Q, Count, Case, When, IntegerField, F, Sum
 from django.http import HttpResponse
 from django.contrib import messages
 from accounts.models import Student, Application, Job, Company, Attendance, Volunteer
 from django.db.models.functions import TruncDate
-from datetime import datetime
+from datetime import datetime, timedelta
 import csv
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from django.core.cache import cache
+from django.utils import timezone
 
 
 # Helper function to check if user is a volunteer
@@ -26,10 +29,17 @@ def volunteer_dashboard(request):
     """
     Dashboard view for volunteers showing key metrics and recent activity
     """
-    # Get statistics with more efficient queries
+    # Try to get cached data first (cache for 5 minutes)
+    cache_key = f'volunteer_dashboard_{request.user.id}'
+    cached_data = cache.get(cache_key)
+    
+    if cached_data:
+        return render(request, 'volunteer/dashboard.html', cached_data)
+    
+    # Get statistics with more efficient queries using Django's ORM capabilities
     total_applications = Application.objects.count()
     
-    # Get attendance counts with a single query using annotate
+    # Get attendance counts with a single query using annotate and Sum
     attendance_stats = Attendance.objects.aggregate(
         total=Count('id'),
         present=Count(Case(When(is_present=True, then=1), output_field=IntegerField())),
@@ -59,7 +69,8 @@ def volunteer_dashboard(request):
         if item['job__interview_date'] and item['count'] > 0:
             interview_dates[item['job__interview_date']] = item['count']
     
-    # Get recent attendance records with select_related for efficiency
+    # Get recent attendance records with optimized select_related
+    # Limit the fields to only those needed for display
     recent_attendance = Attendance.objects.select_related(
         'application__student', 
         'application__job__company',
@@ -78,6 +89,9 @@ def volunteer_dashboard(request):
         'has_data': has_data,
     }
     
+    # Cache the dashboard data for 5 minutes
+    cache.set(cache_key, context, 300)
+    
     return render(request, 'volunteer/dashboard.html', context)
 
 
@@ -87,53 +101,39 @@ def volunteer_applications(request):
     """
     View to display and filter all student applications for attendance marking
     """
-    # Add debug information
-    print("="*50)
-    print("volunteer_applications view called")
-    print(f"Request GET parameters: {request.GET}")
-    print("="*50)
-    
     # Get filter parameters
-    search_query = request.GET.get('search', '')
+    search_query = request.GET.get('search', '').strip()
     selected_date = request.GET.get('date', '')
     selected_company = request.GET.get('company', '')
     attendance_filter = request.GET.get('attendance', '')
     status_filter = request.GET.get('status', '')
     
-    print(f"Search query: '{search_query}'")
-    print(f"Selected date: '{selected_date}'")
-    print(f"Selected company: '{selected_company}'")
-    print(f"Attendance filter: '{attendance_filter}'")
-    print(f"Status filter: '{status_filter}'")
-    
-    # Base queryset - get all applications instead of just accepted ones
-    applications = Application.objects.all().select_related(
+    # Base queryset with optimized select_related and prefetch_related
+    applications = Application.objects.select_related(
         'student', 
         'job__company'
-    ).prefetch_related('attendance')
-    
-    print(f"Initial application count: {applications.count()}")
+    ).prefetch_related('attendance').order_by('-application_date')
     
     # Apply filters
     if search_query:
+        # Improved search functionality to handle partial matches better
         applications = applications.filter(
             Q(student__first_name__icontains=search_query) |
             Q(student__last_name__icontains=search_query) |
-            Q(student__university_roll_no__icontains=search_query)
+            Q(student__university_roll_no__icontains=search_query) |
+            Q(student__email__icontains=search_query) |
+            Q(job__company__name__icontains=search_query) |
+            Q(job__role__icontains=search_query)
         )
-        print(f"After search query filter: {applications.count()} applications")
     
     if selected_date:
         applications = applications.filter(job__interview_date=selected_date)
-        print(f"After date filter: {applications.count()} applications")
     
     if selected_company:
         applications = applications.filter(job__company__id=selected_company)
-        print(f"After company filter: {applications.count()} applications")
     
     if status_filter:
         applications = applications.filter(status=status_filter)
-        print(f"After status filter: {applications.count()} applications")
         
     if attendance_filter:
         if attendance_filter == 'marked':
@@ -144,17 +144,28 @@ def volunteer_applications(request):
             applications = applications.filter(attendance__is_present=True)
         elif attendance_filter == 'absent':
             applications = applications.filter(attendance__is_present=False)
-        print(f"After attendance filter: {applications.count()} applications")
     
     # Get data for filter dropdowns
     interview_dates = []
     for date_choice in Job._meta.get_field('interview_date').choices:
         interview_dates.append(date_choice[0])
     
-    companies = Company.objects.all()
+    companies = Company.objects.all().order_by('name')
+    
+    # Pagination
+    page = request.GET.get('page', 1)
+    paginator = Paginator(applications, 25)  # Show 25 applications per page
+    
+    try:
+        applications_page = paginator.page(page)
+    except PageNotAnInteger:
+        applications_page = paginator.page(1)
+    except EmptyPage:
+        applications_page = paginator.page(paginator.num_pages)
     
     context = {
-        'applications': applications,
+        'applications': applications_page,
+        'total_count': paginator.count,
         'interview_dates': interview_dates,
         'companies': companies,
         'selected_date': selected_date,
@@ -162,10 +173,8 @@ def volunteer_applications(request):
         'attendance_filter': attendance_filter,
         'status_filter': status_filter,
         'search_query': search_query,
+        'now': timezone.now(),  # Add current time for the timestamp
     }
-    
-    print(f"Final application count: {applications.count()}")
-    print("="*50)
     
     return render(request, 'volunteer/applications.html', context)
 
@@ -255,39 +264,48 @@ def mark_attendance(request, application_id, status):
     """
     View to mark a student's attendance regardless of application status
     """
-    application = get_object_or_404(Application, id=application_id)
+    # Check if this is an AJAX request
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
     
-    # Check if attendance already exists
-    if hasattr(application, 'attendance'):
-        # Update existing attendance
-        attendance = application.attendance
-        is_present = status == 'present'
-        attendance.is_present = is_present
-        attendance.marked_by = request.user.volunteer
-        attendance.marked_at = datetime.now()
-        attendance.save()
-        
-        status_text = "present" if is_present else "absent"
-        messages.success(request, f"Updated {application.student.first_name} {application.student.last_name}'s attendance to {status_text}.")
-    else:
-        # Create new attendance record
-        is_present = status == 'present'
-        
-        notes = None
-        # Add a note if application is not accepted
-        if application.status != "accepted":
-            notes = f"Attendance marked while application was in {application.status} status."
-        
-        # Create attendance record
-        attendance = Attendance.objects.create(
-            application=application,
-            is_present=is_present,
-            marked_by=request.user.volunteer,
-            notes=notes
-        )
-        
-        status_text = "present" if is_present else "absent"
-        messages.success(request, f"Marked {application.student.first_name} {application.student.last_name} as {status_text}.")
+    # Fetch application with prefetched related objects to reduce queries
+    application = get_object_or_404(
+        Application.objects.select_related('student', 'job'),
+        id=application_id
+    )
+    
+    is_present = status == 'present'
+    
+    # Use Django's update_or_create to reduce database hits
+    # This combines the check for existence and creation/update in a single query
+    notes = None
+    if application.status != "accepted":
+        notes = f"Attendance marked while application was in {application.status} status."
+    
+    attendance, created = Attendance.objects.update_or_create(
+        application=application,
+        defaults={
+            'is_present': is_present,
+            'marked_by': request.user.volunteer,
+            'marked_at': timezone.now(),
+            'notes': notes
+        }
+    )
+    
+    # Clear dashboard cache
+    cache_key = f'volunteer_dashboard_{request.user.id}'
+    cache.delete(cache_key)
+    
+    # Prepare success message
+    status_text = "present" if is_present else "absent"
+    action_text = "Marked" if created else "Updated"
+    messages.success(
+        request, 
+        f"{action_text} {application.student.first_name} {application.student.last_name}'s attendance to {status_text}."
+    )
+    
+    # Handle AJAX requests differently
+    if is_ajax:
+        return HttpResponse(status=200)
     
     # Redirect to the referring page or applications page
     referer = request.META.get('HTTP_REFERER')
@@ -303,16 +321,39 @@ def change_attendance(request, attendance_id):
     """
     View to change a student's attendance status
     """
-    attendance = get_object_or_404(Attendance, id=attendance_id)
+    # Check if this is an AJAX request
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
     
-    # Toggle attendance status
-    attendance.is_present = not attendance.is_present
-    attendance.marked_by = request.user.volunteer
-    attendance.marked_at = datetime.now()
-    attendance.save()
+    # Fetch attendance with prefetched related objects to reduce queries
+    attendance = get_object_or_404(
+        Attendance.objects.select_related('application__student'),
+        id=attendance_id
+    )
+    
+    # Toggle attendance status and update in a single query
+    new_status = not attendance.is_present
+    Attendance.objects.filter(id=attendance_id).update(
+        is_present=new_status, 
+        marked_by=request.user.volunteer.id,
+        marked_at=timezone.now()
+    )
+    
+    # Clear dashboard cache
+    cache_key = f'volunteer_dashboard_{request.user.id}'
+    cache.delete(cache_key)
+    
+    # Refresh the attendance object to get the updated values
+    attendance.refresh_from_db()
     
     status_text = "present" if attendance.is_present else "absent"
-    messages.success(request, f"Updated {attendance.application.student.first_name} {attendance.application.student.last_name}'s attendance to {status_text}.")
+    messages.success(
+        request, 
+        f"Updated {attendance.application.student.first_name} {attendance.application.student.last_name}'s attendance to {status_text}."
+    )
+    
+    # Handle AJAX requests differently
+    if is_ajax:
+        return HttpResponse(status=200)
     
     # Redirect to the referring page or attendance page
     referer = request.META.get('HTTP_REFERER')
@@ -403,4 +444,92 @@ def volunteer_profile(request):
         'companies_count': companies_count,
     }
     
-    return render(request, 'volunteer/profile.html', context) 
+    return render(request, 'volunteer/profile.html', context)
+
+
+@login_required(login_url='login')
+@volunteer_required
+def bulk_mark_attendance(request):
+    """
+    View to mark attendance for multiple students at once
+    """
+    if request.method != 'POST':
+        messages.error(request, "Invalid request method.")
+        return redirect('volunteer_applications')
+    
+    # Check if this is an AJAX request
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+    
+    application_ids = request.POST.getlist('application_ids', [])
+    status = request.POST.get('status', 'present')
+    is_present = status == 'present'
+    
+    if not application_ids:
+        messages.error(request, "No applications selected.")
+        return redirect('volunteer_applications') if not is_ajax else HttpResponse(status=400)
+    
+    # Get all selected applications in a single query with prefetch_related
+    applications = Application.objects.filter(id__in=application_ids).select_related('student')
+    
+    # Use bulk update/create operations for better performance
+    # First, check which applications already have attendance records
+    existing_attendance_app_ids = Attendance.objects.filter(
+        application_id__in=application_ids
+    ).values_list('application_id', flat=True)
+    
+    current_time = timezone.now()
+    
+    # For applications with existing attendance, update them
+    if existing_attendance_app_ids:
+        Attendance.objects.filter(application_id__in=existing_attendance_app_ids).update(
+            is_present=is_present,
+            marked_by=request.user.volunteer,
+            marked_at=current_time
+        )
+    
+    # For applications without attendance records, create new ones
+    new_attendance_apps = applications.exclude(id__in=existing_attendance_app_ids)
+    attendance_objects = []
+    
+    for application in new_attendance_apps:
+        notes = None
+        if application.status != "accepted":
+            notes = f"Attendance marked while application was in {application.status} status."
+        
+        attendance = Attendance(
+            application=application,
+            is_present=is_present,
+            marked_by=request.user.volunteer,
+            marked_at=current_time,
+            notes=notes
+        )
+        attendance_objects.append(attendance)
+    
+    # Bulk create the new attendance records
+    if attendance_objects:
+        Attendance.objects.bulk_create(attendance_objects)
+    
+    # Clear dashboard cache
+    cache_key = f'volunteer_dashboard_{request.user.id}'
+    cache.delete(cache_key)
+    
+    # Count how many records were affected
+    total_updated = len(existing_attendance_app_ids)
+    total_created = len(attendance_objects)
+    total_affected = total_updated + total_created
+    
+    status_text = "present" if is_present else "absent"
+    action_text = f"Updated {total_updated} and marked {total_created} new students" if total_updated > 0 else f"Marked {total_created} students"
+    
+    messages.success(request, f"{action_text} as {status_text}.")
+    
+    # Handle AJAX requests differently
+    if is_ajax:
+        return HttpResponse(status=200)
+    
+    # Redirect to the referring page or applications page
+    referer = request.META.get('HTTP_REFERER')
+    if referer:
+        return redirect(referer)
+    else:
+        return redirect('volunteer_applications') 
