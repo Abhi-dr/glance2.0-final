@@ -406,61 +406,22 @@ def all_jobs(request):
     # Check if the student has already applied to any jobs
     applied_jobs = Application.objects.filter(student=student).values_list('job_id', flat=True)
     
-    # Apply filters - only if explicitly requested
-    query = request.GET.get("query")
-    job_type = request.GET.get("job_type")
-    salary_min = request.GET.get("salary_min")
-    location = request.GET.get("location")
-    cgpa_max = request.GET.get("cgpa_max")
+    # Only keep the show_expired filter
     show_expired = request.GET.get("show_expired") == "on"
     
     # Debug information
     print(f"Total jobs before filtering: {all_jobs_query.count()}")
     
-    # Filter by search query
-    if query:
-        all_jobs_query = all_jobs_query.filter(
-            Q(title__icontains=query) |
-            Q(description__icontains=query) |
-            Q(company__name__icontains=query) |
-            Q(role__icontains=query)
-        )
+    # Always get active jobs first, then expired jobs if requested
+    active_jobs = all_jobs_query.filter(deadline__gte=today).order_by('company__name', 'title')
     
-    # Filter by job type
-    if job_type:
-        all_jobs_query = all_jobs_query.filter(job_type=job_type)
-    
-    # Filter by salary minimum (simple text comparison)
-    if salary_min:
-        # This is a rough filter since salary is stored as text
-        all_jobs_query = all_jobs_query.filter(salary_range__icontains=salary_min)
-    
-    # Filter by location
-    if location:
-        all_jobs_query = all_jobs_query.filter(location_flexibility__icontains=location)
-    
-    # Filter by maximum CGPA requirement
-    if cgpa_max:
-        try:
-            cgpa_max_float = float(cgpa_max)
-            all_jobs_query = all_jobs_query.filter(cgpa_criteria__lte=cgpa_max_float)
-        except (ValueError, TypeError):
-            pass  # Ignore invalid CGPA values
-    
-    # Apply backlog restrictions only if student has backlogs
-    if student.backlog and student.backlog > 0:
-        all_jobs_query = all_jobs_query.exclude(is_backlog_allowed=False)
-    
-    # Separate active and expired jobs
-    if not show_expired:
-        # Only show active jobs if show_expired is not checked
-        active_jobs = all_jobs_query.filter(deadline__gte=today).order_by('company__name', 'title')
-        jobs_list = list(active_jobs)
-    else:
-        # Show both active and expired jobs
-        active_jobs = all_jobs_query.filter(deadline__gte=today).order_by('company__name', 'title')
+    if show_expired:
+        # Show both active and expired jobs, with expired at the end
         expired_jobs = all_jobs_query.filter(deadline__lt=today).order_by('company__name', 'title')
         jobs_list = list(active_jobs) + list(expired_jobs)
+    else:
+        # Only show active jobs
+        jobs_list = list(active_jobs)
     
     # Mark which jobs the student has already applied to
     for job in jobs_list:
@@ -482,16 +443,11 @@ def all_jobs(request):
     parameters = {
         "student": student,
         "jobs": jobs_list,
-        "query": query,
-        "job_type": job_type,
-        "salary_min": salary_min,
-        "location": location,
-        "cgpa_max": cgpa_max,
         "show_expired": show_expired,
-        "job_types": job_types,
-        "locations": locations,
         "today_date": today,
         "total_jobs": len(jobs_list),
+        "active_jobs_count": len([j for j in jobs_list if not j.is_expired]),
+        "expired_jobs_count": len([j for j in jobs_list if j.is_expired]),
         "all_jobs_count": Job.objects.count()  # Add total count for debugging
     }
     

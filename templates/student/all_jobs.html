@@ -147,7 +147,7 @@ Student -> All Jobs
     <div class="card-body">
       <h5 class="card-title fw-semibold mb-3">Lots of Opportunities!</h5>
       <p class="mb-0">The Place Where You Unlock Your Potential🔥!</p>
-      <p class="mt-2 text-primary">Showing {{ total_jobs }} jobs out of {{ all_jobs_count }} total jobs</p>
+      <p class="mt-2 text-primary">Showing {{ active_jobs_count }} active jobs {% if expired_jobs_count > 0 %}and {{ expired_jobs_count }} expired jobs{% endif %} ({{ total_jobs }} total)</p>
     </div>
   </div>
 
@@ -155,65 +155,9 @@ Student -> All Jobs
     <div class="col-12">
       <div class="card">
         <div class="card-body p-4">
-          <h5 class="card-title fw-semibold mb-3"><i class="ti ti-filter me-2"></i>Search & Filter Companies</h5>
+          <h5 class="card-title fw-semibold mb-3"><i class="ti ti-filter me-2"></i>Job Visibility Options</h5>
           <form method="get" class="mb-0">
             <div class="row g-3">
-              <!-- Search query -->
-              <div class="col-md-12 mb-3">
-                <label for="query" class="form-label">Search by company, job title, or description</label>
-                <div class="input-group">
-                  <input type="text" class="form-control" placeholder="Search..." id="query" name="query" value="{{ query }}">
-                  <button class="btn btn-primary" type="submit">Search</button>
-                  <a href="{% url 'all_jobs' %}" class="btn btn-danger">Clear</a>
-                </div>
-              </div>
-
-              <!-- Filters -->
-              <div class="col-md-3">
-                <label for="job_type" class="form-label">Job Type</label>
-                <select class="form-select" id="job_type" name="job_type">
-                  <option value="">All Types</option>
-                  {% for type in job_types %}
-                    <option value="{{ type }}" {% if job_type == type %}selected{% endif %}>{{ type|title }}</option>
-                  {% endfor %}
-                </select>
-              </div>
-
-              <div class="col-md-3">
-                <label for="salary_min" class="form-label">Minimum Salary (LPA)</label>
-                <select class="form-select" id="salary_min" name="salary_min">
-                  <option value="">Any Salary</option>
-                  <option value="3" {% if salary_min == '3' %}selected{% endif %}>3+ LPA</option>
-                  <option value="5" {% if salary_min == '5' %}selected{% endif %}>5+ LPA</option>
-                  <option value="8" {% if salary_min == '8' %}selected{% endif %}>8+ LPA</option>
-                  <option value="10" {% if salary_min == '10' %}selected{% endif %}>10+ LPA</option>
-                  <option value="15" {% if salary_min == '15' %}selected{% endif %}>15+ LPA</option>
-                </select>
-              </div>
-
-              <div class="col-md-3">
-                <label for="location" class="form-label">Location</label>
-                <select class="form-select" id="location" name="location">
-                  <option value="">Any Location</option>
-                  {% for loc in locations %}
-                    {% if loc %}
-                    <option value="{{ loc }}" {% if location == loc %}selected{% endif %}>{{ loc|title }}</option>
-                    {% endif %}
-                  {% endfor %}
-                </select>
-              </div>
-
-              <div class="col-md-3">
-                <label for="cgpa_max" class="form-label">Maximum CGPA Required</label>
-                <select class="form-select" id="cgpa_max" name="cgpa_max">
-                  <option value="">Any CGPA</option>
-                  <option value="6" {% if cgpa_max == '6' %}selected{% endif %}>Up to 6</option>
-                  <option value="7" {% if cgpa_max == '7' %}selected{% endif %}>Up to 7</option>
-                  <option value="8" {% if cgpa_max == '8' %}selected{% endif %}>Up to 8</option>
-                  <option value="9" {% if cgpa_max == '9' %}selected{% endif %}>Up to 9</option>
-                </select>
-              </div>
-
               <div class="col-md-12">
                 <div class="form-check form-switch">
                   <input class="form-check-input" type="checkbox" id="show_expired" name="show_expired" {% if show_expired %}checked{% endif %}>
@@ -223,10 +167,10 @@ Student -> All Jobs
 
               <div class="col-12 mt-3">
                 <button type="submit" class="btn btn-primary">
-                  <i class="ti ti-filter me-1"></i> Apply Filters
+                  <i class="ti ti-filter me-1"></i> Apply
                 </button>
                 <a href="{% url 'all_jobs' %}" class="btn btn-outline-secondary">
-                  <i class="ti ti-refresh me-1"></i> Reset Filters
+                  <i class="ti ti-refresh me-1"></i> Reset
                 </a>
               </div>
             </div>
