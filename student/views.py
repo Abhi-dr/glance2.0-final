@@ -406,22 +406,18 @@ def all_jobs(request):
     # Check if the student has already applied to any jobs
     applied_jobs = Application.objects.filter(student=student).values_list('job_id', flat=True)
     
-    # Only keep the show_expired filter
-    show_expired = request.GET.get("show_expired") == "on"
+    # We'll always show all jobs, but we'll keep the variable for compatibility
+    show_expired = True
     
     # Debug information
     print(f"Total jobs before filtering: {all_jobs_query.count()}")
     
-    # Always get active jobs first, then expired jobs if requested
+    # Always get active jobs first, then expired jobs
     active_jobs = all_jobs_query.filter(deadline__gte=today).order_by('company__name', 'title')
+    expired_jobs = all_jobs_query.filter(deadline__lt=today).order_by('company__name', 'title')
     
-    if show_expired:
-        # Show both active and expired jobs, with expired at the end
-        expired_jobs = all_jobs_query.filter(deadline__lt=today).order_by('company__name', 'title')
-        jobs_list = list(active_jobs) + list(expired_jobs)
-    else:
-        # Only show active jobs
-        jobs_list = list(active_jobs)
+    # Always show all jobs, with active first and expired at the end
+    jobs_list = list(active_jobs) + list(expired_jobs)
     
     # Mark which jobs the student has already applied to
     for job in jobs_list:
