@@ -116,7 +116,15 @@ def register(request):
         first_name = request.POST.get("first_name").strip().title()
         last_name = request.POST.get("last_name").strip().title()
         phone_number = request.POST.get("mobile_number")
-        # profile_pic = request.FILES.get("profile_pic")
+        
+        # Get file uploads - resume is mandatory, others are optional
+        profile_pic = request.FILES.get('profile_pic')
+        resume = request.FILES.get('resume')
+        
+        # Resume is required
+        if not resume:
+            messages.error(request, "Resume is Required")
+            return redirect("register")
         
         # Check if email already exists
         if Student.objects.filter(username=username).exists():
@@ -128,24 +136,134 @@ def register(request):
             messages.error(request, "Mobile Number Already Registered")
             return redirect("register")
         
-        # # Validate profile picture
-        # if not profile_pic:
-        #     messages.error(request, "Profile Photo is Required")
-        #     return redirect("register")
+        # Get device info if available
+        device_info = request.POST.get('device_info', 'Unknown device')
+        print(f"Processing registration from: {device_info}")
+            
+        # Only validate resume if it was provided (now optional)
+        if resume:
+            try:
+                # Check file size (max 5MB)
+                max_size = 5 * 1024 * 1024  # 5MB in bytes
+                if resume.size > max_size:
+                    messages.error(request, "Resume file is too large. Maximum size is 5MB.")
+                    return redirect("register")
+                
+                # Log file information for debugging
+                print(f"Resume file: name={resume.name}, size={resume.size}, content_type={resume.content_type}")
+                
+                # Enhanced PDF detection with multiple checks for cross-device compatibility
+                is_pdf = False
+                
+                # 1. Check file extension (most reliable across devices)
+                if resume.name.lower().endswith('.pdf'):
+                    is_pdf = True
+                    print("PDF detected by file extension")
+                    
+                # 2. Check content type (can vary across devices)
+                pdf_content_types = [
+                    'application/pdf',
+                    'application/x-pdf',
+                    'application/acrobat',
+                    'applications/vnd.pdf',
+                    'text/pdf',
+                    'text/x-pdf'
+                ]
+                
+                if resume.content_type in pdf_content_types:
+                    is_pdf = True
+                    print(f"PDF detected by content type: {resume.content_type}")
+                
+                # 3. Additional check for iOS and older Android devices that may report content type incorrectly
+                if 'iPhone' in device_info or 'iPad' in device_info or 'Android 4' in device_info:
+                    # For these devices, prioritize file extension over content type
+                    if resume.name.lower().endswith('.pdf'):
+                        is_pdf = True
+                        print("PDF detection override for mobile device")
+                
+                # Final PDF validation
+                if not is_pdf:
+                    messages.error(request, "Resume must be a PDF file. Please convert your document to PDF format.")
+                    return redirect("register")
+            except Exception as e:
+                # Log the error but provide a user-friendly message
+                print(f"Error validating resume: {str(e)}")
+                messages.error(request, "There was a problem with your resume file. Please ensure it's a valid PDF under 5MB.")
+                return redirect("register")
+        
+        # Enhanced profile picture validation with comprehensive device support
+        if profile_pic:
+            try:
+                # Get device info if available
+                device_info = request.POST.get('device_info', 'Unknown device')
+                print(f"Processing profile picture from: {device_info}")
+                
+                # Check file size (max 2MB)
+                max_size = 2 * 1024 * 1024  # 2MB in bytes
+                if profile_pic.size > max_size:
+                    messages.error(request, "Profile picture is too large. Maximum size is 2MB.")
+                    return redirect("register")
+                
+                # Log file information for debugging
+                print(f"Profile picture: name={profile_pic.name}, size={profile_pic.size}, content_type={profile_pic.content_type}")
+                
+                # Enhanced image detection with multiple checks for cross-device compatibility
+                is_image = False
+                
+                # 1. Check file extension (most reliable across devices)
+                image_extensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp', '.heic', '.heif']
+                if any(profile_pic.name.lower().endswith(ext) for ext in image_extensions):
+                    is_image = True
+                    print("Image detected by file extension")
+                
+                # 2. Check content type (can vary across devices)
+                if profile_pic.content_type.startswith('image/'):
+                    is_image = True
+                    print(f"Image detected by content type: {profile_pic.content_type}")
+                
+                # 3. Additional check for iOS and older Android devices
+                if 'iPhone' in device_info or 'iPad' in device_info or 'Android' in device_info:
+                    # For these devices, prioritize file extension over content type
+                    if any(profile_pic.name.lower().endswith(ext) for ext in image_extensions):
+                        is_image = True
+                        print("Image detection override for mobile device")
+                
+                # Final image validation
+                if not is_image:
+                    messages.error(request, "Profile picture must be an image file (JPEG, PNG, etc.).")
+                    return redirect("register")
+                    
+            except Exception as e:
+                # Log the error but provide a user-friendly message
+                print(f"Error validating profile picture: {str(e)}")
+                messages.error(request, "There was a problem with your profile picture. Please ensure it's a valid image under 2MB.")
+                return redirect("register")
         
         password = request.POST.get("password")
 
-        new_user = Student.objects.create(
-            username=username,
-            first_name=first_name,
-            last_name=last_name,
-            phone_number=phone_number,
-            # profile_pic=profile_pic
-        )
+        try:
+            # Create user with required fields
+            new_user = Student.objects.create(
+                username=username,
+                first_name=first_name,
+                last_name=last_name,
+                phone_number=phone_number,
+                resume=resume
+            )
+            
+            # Add optional profile picture if provided
+            if profile_pic:
+                new_user.profile_pic = profile_pic
 
-        new_user.set_password(password)
-
-        new_user.save()
+            # Set password and save
+            new_user.set_password(password)
+            new_user.save()
+        except Exception as e:
+            # Log the error for debugging
+            print(f"Error creating user: {str(e)}")
+            # Provide a user-friendly error message
+            messages.error(request, "There was a problem creating your account. Please try again.")
+            return redirect("register")
         
         myfile = f"""Dear {first_name},
 

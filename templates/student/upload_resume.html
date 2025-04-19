@@ -164,6 +164,11 @@
     }
     
     .status-missing {
+        background-color: #6c757d;
+    }
+    
+    /* Only resume missing should be red */
+    li:first-child .status-missing {
         background-color: #dc3545;
     }
 </style>
@@ -202,18 +207,18 @@
             </li>
             <li>
                 <span class="document-status {% if student.tenth_marksheet %}status-uploaded{% else %}status-missing{% endif %}"></span>
-                Highschool Marksheet 
-                {% if student.tenth_marksheet %}<span class="badge bg-success">Uploaded</span>{% else %}<span class="badge bg-danger">Required</span>{% endif %}
+                Highschool Marksheet
+                {% if student.tenth_marksheet %}<span class="badge bg-success">Uploaded</span>{% else %}<span class="badge bg-secondary">Optional</span>{% endif %}
             </li>
             <li>
                 <span class="document-status {% if student.twelfth_marksheet %}status-uploaded{% else %}status-missing{% endif %}"></span>
-                Intermediate Marksheet 
-                {% if student.twelfth_marksheet %}<span class="badge bg-success">Uploaded</span>{% else %}<span class="badge bg-danger">Required</span>{% endif %}
+                Intermediate Marksheet
+                {% if student.twelfth_marksheet %}<span class="badge bg-success">Uploaded</span>{% else %}<span class="badge bg-secondary">Optional</span>{% endif %}
             </li>
             <li>
                 <span class="document-status {% if student.college_profile_print %}status-uploaded{% else %}status-missing{% endif %}"></span>
-                College Profile Print 
-                {% if student.college_profile_print %}<span class="badge bg-success">Uploaded</span>{% else %}<span class="badge bg-danger">Required</span>{% endif %}
+                College Profile
+                {% if student.college_profile_print %}<span class="badge bg-success">Uploaded</span>{% else %}<span class="badge bg-secondary">Optional</span>{% endif %}
             </li>
         </ul>
     </div>
@@ -438,7 +443,7 @@
                 <!-- Highschool Marksheet Section -->
                 <div class="document-section">
                     <div class="document-title">
-                        <i class="ti ti-certificate"></i> Highschool Marksheet <span class="required-badge">Required</span>
+                        <i class="ti ti-certificate"></i> Highschool Marksheet <span class="badge bg-secondary">Optional</span>
                     </div>
                     
                     <div class="document-instructions">
@@ -471,7 +476,7 @@
                 <!-- Intermediate Marksheet Section -->
                 <div class="document-section">
                     <div class="document-title">
-                        <i class="ti ti-certificate"></i> Intermediate Marksheet <span class="required-badge">Required</span>
+                        <i class="ti ti-certificate"></i> Intermediate Marksheet <span class="badge bg-secondary">Optional</span>
                     </div>
                     
                     <div class="document-instructions">
@@ -501,10 +506,10 @@
                     </div>
                 </div>
 
-                <!-- College Profile Print Section -->
+                <!-- College Profile Section -->
                 <div class="document-section">
                     <div class="document-title">
-                        <i class="ti ti-building-university"></i> College Profile Print <span class="required-badge">Required</span>
+                        <i class="ti ti-school"></i> College Profile <span class="badge bg-secondary">Optional</span>
                     </div>
                     
                     <div class="document-instructions">
@@ -569,32 +574,63 @@
 <script>
     // File size validation - maximum 5MB
     function validateFileSize(inputElement) {
-        const maxSizeInBytes = 5 * 1024 * 1024; // 5MB
-        const file = inputElement.files[0];
-        
-        if (file) {
-            // Check file size
-            if (file.size > maxSizeInBytes) {
-                showError(inputElement, `File "${file.name}" is too large (${(file.size/1024/1024).toFixed(1)}MB). Maximum size is 5MB.`);
-                return false;
-            } 
+        try {
+            const maxSizeInBytes = 5 * 1024 * 1024; // 5MB
+            const file = inputElement.files[0];
             
-            // Check if file is a PDF
-            const fileType = file.type;
-            const fileName = file.name.toLowerCase();
-            
-            if (!(fileType === 'application/pdf' || fileName.endsWith('.pdf'))) {
-                showError(inputElement, `File "${file.name}" is not a PDF. Only PDF files are allowed.`);
-                return false;
-            } 
-            
-            // All checks passed
-            clearError(inputElement);
-            showSuccess(inputElement, `File "${file.name}" ready to upload.`);
-            return true;
-        } else {
-            clearError(inputElement);
-            return true;
+            if (file) {
+                // Log file info for debugging
+                console.log('Validating file:', {
+                    name: file.name,
+                    type: file.type,
+                    size: file.size,
+                    device: inputElement.getAttribute('data-device-type')
+                });
+                
+                // Check file size
+                if (file.size > maxSizeInBytes) {
+                    showError(inputElement, `File "${file.name}" is too large (${(file.size/1024/1024).toFixed(1)}MB). Maximum size is 5MB.`);
+                    return false;
+                } 
+                
+                // Enhanced PDF detection
+                const fileType = file.type;
+                const fileName = file.name.toLowerCase();
+                
+                // Multiple checks for PDF format
+                const isPdf = 
+                    fileType === 'application/pdf' || 
+                    fileType === 'application/x-pdf' || 
+                    fileType === 'application/acrobat' || 
+                    fileType === 'applications/vnd.pdf' || 
+                    fileName.endsWith('.pdf');
+                
+                if (!isPdf) {
+                    showError(inputElement, `File "${file.name}" is not a PDF. Only PDF files are allowed.`);
+                    return false;
+                } 
+                
+                // All checks passed
+                clearError(inputElement);
+                showSuccess(inputElement, `File "${file.name}" ready to upload.`);
+                return true;
+            } else {
+                clearError(inputElement);
+                return true;
+            }
+        } catch (error) {
+            console.error('Error in validateFileSize:', error);
+            // Fallback validation for error cases
+            if (inputElement.value) {
+                // If there's a value but we couldn't validate properly, assume it's OK
+                // Server-side validation will catch any issues
+                clearError(inputElement);
+                return true;
+            } else {
+                // No file selected
+                clearError(inputElement);
+                return true;
+            }
         }
     }
     
@@ -632,18 +668,55 @@
         element.classList.remove('is-invalid');
     }
     
-    // Fix for iOS Safari file input issues
-    function fixIOSFileInput() {
-        // Check if we're on iOS
-        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    // Enhanced file input handling for all devices
+    function enhanceFileInputsForAllDevices() {
+        // Get all file inputs
+        const fileInputs = document.querySelectorAll('input[type="file"]');
         
-        if (isIOS) {
-            const fileInputs = document.querySelectorAll('input[type="file"]');
-            fileInputs.forEach(input => {
-                // Add click event to parent input-group to trigger file input
+        // Detect device type
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        const isOldAndroid = /Android\s[23]/.test(navigator.userAgent);
+        const isWindowsPhone = /Windows Phone/.test(navigator.userAgent);
+        const isMobile = isIOS || /Android/.test(navigator.userAgent) || isWindowsPhone;
+        
+        console.log('Device detection:', { isIOS, isOldAndroid, isWindowsPhone, isMobile });
+        
+        // Apply appropriate fixes based on device
+        fileInputs.forEach(input => {
+            // Add data attribute for debugging
+            input.setAttribute('data-device-type', 
+                isIOS ? 'ios' : (isOldAndroid ? 'old-android' : (isMobile ? 'mobile' : 'desktop')));
+            
+            // iOS specific fixes
+            if (isIOS) {
+                // Store original accept attribute
+                const acceptValue = input.getAttribute('accept');
+                input.setAttribute('data-original-accept', acceptValue || '');
+                
+                try {
+                    // For iOS 13+ we keep the accept attribute but add capture
+                    const iosVersion = parseInt((navigator.appVersion).match(/OS (\d+)_(\d+)_?(\d+)?/)?.[1] || '0', 10);
+                    console.log('iOS version detected:', iosVersion);
+                    
+                    if (iosVersion >= 13) {
+                        input.setAttribute('capture', 'camera');
+                    } else {
+                        // For older iOS we remove accept which can be problematic
+                        input.removeAttribute('accept');
+                    }
+                } catch (e) {
+                    console.error('Error detecting iOS version:', e);
+                    // Fallback for any parsing errors
+                    input.setAttribute('capture', 'camera');
+                }
+                
+                // Make parent container clickable for better touch area
                 const inputGroup = input.closest('.input-group');
                 if (inputGroup) {
                     inputGroup.style.cursor = 'pointer';
+                    inputGroup.style.position = 'relative';
+                    
+                    // Add click handler to the entire input group
                     inputGroup.addEventListener('click', function(e) {
                         // Only trigger if the click wasn't directly on the input
                         if (e.target !== input) {
@@ -651,14 +724,80 @@
                         }
                     });
                 }
+            }
+            
+            // Old Android fixes
+            if (isOldAndroid) {
+                console.log('Applying old Android fixes');
+                // Simplify file input for older Android browsers
+                input.style.padding = '12px';
+                input.style.fontSize = '16px';
+                
+                // Make the clickable area larger
+                const inputGroup = input.closest('.input-group');
+                if (inputGroup) {
+                    inputGroup.style.cursor = 'pointer';
+                    
+                    // Add click handler to the entire input group
+                    inputGroup.addEventListener('click', function(e) {
+                        if (e.target !== input) {
+                            input.click();
+                        }
+                    });
+                }
+            }
+            
+            // General mobile improvements
+            if (isMobile) {
+                // Ensure proper sizing and visibility
+                input.style.opacity = '1';
+                input.style.height = 'auto';
+                input.style.minHeight = '44px';
+                
+                // Add visual feedback for touch
+                input.addEventListener('touchstart', function() {
+                    this.style.backgroundColor = 'rgba(13, 110, 253, 0.1)';
+                });
+                
+                input.addEventListener('touchend', function() {
+                    this.style.backgroundColor = '';
+                });
+            }
+            
+            // Add fallback validation for all devices
+            input.addEventListener('change', function() {
+                // Store file info for debugging
+                if (this.files && this.files[0]) {
+                    const file = this.files[0];
+                    console.log('File selected:', {
+                        name: file.name,
+                        type: file.type,
+                        size: file.size,
+                        device: input.getAttribute('data-device-type')
+                    });
+                }
             });
+        });
+        
+        // Add a hidden field to track device info for server-side handling
+        const form = document.getElementById('uploadForm');
+        if (form) {
+            let deviceInfoInput = document.getElementById('device_info_input');
+            if (!deviceInfoInput) {
+                deviceInfoInput = document.createElement('input');
+                deviceInfoInput.type = 'hidden';
+                deviceInfoInput.id = 'device_info_input';
+                deviceInfoInput.name = 'device_info';
+                deviceInfoInput.value = navigator.userAgent;
+                form.appendChild(deviceInfoInput);
+            }
         }
     }
     
     // Add event listeners to all file inputs
     document.addEventListener('DOMContentLoaded', function() {
-        // Fix iOS file input issues
-        fixIOSFileInput();
+        // Apply device-specific enhancements
+        enhanceFileInputsForAllDevices();
         
         const fileInputs = [
             document.getElementById('resumeFile'),

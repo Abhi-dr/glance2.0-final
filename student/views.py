@@ -185,59 +185,199 @@ def upload_resume(request):
             twelfth_marksheet = request.FILES.get('twelfth_marksheet')
             college_profile_print = request.FILES.get('college_profile_print')
             
-            # Check if at least one file was uploaded
-            if not any([resume, tenth_marksheet, twelfth_marksheet, college_profile_print]):
-                messages.error(request, "Please select at least one file to upload.")
-                return redirect('upload_resume')
-            
-            # Check file sizes (max 5MB) and file types
-            max_size = 5 * 1024 * 1024  # 5MB in bytes
-            for file_obj in [f for f in [resume, tenth_marksheet, twelfth_marksheet, college_profile_print] if f]:
-                if file_obj.size > max_size:
-                    messages.error(request, f"File '{file_obj.name}' is too large. Maximum size is 5MB.")
-                    return redirect('upload_resume')
+            # Enhanced resume file validation with comprehensive device support
+            try:
+                # Get device info if available
+                device_info = request.POST.get('device_info', 'Unknown device')
+                print(f"Processing file upload from: {device_info}")
                 
-                # Check if file is PDF
-                if not file_obj.name.lower().endswith('.pdf') and not file_obj.content_type == 'application/pdf':
-                    messages.error(request, f"File '{file_obj.name}' is not a PDF. Only PDF files are allowed.")
-                    return redirect('upload_resume')
-            
-            # Get the student and update fields (student already fetched above)
-            upload_success = False
-            
-            if resume:
+                if not resume:
+                    messages.error(request, "Please select a resume file to upload.")
+                    return redirect("upload_resume")
+                
+                # Check file size (max 5MB)
+                max_size = 5 * 1024 * 1024  # 5MB in bytes
+                if resume.size > max_size:
+                    messages.error(request, "Resume file is too large. Maximum size is 5MB.")
+                    return redirect("upload_resume")
+                
+                # Log file information for debugging
+                print(f"Resume file: name={resume.name}, size={resume.size}, content_type={resume.content_type}")
+                
+                # Enhanced PDF detection with multiple checks for cross-device compatibility
+                is_pdf = False
+                
+                # 1. Check file extension (most reliable across devices)
+                if resume.name.lower().endswith('.pdf'):
+                    is_pdf = True
+                    print("PDF detected by file extension")
+                    
+                # 2. Check content type (can vary across devices)
+                pdf_content_types = [
+                    'application/pdf',
+                    'application/x-pdf',
+                    'application/acrobat',
+                    'applications/vnd.pdf',
+                    'text/pdf',
+                    'text/x-pdf'
+                ]
+                
+                if resume.content_type in pdf_content_types:
+                    is_pdf = True
+                    print(f"PDF detected by content type: {resume.content_type}")
+                
+                # 3. Additional check for iOS and older Android devices that may report content type incorrectly
+                if 'iPhone' in device_info or 'iPad' in device_info or 'Android' in device_info:
+                    # For these devices, prioritize file extension over content type
+                    if resume.name.lower().endswith('.pdf'):
+                        is_pdf = True
+                        print("PDF detection override for mobile device")
+                
+                # Final PDF validation
+                if not is_pdf:
+                    messages.error(request, "Resume must be a PDF file. Please convert your document to PDF format.")
+                    return redirect("upload_resume")
+                    
+            except Exception as e:
+                # Log the error but provide a user-friendly message
+                print(f"Error validating resume: {str(e)}")
+                messages.error(request, "There was a problem with your resume file. Please ensure it's a valid PDF under 5MB.")
+                return redirect("upload_resume")
+                
+            # Save the resume with error handling
+            try:
                 student.resume = resume
-                upload_success = True
-                
+                student.save()
+            except Exception as e:
+                # Log the error for debugging
+                print(f"Error saving resume: {str(e)}")
+                # Provide a user-friendly error message
+                messages.error(request, "There was a problem saving your resume. Please try again.")
+                return redirect("upload_resume")
+            
+            upload_success = True
+            
+            # All other documents are optional - validate them with enhanced device compatibility
             if tenth_marksheet:
-                student.tenth_marksheet = tenth_marksheet
-                upload_success = True
+                try:
+                    # Get device info
+                    device_info = request.POST.get('device_info', 'Unknown device')
+                    
+                    # Check file size for tenth marksheet
+                    max_size = 5 * 1024 * 1024  # 5MB in bytes
+                    if tenth_marksheet.size > max_size:
+                        messages.warning(request, "10th Marksheet is too large (max 5MB). It was not uploaded.")
+                    else:
+                        # Enhanced PDF detection with multiple checks
+                        is_pdf = False
+                        
+                        # Check file extension
+                        if tenth_marksheet.name.lower().endswith('.pdf'):
+                            is_pdf = True
+                        
+                        # Check various content types
+                        pdf_content_types = ['application/pdf', 'application/x-pdf', 'application/acrobat', 'applications/vnd.pdf']
+                        if tenth_marksheet.content_type in pdf_content_types:
+                            is_pdf = True
+                        
+                        # Special handling for mobile devices
+                        if ('iPhone' in device_info or 'iPad' in device_info or 'Android' in device_info) and tenth_marksheet.name.lower().endswith('.pdf'):
+                            is_pdf = True
+                        
+                        if not is_pdf:
+                            messages.warning(request, "10th Marksheet must be a PDF file. It was not uploaded.")
+                        else:
+                            student.tenth_marksheet = tenth_marksheet
+                            print(f"Successfully processed 10th marksheet: {tenth_marksheet.name}")
+                except Exception as e:
+                    print(f"Error with 10th marksheet: {str(e)}")
+                    messages.warning(request, "There was an issue with your 10th Marksheet. It was not uploaded.")
                 
             if twelfth_marksheet:
-                student.twelfth_marksheet = twelfth_marksheet
-                upload_success = True
+                try:
+                    # Get device info
+                    device_info = request.POST.get('device_info', 'Unknown device')
+                    
+                    # Check file size for twelfth marksheet
+                    max_size = 5 * 1024 * 1024  # 5MB in bytes
+                    if twelfth_marksheet.size > max_size:
+                        messages.warning(request, "12th Marksheet is too large (max 5MB). It was not uploaded.")
+                    else:
+                        # Enhanced PDF detection with multiple checks
+                        is_pdf = False
+                        
+                        # Check file extension
+                        if twelfth_marksheet.name.lower().endswith('.pdf'):
+                            is_pdf = True
+                        
+                        # Check various content types
+                        pdf_content_types = ['application/pdf', 'application/x-pdf', 'application/acrobat', 'applications/vnd.pdf']
+                        if twelfth_marksheet.content_type in pdf_content_types:
+                            is_pdf = True
+                        
+                        # Special handling for mobile devices
+                        if ('iPhone' in device_info or 'iPad' in device_info or 'Android' in device_info) and twelfth_marksheet.name.lower().endswith('.pdf'):
+                            is_pdf = True
+                        
+                        if not is_pdf:
+                            messages.warning(request, "12th Marksheet must be a PDF file. It was not uploaded.")
+                        else:
+                            student.twelfth_marksheet = twelfth_marksheet
+                            print(f"Successfully processed 12th marksheet: {twelfth_marksheet.name}")
+                except Exception as e:
+                    print(f"Error with 12th marksheet: {str(e)}")
+                    messages.warning(request, "There was an issue with your 12th Marksheet. It was not uploaded.")
                 
             if college_profile_print:
-                student.college_profile_print = college_profile_print
-                upload_success = True
+                try:
+                    # Get device info
+                    device_info = request.POST.get('device_info', 'Unknown device')
+                    
+                    # Check file size for college profile
+                    max_size = 5 * 1024 * 1024  # 5MB in bytes
+                    if college_profile_print.size > max_size:
+                        messages.warning(request, "College Profile is too large (max 5MB). It was not uploaded.")
+                    else:
+                        # Enhanced PDF detection with multiple checks
+                        is_pdf = False
+                        
+                        # Check file extension
+                        if college_profile_print.name.lower().endswith('.pdf'):
+                            is_pdf = True
+                        
+                        # Check various content types
+                        pdf_content_types = ['application/pdf', 'application/x-pdf', 'application/acrobat', 'applications/vnd.pdf']
+                        if college_profile_print.content_type in pdf_content_types:
+                            is_pdf = True
+                        
+                        # Special handling for mobile devices
+                        if ('iPhone' in device_info or 'iPad' in device_info or 'Android' in device_info) and college_profile_print.name.lower().endswith('.pdf'):
+                            is_pdf = True
+                        
+                        if not is_pdf:
+                            messages.warning(request, "College Profile must be a PDF file. It was not uploaded.")
+                        else:
+                            student.college_profile_print = college_profile_print
+                            print(f"Successfully processed college profile: {college_profile_print.name}")
+                except Exception as e:
+                    print(f"Error with college profile: {str(e)}")
+                    messages.warning(request, "There was an issue with your College Profile. It was not uploaded.")
             
             student.save()
             
             # List of successfully uploaded files for the success message
             uploaded_files = []
-            if resume:
-                uploaded_files.append("Resume")
+            uploaded_files.append("Resume")  # Resume is always uploaded at this point
+            
             if tenth_marksheet:
                 uploaded_files.append("10th Marksheet")
             if twelfth_marksheet:
                 uploaded_files.append("12th Marksheet")
             if college_profile_print:
-                uploaded_files.append("College Profile")
-            
-            if uploaded_files:
-                messages.success(request, f"Successfully uploaded: {', '.join(uploaded_files)}")
-            else:
-                messages.info(request, "No new documents were uploaded.")
+                uploaded_files.append("College Profile Print")
+                
+            # Success message will always include Resume at minimum
+            messages.success(request, f"Successfully uploaded: {', '.join(uploaded_files)}")
                 
             return redirect('upload_resume')
             
@@ -363,18 +503,10 @@ def apply_job(request, slug):
     # Get the student
     student = Student.objects.get(id=request.user.id)
     
-    # Check if profile is complete and has required documents
-    has_complete_profile, missing_items, redirect_url = check_profile_completeness(student)
-    
-    if not has_complete_profile:
-        # Prepare descriptive error message
-        if len(missing_items) > 1:
-            message = f"Please provide the following missing information before applying: {', '.join(missing_items)}"
-        else:
-            message = f"Please provide your {missing_items[0]} before applying."
-        
-        messages.error(request, message)
-        return redirect(redirect_url)
+    # Only check if resume is uploaded (other documents are optional)
+    if not student.resume:
+        messages.error(request, "Please upload your resume before applying for jobs.")
+        return redirect('upload_resume')
     
     # Check if the student has companies_left
     if student.no_of_companies_left <= 0:
@@ -531,21 +663,27 @@ def check_eligibility(student, job):
     if student.bypass_eligibility:
         return True, "You are eligible for this job"
     
-    # Check CGPA
-    if job.cgpa_criteria and student.cgpa and student.cgpa < job.cgpa_criteria:
-        return False, f"Your CGPA ({student.cgpa}) is lower than the required CGPA ({job.cgpa_criteria})"
+    # Handle missing fields gracefully - if a field is missing, we don't check that criterion
     
-    # Check 10th percentage
-    if job.tenth_percentage and student.tenth and student.tenth < job.tenth_percentage:
-        return False, f"Your 10th percentage ({student.tenth}%) is lower than the required percentage ({job.tenth_percentage}%)"
+    # Check CGPA only if both job criteria and student CGPA are present
+    if job.cgpa_criteria is not None and student.cgpa is not None:
+        if student.cgpa < job.cgpa_criteria:
+            return False, f"Your CGPA ({student.cgpa}) is lower than the required CGPA ({job.cgpa_criteria})"
     
-    # Check 12th percentage
-    if job.twelfth_percentage and student.twelfth and student.twelfth < job.twelfth_percentage:
-        return False, f"Your 12th percentage ({student.twelfth}%) is lower than the required percentage ({job.twelfth_percentage}%)"
+    # Check 10th percentage only if both job criteria and student percentage are present
+    if job.tenth_percentage is not None and student.tenth is not None:
+        if student.tenth < job.tenth_percentage:
+            return False, f"Your 10th percentage ({student.tenth}%) is lower than the required percentage ({job.tenth_percentage}%)"
     
-    # Check backlog
-    if student.backlog and student.backlog > 0 and not job.is_backlog_allowed:
-        return False, "This job does not allow students with backlogs"
+    # Check 12th percentage only if both job criteria and student percentage are present
+    if job.twelfth_percentage is not None and student.twelfth is not None:
+        if student.twelfth < job.twelfth_percentage:
+            return False, f"Your 12th percentage ({student.twelfth}%) is lower than the required percentage ({job.twelfth_percentage}%)"
+    
+    # Check backlog only if student backlog info is present
+    if student.backlog is not None:
+        if student.backlog > 0 and not job.is_backlog_allowed:
+            return False, "This job does not allow students with backlogs"
     
     # If we get here, the student is eligible
     return True, "You are eligible for this job"
@@ -557,44 +695,36 @@ def check_profile_completeness(student):
     """
     missing_items = []
     
-    # Check basic profile info
+    # Check for resume (only mandatory document)
+    if student.resume is None or not student.resume:
+        return False, ["Resume"], 'upload_resume'
+    
+    # Make basic profile info optional
+    optional_missing = []
+    
+    # These fields are now optional but we'll track them for informational purposes
     if student.tenth is None:
-        missing_items.append("10th percentage")
+        optional_missing.append("10th percentage")
     if student.twelfth is None:
-        missing_items.append("12th percentage")
+        optional_missing.append("12th percentage")
     if student.cgpa is None:
-        missing_items.append("CGPA")
+        optional_missing.append("CGPA")
     if student.gender is None:
-        missing_items.append("Gender")
+        optional_missing.append("Gender")
     if student.course is None:
-        missing_items.append("Course")
+        optional_missing.append("Course")
     if student.year is None:
-        missing_items.append("Year")
-        
-    # If basic profile info is missing, redirect to edit profile
-    if missing_items:
-        return False, missing_items, 'edit_profile'
+        optional_missing.append("Year")
     
-    # Check for documents
-    missing_docs = []
-    if student.resume is None:
-        missing_docs.append("Resume")
-    if student.tenth_marksheet is None:
-        missing_docs.append("10th Marksheet")
-    if student.twelfth_marksheet is None:
-        missing_docs.append("12th Marksheet")
-    if student.college_profile_print is None:
-        missing_docs.append("College Profile Print")
+    # Log optional missing items but don't prevent application
+    if optional_missing:
+        print(f"Student {student.id} is missing optional profile fields: {', '.join(optional_missing)}")
     
-    # If documents are missing, redirect to upload_resume
-    if missing_docs:
-        return False, missing_docs, 'upload_resume'
+    # Other documents are optional, so we don't check for them here
     
-    # Check profile picture
-    if not student.profile_pic or str(student.profile_pic).endswith('default.jpg'):
-        return False, ["Profile Picture"], 'edit_profile'
+    # Profile picture is optional, so we don't require it
     
-    # All checks passed
+    # All mandatory checks passed
     return True, [], None
 
 # ================================== WITHDRAW APPLICATION BY ID ===========================================

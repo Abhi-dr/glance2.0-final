@@ -51,6 +51,73 @@
     }
   }
 
+  /* Mobile-specific styles for file inputs */
+  @media (max-width: 768px) {
+    input[type="file"] {
+      font-size: 14px;
+      padding: 8px;
+      width: 100%;
+    }
+    
+    .file-requirements {
+      font-size: 12px;
+      line-height: 1.3;
+    }
+    
+    /* Make file inputs more touch-friendly */
+    .input-container input[type="file"] {
+      padding: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      height: auto;
+      min-height: 44px; /* Minimum touch target size */
+    }
+    
+    /* Fix for iOS Safari file input issues */
+    input[type="file"]::-webkit-file-upload-button {
+      padding: 8px 12px;
+      height: auto;
+      font-size: 14px;
+      margin-right: 8px;
+      border-radius: 4px;
+      background: rgba(33, 150, 243, 0.9);
+    }
+    
+    /* Fix for older Android browsers */
+    input[type="file"]::-ms-browse {
+      padding: 8px 12px;
+      height: auto;
+      font-size: 14px;
+      margin-right: 8px;
+      border-radius: 4px;
+      background: rgba(33, 150, 243, 0.9);
+    }
+    
+    /* Required badge styling */
+    .required-badge {
+      background-color: #dc3545;
+      color: white;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      margin-left: 8px;
+    }
+    
+    /* Make form elements larger for better touch targets */
+    .form-control, .btn {
+      min-height: 44px;
+    }
+    
+    /* Improve visibility of validation messages */
+    .validation-message {
+      font-size: 14px;
+      padding: 8px;
+      margin-top: 5px;
+      border-radius: 4px;
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+  }
+
   /* Header styles */
   .register-header {
     text-align: center;
@@ -253,6 +320,8 @@
     border: 1px solid rgba(255, 255, 255, 0.2);
     width: 100%;
     cursor: pointer;
+    max-width: 100%;
+    box-sizing: border-box;
   }
 
   input[type="file"]::-webkit-file-upload-button {
@@ -268,6 +337,17 @@
 
   input[type="file"]::-webkit-file-upload-button:hover {
     background: rgba(33, 150, 243, 1);
+  }
+  
+  /* Firefox file input styling */
+  input[type="file"]::-moz-file-upload-button {
+    background: rgba(33, 150, 243, 0.8);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    margin-right: 1rem;
+    border-radius: 4px;
+    cursor: pointer;
   }
 
   .file-requirements {
@@ -285,8 +365,8 @@
 
     input[type="file"]::-webkit-file-upload-button {
       padding: 0.4rem 0.8rem;
-      margin-right: 0.5rem;
       font-size: 0.8rem;
+      margin-right: 0.5rem;
     }
 
     .file-requirements {
@@ -632,16 +712,28 @@
         </div>
       </div>
 
-      <!-- Profile Photo Upload Field -->
-      <!-- <div class="form-group">
-        <label for="profile_pic">Profile Photo</label>
+      <!-- Resume Upload Field (Mandatory) -->
+      <div class="form-group">
+        <label for="resume">Resume <span class="required-badge">Required</span></label>
         <div class="input-container">
-          <input type="file" id="profile_pic" name="profile_pic" accept="image/*" required />
+          <input type="file" id="resume" name="resume" accept=".pdf" required />
           <div class="validation-icon"></div>
-          <div class="validation-message">Please upload a profile photo</div>
+          <div class="validation-message"></div>
+        </div>
+        <p class="file-requirements">PDF only, max 5MB</p>
+      </div>
+      
+      <!-- Profile Photo Upload Field (Optional) -->
+      <div class="form-group">
+        <label for="profile_pic">Profile Photo <small>(Optional)</small></label>
+        <div class="input-container">
+          <input type="file" id="profile_pic" name="profile_pic" accept="image/*" />
+          <div class="validation-icon"></div>
+          <div class="validation-message">Please upload a valid image file</div>
         </div>
         <p class="file-requirements">Upload a clear photo of yourself (JPEG, PNG, up to 2MB)</p>
-      </div> -->
+      </div>
+
       <div class="form-group terms-checkbox">
         <div class="checkbox-container">
           <input type="checkbox" id="terms" name="terms" required />
@@ -706,14 +798,14 @@
       password,
       confirmPassword
     ];
-    
+
     // Basic real-time validation
     inputs.forEach((input) => {
       input.addEventListener("input", function () {
         validateInput(this);
       });
     });
-    
+
     // Simple validation function
     function validateInput(input) {
       const container = input.parentElement;
@@ -751,7 +843,7 @@
       clearTimeout(emailTimeout);
       const container = this.parentElement;
       const validationMessage = container.querySelector('.validation-message');
-      
+
       if (this.value) {
         // Check for valid domain (@gmail.com or @gla.ac.in)
         if (!this.checkValidity()) {
@@ -789,13 +881,13 @@
         validationMessage.style.display = 'none';
       }
     });
-    
+
     // Mobile validation
     mobileInput.addEventListener('input', function () {
       clearTimeout(mobileTimeout);
       const container = this.parentElement;
       const validationMessage = container.querySelector('.validation-message');
-      
+
       if (this.value) {
         // Check for valid mobile number format
         if (!this.checkValidity()) {
@@ -835,51 +927,227 @@
     });
 
     // Profile photo validation on change
-    /* profilePicInput.addEventListener('change', function () {
-      const container = this.parentElement;
-      const validationMessage = container.querySelector('.validation-message');
+    const profilePicInput = document.getElementById('profile_pic');
+    const resumeInput = document.getElementById('resume');
 
-      if (this.files && this.files.length > 0) {
-        const file = this.files[0];
-        const fileSize = file.size / 1024 / 1024; // in MB
-        const fileType = file.type;
+    // Comprehensive device detection and fixes for file inputs
+    function enhanceFileInputsForAllDevices() {
+      // Get all file inputs
+      const fileInputs = document.querySelectorAll('input[type="file"]');
+      
+      // Detect device type
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+      const isOldAndroid = /Android\s[23]/.test(navigator.userAgent);
+      const isWindowsPhone = /Windows Phone/.test(navigator.userAgent);
+      const isMobile = isIOS || /Android/.test(navigator.userAgent) || isWindowsPhone;
+      
+      // Apply appropriate fixes based on device
+      fileInputs.forEach(input => {
+        // Add data attribute for debugging
+        input.setAttribute('data-device-type', 
+          isIOS ? 'ios' : (isOldAndroid ? 'old-android' : (isMobile ? 'mobile' : 'desktop')));
+        
+        // iOS specific fixes
+        if (isIOS) {
+          // Remove accept attribute which can cause issues on some iOS versions
+          const acceptValue = input.getAttribute('accept');
+          input.setAttribute('data-original-accept', acceptValue);
+          
+          // For iOS 13+ we keep the accept attribute but add capture
+          if (parseInt((navigator.appVersion).match(/OS (\d+)_(\d+)_?(\d+)?/)[1], 10) >= 13) {
+            input.setAttribute('capture', 'camera');
+          } else {
+            // For older iOS we remove accept which can be problematic
+            input.removeAttribute('accept');
+          }
+          
+          // Prevent zoom issues on focus
+          input.addEventListener('touchstart', function(e) {
+            // Only prevent default if it's not the actual input
+            if (e.target !== this) {
+              e.preventDefault();
+            }
+            // Trigger click after a small delay
+            setTimeout(() => {
+              this.click();
+            }, 100);
+          });
+          
+          // Add click handler to parent container for better touch area
+          const container = input.closest('.input-container');
+          if (container) {
+            container.style.cursor = 'pointer';
+            container.addEventListener('click', function(e) {
+              // Only trigger if the click wasn't directly on the input
+              if (e.target !== input) {
+                input.click();
+              }
+            });
+          }
+        }
+        
+        // Old Android fixes
+        if (isOldAndroid) {
+          // Simplify file input for older Android browsers
+          input.style.padding = '12px';
+          input.style.fontSize = '16px';
+          
+          // Make the clickable area larger
+          const container = input.closest('.input-container');
+          if (container) {
+            container.style.cursor = 'pointer';
+            container.addEventListener('click', function(e) {
+              if (e.target !== input) {
+                input.click();
+              }
+            });
+          }
+        }
+        
+        // General mobile improvements
+        if (isMobile) {
+          // Ensure proper sizing and visibility
+          input.style.opacity = '1';
+          input.style.height = 'auto';
+          input.style.minHeight = '44px';
+          
+          // Add touch feedback
+          input.addEventListener('touchstart', function() {
+            this.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+          });
+          
+          input.addEventListener('touchend', function() {
+            this.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+          });
+        }
+      });
+      
+      // Add a hidden field to track device info for server-side handling
+      const form = document.querySelector('form');
+      if (form) {
+        const deviceInfoInput = document.createElement('input');
+        deviceInfoInput.type = 'hidden';
+        deviceInfoInput.name = 'device_info';
+        deviceInfoInput.value = navigator.userAgent;
+        form.appendChild(deviceInfoInput);
+      }
+    }
+    
+    // Call the device enhancement function on page load
+    document.addEventListener('DOMContentLoaded', enhanceFileInputsForAllDevices);
+    
+    // Resume validation - required and must be PDF
+    if (resumeInput) {
+      resumeInput.addEventListener('change', function() {
+        const container = this.parentElement;
+        const validationMessage = container.querySelector('.validation-message');
+        
+        try {
+          if (this.files && this.files.length > 0) {
+            const file = this.files[0];
+            const fileSize = file.size / 1024 / 1024; // Convert to MB
+            const fileType = file.type;
+            const fileName = file.name.toLowerCase();
+            
+            // Check file type
+            if (fileType !== 'application/pdf' && !fileName.endsWith('.pdf')) {
+              container.classList.add('invalid');
+              validationMessage.textContent = 'Please upload a PDF file';
+              validationMessage.style.display = 'block';
+              this.value = ''; // Clear the file input
+              return;
+            }
+            
+            // Check file size (max 5MB)
+            if (fileSize > 5) {
+              container.classList.add('invalid');
+              validationMessage.textContent = 'File size exceeds 5MB limit';
+              validationMessage.style.display = 'block';
+              this.value = ''; // Clear the file input
+              return;
+            }
+            
+            container.classList.remove('invalid');
+            container.classList.add('valid');
+            validationMessage.style.display = 'none';
+          } else {
+            container.classList.add('invalid');
+            validationMessage.textContent = 'Resume is required';
+            validationMessage.style.display = 'block';
+          }
+        } catch (error) {
+          console.error('Error validating resume:', error);
+          // Fallback to basic validation if error occurs
+          if (!this.value) {
+            container.classList.add('invalid');
+            validationMessage.textContent = 'Resume is required';
+            validationMessage.style.display = 'block';
+          } else {
+            container.classList.remove('invalid');
+            container.classList.add('valid');
+            validationMessage.style.display = 'none';
+          }
+        }
+      });
+    }
 
-        if (fileType.startsWith('image/') && fileSize <= 2) {
-          container.classList.add('valid');
+    // Profile pic validation (optional)
+    if (profilePicInput) {
+      profilePicInput.addEventListener('change', function () {
+        const container = this.parentElement;
+        const validationMessage = container.querySelector('.validation-message');
+
+        try {
+          if (this.files && this.files.length > 0) {
+            const file = this.files[0];
+            const fileSize = file.size / 1024 / 1024; // in MB
+            const fileType = file.type;
+
+            if (fileType.startsWith('image/') && fileSize <= 2) {
+              container.classList.add('valid');
+              container.classList.remove('invalid');
+              validationMessage.style.display = 'none';
+            } else {
+              container.classList.add('invalid');
+              container.classList.remove('valid');
+
+              if (!fileType.startsWith('image/')) {
+                validationMessage.textContent = "Please upload a valid image file (JPEG, PNG, etc.)";
+                validationMessage.style.display = 'block';
+
+                // For desktop, also show alert for better visibility
+                if (window.innerWidth > 480) {
+                  alert("Please upload a valid image file (JPEG, PNG, etc.)");
+                }
+              } else if (fileSize > 2) {
+                validationMessage.textContent = "Profile photo must be less than 2MB in size";
+                validationMessage.style.display = 'block';
+
+                // For desktop, also show alert for better visibility
+                if (window.innerWidth > 480) {
+                  alert("Profile photo must be less than 2MB in size");
+                }
+              }
+
+              // Reset the input
+              this.value = '';
+            }
+          } else {
+            // Profile pic is optional, so no validation needed if empty
+            container.classList.remove('valid');
+            container.classList.remove('invalid');
+            validationMessage.style.display = 'none';
+          }
+        } catch (error) {
+          console.error('Error validating profile picture:', error);
+          // Since profile pic is optional, just remove validation if there's an error
+          container.classList.remove('valid');
           container.classList.remove('invalid');
           validationMessage.style.display = 'none';
-      } else {
-          container.classList.add('invalid');
-          container.classList.remove('valid');
-
-          if (!fileType.startsWith('image/')) {
-            validationMessage.textContent = "Please upload a valid image file (JPEG, PNG, etc.)";
-            validationMessage.style.display = 'block';
-
-            // For desktop, also show alert for better visibility
-            if (window.innerWidth > 480) {
-              alert("Please upload a valid image file (JPEG, PNG, etc.)");
-            }
-          } else if (fileSize > 2) {
-            validationMessage.textContent = "Profile photo must be less than 2MB in size";
-            validationMessage.style.display = 'block';
-
-            // For desktop, also show alert for better visibility
-            if (window.innerWidth > 480) {
-              alert("Profile photo must be less than 2MB in size");
-            }
-          }
-
-          // Reset the input
-          this.value = '';
         }
-      } else {
-        container.classList.remove('valid');
-        container.classList.remove('invalid');
-        validationMessage.style.display = 'none';
-      }
-    }); */
-    
+      });
+    }
+
     // Password requirements validation
     password.addEventListener("input", function () {
       const val = this.value;
@@ -928,18 +1196,18 @@
           container.classList.remove("invalid");
         }
       }
-      
+
       // Also validate confirm password if it has a value
       if (confirmPassword.value) {
         validatePasswordMatch();
       }
     });
-    
+
     // Password matching validation
     function validatePasswordMatch() {
       const container = confirmPassword.parentElement;
       const validationMessage = container.querySelector('.validation-message');
-      
+
       if (confirmPassword.value === "") {
         container.classList.remove("valid", "invalid");
         validationMessage.style.display = 'none';
@@ -953,14 +1221,77 @@
         validationMessage.style.display = 'none';
       }
     }
-    
+
     confirmPassword.addEventListener("input", validatePasswordMatch);
-    
+
+    // Validate resume on form submission
+    function validateResume() {
+      if (resumeInput) {
+        const container = resumeInput.parentElement;
+        const validationMessage = container.querySelector('.validation-message');
+        
+        try {
+          if (!resumeInput.files || resumeInput.files.length === 0) {
+            container.classList.add('invalid');
+            validationMessage.textContent = 'Resume is required';
+            validationMessage.style.display = 'block';
+            
+            // Scroll to the resume input for better visibility
+            resumeInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return false;
+          }
+          
+          // Additional validation for file type and size
+          const file = resumeInput.files[0];
+          const fileSize = file.size / 1024 / 1024; // Convert to MB
+          const fileType = file.type;
+          const fileName = file.name.toLowerCase();
+          
+          // Check file type
+          if (fileType !== 'application/pdf' && !fileName.endsWith('.pdf')) {
+            container.classList.add('invalid');
+            validationMessage.textContent = 'Please upload a PDF file';
+            validationMessage.style.display = 'block';
+            resumeInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return false;
+          }
+          
+          // Check file size (max 5MB)
+          if (fileSize > 5) {
+            container.classList.add('invalid');
+            validationMessage.textContent = 'File size exceeds 5MB limit';
+            validationMessage.style.display = 'block';
+            resumeInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return false;
+          }
+        } catch (error) {
+          console.error('Error in validateResume:', error);
+          // Fallback validation if error occurs
+          if (!resumeInput.value) {
+            container.classList.add('invalid');
+            validationMessage.textContent = 'Resume is required';
+            validationMessage.style.display = 'block';
+            return false;
+          }
+        }
+      }
+      return true;
+    }
+
     // Handle form submission
     form.addEventListener("submit", function (e) {
+      // Validate resume first (it's mandatory)
+      if (!validateResume()) {
+        e.preventDefault();
+        // Show a clear message about the resume requirement
+        if (window.innerWidth > 480) {
+          alert("Please upload your resume in PDF format (max 5MB). This is required to complete your registration.");
+        }
+        return false;
+      }
       let hasError = false;
       let errorMessages = [];
-      
+
       // Validate all inputs
       inputs.forEach((input) => {
         if (!input.checkValidity() || input.value.trim() === "") {
