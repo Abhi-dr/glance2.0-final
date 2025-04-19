@@ -391,39 +391,37 @@ def add_notification(request):
 @login_required(login_url='login')
 @admin_required
 def all_students(request):
-        
-    user = User.objects.get(id = request.user.id)
-    students = Student.objects.all()
+    user = User.objects.get(id=request.user.id)
     
-    # Debug: Print all students for troubleshooting
-    print(f"============ ALL STUDENTS ============")
-    print(f"Found {students.count()} students.")
-    for student in students:
-        print(f"Student ID: {student.id}, Name: {student.first_name} {student.last_name}, Email: {student.email}")
-    print("====================================")
+    # Use select_related and prefetch_related to reduce database queries
+    students_query = Student.objects.select_related('user').prefetch_related('application_set')
     
-    # sort the students based on the number of jobs they have applied for
-    students = sorted(students, key=lambda x: x.application_set.count(), reverse=True)
+    # Get query parameter from both GET and POST for flexibility
+    query = request.POST.get("query") or request.GET.get("query")
     
-    query = request.POST.get("query")
+    # Apply database-level filtering if there's a query
     if query:
-        filtered_students = []
-        for student in students:
-            if (query.lower() in student.first_name.lower() or 
-                query.lower() in student.last_name.lower() or 
-                (student.email and query.lower() in student.email.lower()) or 
-                (student.phone_number and query.lower() in student.phone_number) or 
-                (student.year and query.lower() in student.year.lower()) or 
-                (student.course and query.lower() in student.course.lower())):
-                filtered_students.append(student)
-        students = filtered_students
+        students_query = students_query.filter(
+            Q(first_name__icontains=query) |
+            Q(last_name__icontains=query) |
+            Q(username__icontains=query) |
+            Q(phone_number__icontains=query) |
+            Q(year__icontains=query) |
+            Q(course__icontains=query)
+        )
     
-    # Get the total count before pagination
-    total_count = len(students)
+    # Annotate with application count to enable sorting at the database level
+    students_query = students_query.annotate(application_count=Count('application'))
+    
+    # Sort by application count at the database level
+    students_query = students_query.order_by('-application_count')
+    
+    # Get the total count
+    total_count = students_query.count()
     
     # Pagination
     page = request.GET.get('page', 1)
-    paginator = Paginator(students, 20)  # Show 20 students per page
+    paginator = Paginator(students_query, 50)  # Show 50 students per page for faster loading
     
     try:
         paginated_students = paginator.page(page)

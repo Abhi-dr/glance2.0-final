@@ -400,16 +400,22 @@ def all_jobs(request):
     # Get today's date for comparison
     today = date.today()
     
-    # Get all jobs 
-    all_jobs_query = Job.objects.all().exclude(applications__student=student)
+    # Get all jobs - use distinct() to avoid duplicates
+    all_jobs_query = Job.objects.all().distinct()
     
-    # Apply filters
+    # Check if the student has already applied to any jobs
+    applied_jobs = Application.objects.filter(student=student).values_list('job_id', flat=True)
+    
+    # Apply filters - only if explicitly requested
     query = request.GET.get("query")
     job_type = request.GET.get("job_type")
     salary_min = request.GET.get("salary_min")
     location = request.GET.get("location")
     cgpa_max = request.GET.get("cgpa_max")
     show_expired = request.GET.get("show_expired") == "on"
+    
+    # Debug information
+    print(f"Total jobs before filtering: {all_jobs_query.count()}")
     
     # Filter by search query
     if query:
@@ -441,18 +447,31 @@ def all_jobs(request):
         except (ValueError, TypeError):
             pass  # Ignore invalid CGPA values
     
-    # Apply backlog restrictions
+    # Apply backlog restrictions only if student has backlogs
     if student.backlog and student.backlog > 0:
         all_jobs_query = all_jobs_query.exclude(is_backlog_allowed=False)
     
     # Separate active and expired jobs
     if not show_expired:
-        active_jobs = all_jobs_query.filter(deadline__gte=today).order_by('deadline')
+        # Only show active jobs if show_expired is not checked
+        active_jobs = all_jobs_query.filter(deadline__gte=today).order_by('company__name', 'title')
         jobs_list = list(active_jobs)
     else:
-        active_jobs = all_jobs_query.filter(deadline__gte=today).order_by('deadline')
-        expired_jobs = all_jobs_query.filter(deadline__lt=today).order_by('-deadline')
+        # Show both active and expired jobs
+        active_jobs = all_jobs_query.filter(deadline__gte=today).order_by('company__name', 'title')
+        expired_jobs = all_jobs_query.filter(deadline__lt=today).order_by('company__name', 'title')
         jobs_list = list(active_jobs) + list(expired_jobs)
+    
+    # Mark which jobs the student has already applied to
+    for job in jobs_list:
+        job.has_applied = job.id in applied_jobs
+        # Explicitly mark expired jobs for template rendering
+        job.is_expired = job.deadline < today
+    
+    # Debug information
+    print(f"Total jobs after filtering: {len(jobs_list)}")
+    print(f"Active jobs: {len([j for j in jobs_list if not j.is_expired])}")
+    print(f"Expired jobs: {len([j for j in jobs_list if j.is_expired])}")
     
     # Get unique job types for filter dropdown
     job_types = Job.objects.values_list('job_type', flat=True).distinct()
@@ -472,7 +491,8 @@ def all_jobs(request):
         "job_types": job_types,
         "locations": locations,
         "today_date": today,
-        "total_jobs": len(jobs_list)
+        "total_jobs": len(jobs_list),
+        "all_jobs_count": Job.objects.count()  # Add total count for debugging
     }
     
     return render(request, 'student/all_jobs.html', parameters)

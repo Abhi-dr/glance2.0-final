@@ -147,7 +147,7 @@ Student -> All Jobs
     <div class="card-body">
       <h5 class="card-title fw-semibold mb-3">Lots of Opportunities!</h5>
       <p class="mb-0">The Place Where You Unlock Your Potential🔥!</p>
-      <p class="mt-2 text-primary">Showing {{ total_jobs }} jobs that match your criteria</p>
+      <p class="mt-2 text-primary">Showing {{ total_jobs }} jobs out of {{ all_jobs_count }} total jobs</p>
     </div>
   </div>
 
@@ -239,10 +239,15 @@ Student -> All Jobs
   <div class="row g-4">
     {% for job in jobs %}
     <div class="col-sm-6 col-md-4 col-xl-3">
-      <div class="card h-100 overflow-hidden rounded-2 {% if job.deadline < today_date %}card-expired{% endif %}">
+      <div class="card h-100 overflow-hidden rounded-2 {% if job.is_expired %}card-expired{% endif %} {% if job.has_applied %}border border-success{% endif %}">
         <div class="position-relative text-center p-3 bg-dark">
-          {% if job.deadline < today_date %}
+          {% if job.is_expired %}
           <div class="expired-badge">EXPIRED</div>
+          {% endif %}
+          {% if job.has_applied %}
+          <div class="position-absolute top-0 end-0 m-2">
+            <span class="badge bg-success">Applied</span>
+          </div>
           {% endif %}
           <a href="{% url 'student_job_details' job.slug %}">
             {% if job.company.logo %}
@@ -269,7 +274,7 @@ Student -> All Jobs
             </span>
             <span class="badge bg-danger text-white me-1">{{ job.job_type|title|truncatechars:10 }}</span>
             <span class="badge bg-primary text-white">{{ job.location_flexibility|title|truncatechars:10 }}</span>
-            {% if job.deadline < today_date %}
+            {% if job.is_expired %}
             <span class="badge bg-warning text-dark mt-1">Deadline Passed</span>
             {% endif %}
           </div>
