@@ -856,15 +856,56 @@ $(document).ready(function() {
 
     // Function to create export URL with filter parameters
     function createFilteredExportUrl(format) {
-        const filters = getCurrentFilters();
+        // Start with the base URL
         let url = '/administration/export_filtered_students?format=' + format;
         
-        // Add filter parameters to URL
+        // Get form data to capture all inputs including checkboxes
+        const formData = new FormData(document.getElementById('filterForm'));
+        
+        // Get selected courses (checkboxes)
+        const selectedCourses = [];
+        $('.course-checkbox:checked').each(function() {
+            selectedCourses.push($(this).val());
+        });
+        
+        // Get selected companies (checkboxes)
+        const selectedCompanies = [];
+        $('.company-checkbox:checked').each(function() {
+            selectedCompanies.push($(this).val());
+        });
+        
+        // Get selected jobs (checkboxes)
+        const selectedJobs = [];
+        $('.job-checkbox:checked').each(function() {
+            selectedJobs.push($(this).val());
+        });
+        
+        // Add basic filters
+        const filters = getCurrentFilters();
         Object.keys(filters).forEach(key => {
             if (filters[key]) {
                 url += '&' + key + '=' + encodeURIComponent(filters[key]);
             }
         });
+        
+        // Add multiple selection filters
+        if (selectedCourses.length > 0) {
+            selectedCourses.forEach(course => {
+                url += '&course[]=' + encodeURIComponent(course);
+            });
+        }
+        
+        if (selectedCompanies.length > 0) {
+            selectedCompanies.forEach(company => {
+                url += '&companies[]=' + encodeURIComponent(company);
+            });
+        }
+        
+        if (selectedJobs.length > 0) {
+            selectedJobs.forEach(job => {
+                url += '&jobs[]=' + encodeURIComponent(job);
+            });
+        }
         
         console.log("Export URL:", url);
         return url;

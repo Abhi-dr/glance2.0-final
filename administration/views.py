@@ -393,8 +393,9 @@ def add_notification(request):
 def all_students(request):
     user = User.objects.get(id=request.user.id)
     
-    # Use select_related and prefetch_related to reduce database queries
-    students_query = Student.objects.select_related('user').prefetch_related('application_set')
+    # Use prefetch_related to reduce database queries
+    # Note: Student inherits from User, so we don't need select_related('user')
+    students_query = Student.objects.prefetch_related('application_set')
     
     # Get query parameter from both GET and POST for flexibility
     query = request.POST.get("query") or request.GET.get("query")
